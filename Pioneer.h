@@ -7,4 +7,6 @@
  */
 
 /* Function Prototypes: */
-public double movePioneer(double currentX, double currentY, double targetX, double targetY);
+public:
+	double movePioneer(double distance, double currentX, double currentY, double targetX, double targetY);
+	double mapYaw(double current_yaw);

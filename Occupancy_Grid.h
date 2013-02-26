@@ -14,15 +14,22 @@
 
 /* Occupancy_Grid class definition */
 public class Occupancy_Grid {
-	private int** grid;
-	private int columnLength;
-	private int rowHeight;
-
-	/* Member Function Prototypes: */
-	public Occupancy_Grid();
-	public void resizeGrid(int directionToExpand);
-	public void shiftValuesDown();
-	public void shiftValuesRight();
-	public void printGrid();
-
+	private:
+		int** grid;
+		int columnLength;
+		int rowHeight;
+		int robotX;
+		int robotY;
+	
+	public:
+		/* Member Function Prototypes: */
+		Occupancy_Grid();
+		void resizeGrid(int directionToExpand);
+		void shiftValuesDown();
+		void shiftValuesRight();
+		void printGrid();
+		void gridUpdate(int direction);
+		void mapRobotLocation(int direction);
+		int getRobotY();
+		int getRobotX();
 }

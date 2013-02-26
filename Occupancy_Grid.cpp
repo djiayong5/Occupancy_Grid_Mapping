@@ -6,7 +6,11 @@
  * Last Modified: 25/02/2013
  */	
 
+#include "Occupancy_Grid.h"
+
 public Occupancy_Grid::Occupancy_Grid() {
+	robotX = 0;
+	robotY = 0;
 	grid = calloc(grid, sizeof(int*) * 3); /* Allocates memory for 3 columns of the grid and sets values to 0. */
 	
 	for(counter = 0; counter<columnLength; counter++) {
@@ -63,7 +67,7 @@ public void Occupancy_Grid::shiftValuesRight() {
 	}
 }
 
-public void printGrid() {
+public void Occupancy_Grid::printGrid() {
 	int columnCounter = 0;
 	int rowCounter = 0;
 
@@ -72,4 +76,42 @@ public void printGrid() {
 			cout << grid[columnCounter][rowCounter];
 		}
 	}
+}
+
+public void Occupancy_Grid::gridUpdate(int direction) {
+	if (direction == UP) {
+		grid[getRobotX()][getRobotY() + 1]++;
+	}
+	else if (direction == DOWN) {
+		grid[getRobotX()][getRobotY() - 1]++;
+	}
+	else if (direction == LEFT) {
+		grid[getRobotX() - 1][getRobotY()]++;
+	}
+	else if (direction == RIGHT) {
+		grid[getRobotX() + 1][getRobotY()]++;
+	}
+}
+
+public void Occupancy_Grid::mapRobotLocation(int direction) {
+	if (direction == UP) {
+		robotY++; 
+	}
+	else if (direction == DOWN) {
+		robotY--;
+	}
+	else if (direction == LEFT) {
+		robotX--;
+	}
+	else if (direction == RIGHT) {
+		robotX++;
+	}
+}
+
+public int Occupancy_Grid::getRobotY() {
+	return robotY;
+}
+
+public int Occupancy_Grid::getRobotX() {
+	return robotX;
 }
