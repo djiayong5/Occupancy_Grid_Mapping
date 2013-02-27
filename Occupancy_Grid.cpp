@@ -25,12 +25,6 @@ Occupancy_Grid::Occupancy_Grid() {
     for (int counter = 0; counter < START_COLUMNS; counter++) {
         grid[counter].resize(START_ROWS);
     }
-    //grid = new int*[3];
-    /*grid = calloc(grid, sizeof (int*) * 3); /* Allocates memory for 3 columns of the grid and sets values to 0. */
-
-    /* for (counter = 0; counter < columnWidth; counter++) {
-        grid[counter] = calloc(grid[counter], sizeof (int) * 3); /* Allocates memory for 3 rows of the grid and sets values to 0. */
-    /*}*/
 }
 
 vector<vector<int> > Occupancy_Grid::getGrid() {
@@ -38,60 +32,42 @@ vector<vector<int> > Occupancy_Grid::getGrid() {
 }
 
 void Occupancy_Grid::shiftValuesDown() {
-    int columnCounter = 0;
-    int rowCounter;
-
-    for (columnCounter; columnCounter < columnWidth; columnCounter++) {
-        for (rowCounter = 1; rowCounter < rowHeight; rowCounter++) {
-            grid[columnCounter][rowCounter - 1] = grid[columnCounter][rowCounter]; /* Copies value to the cell below. */
-            //grid[columnCounter][rowCounter] = 0; /* Sets value of cell to 0. */
+    for (int rowCounter =  rowHeight - 1; rowCounter > 0; rowCounter--) {
+        for (int columnCounter = 0; columnCounter < columnWidth; columnCounter++) {
+            grid[rowCounter][columnCounter] = grid[rowCounter - 1][columnCounter]; /* Copies value to the cell below. */
+            grid[rowCounter - 1][columnCounter] = 0; /* Sets value of cell to 0. */
         }
     }
 }
 
-void Occupancy_Grid::shiftValuesRight() {
-    int columnCounter;
-    int rowCounter = 0;
-
-    for (columnCounter = columnWidth - 1; columnCounter >= 0; columnCounter--) {
-        for (rowCounter; rowCounter < rowHeight; rowCounter++) {
-            grid[columnCounter + 1][rowCounter] = grid[columnCounter][rowCounter]; /* Copies values to the cell to the right. */
-            //grid[columnCounter][rowCounter] = 0; /* Sets value of cell to 0. */
+void Occupancy_Grid::shiftValuesRight() {    
+    for (int rowCounter = 0; rowCounter < rowHeight; rowCounter++) {
+        for (int columnCounter = 1; columnCounter < columnWidth; columnCounter++) {
+            grid[rowCounter][columnCounter - 1] = grid[rowCounter][columnCounter]; /* Copies value to the cell to the right. */
+            grid[rowCounter][columnCounter] = 0; /* Sets value of cell to 0. */
         }
     }
 }
 
 void Occupancy_Grid::resizeGrid(int directionToExpand) {
-    if (directionToExpand == UP || directionToExpand == DOWN) {
-        rowHeight++;
-        grid.resize(rowHeight);
-        //grid = realloc(grid, sizeof (int*) * rowHeight); /* Increases grid's row height by 1, allocating memory for it. */
+    if (directionToExpand == UP || directionToExpand == DOWN) rowHeight++;
+    else if (directionToExpand == LEFT || directionToExpand == RIGHT) columnWidth++;
 
-        for (int counter = 0; counter < columnWidth; counter++) {
-            grid[counter][rowHeight - 1] = 0; /* Set values of new cells to 0. */
-        }
+    grid.resize(rowHeight);
 
-        if (directionToExpand == DOWN) shiftValuesDown();
-    } else if (directionToExpand == LEFT || directionToExpand == RIGHT) {
-        columnWidth++;
-        grid.resize(columnWidth);
-        //grid = realloc(grid, sizeof (int*) * columnWidth); /* Increases grid's column length by 1, allocating memory for it. */
+    for (int rowCounter = 0; rowCounter < rowHeight; rowCounter++) grid[rowCounter].resize(columnWidth);
 
-        for (int counter = 0; counter < rowHeight; counter++) {
-            grid[columnWidth - 1][counter] = 0; /* Set values of new cells to 0. */
-        }
-
-        if (directionToExpand == LEFT) shiftValuesRight();
-    }
+    if (directionToExpand == UP) shiftValuesDown();
+    else if (directionToExpand == LEFT) shiftValuesRight();
 }
 
 void Occupancy_Grid::printGrid() {
-    cout << "Number of columns: " << columnWidth << endl;
     cout << "Number of rows: " << rowHeight << endl;
+    cout << "Number of columns: " << columnWidth << endl;
 
-    for (int columnCounter = 0; columnCounter < columnWidth; columnCounter++) {
-        for (int rowCounter = 0; rowCounter < rowHeight; rowCounter++) {
-            cout << grid[columnCounter][rowCounter];
+    for (int rowCounter = 0; rowCounter < rowHeight; rowCounter++) {
+        for (int columnCounter = 0; columnCounter < columnWidth; columnCounter++) {
+            cout << grid[rowCounter][columnCounter];
         }
         cout << endl;
     }
