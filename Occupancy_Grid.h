@@ -13,10 +13,14 @@
 #include <cstdlib>
 #include <vector>
 
+#ifndef DIRECTIONS
+#define DIRECTIONS
 #define UP 0
-#define DOWN 1
-#define LEFT 2
-#define RIGHT 3
+#define DOWN 180
+#define LEFT 90
+#define RIGHT 360
+#endif
+
 #define START_COLUMNS 3
 #define START_ROWS 3
 
@@ -30,6 +34,14 @@ private:
     int rowHeight;
     int robotX;
     int robotY;
+    void incrementCellUp();
+    void incrementCellDown();
+    void incrementCellLeft();
+    void incrementCellRight();
+    void decrementCellUp();
+    void decrementCellDown();
+    void decrementCellLeft();
+    void decrementCellRight();
 
 public:
     /* Member Function Prototypes: */
@@ -41,5 +53,6 @@ public:
     void printGrid();
     void gridUpdate(int direction);
     void mapRobotLocation(int direction);
+    void evaluateSonarReading(double sonarReading, int sonarFacing);
 };
 #endif

@@ -27,72 +27,99 @@
  *                                           */
 
 #include <iostream>
-#include <libplayerc++/playerc++.h>
+#include </src/player-3.0.2/client_libs/libplayerc++/playerc++.h>
 
 #define PGAIN 0.5
 
 //void spinOnTheSpot();
 //double calculateSpeed(Position2dProxy pp, double target_x_coord, double target_y_coord);
 
-int main(int argc, char *argv[])
-{
-	using namespace PlayerCc;
+int main(int argc, char *argv[]) {
+    using namespace PlayerCc;
 
-	PlayerClient    robot("lisa.islnet");
-	SonarProxy      sp(&robot,0);
-	Position2dProxy pp(&robot,0);
+    PlayerClient robot("lisa.islnet");
+    SonarProxy sp(&robot, 0);
+    Position2dProxy pp(&robot, 0);
+    double currentY, currentX, targetY, targetX; /* Fields to robot's current and target, x/y coordinates. */
+    
+    pp.SetMotorEnable(true);
 
-	pp.SetMotorEnable(true);
+    for (;;) {
+        double turnRate = 0.00;
+        double speed;
 
-	/*for(;;)
-	{
-		double turnrate, speed;
+        /* Read from proxies. */
+        robot.Read();
+        
+        /* Get robot's curent x and y coordinates. */
+        currentY = pp.GetYPos();
+        currentX = pp.GetXPos();
+        
+        /**/
+        //Print out sonar readings
+        std::cout << sp << std::endl;
 
-		//Read from the proxies
-		robot.Read();
+        //Do simple collision avoidance
+        if ((sp[0] + sp[1]) < (sp[6] + sp[7]))
+            turnRate = dtor(-20); //Turn 20 degrees per delta time
+        else
+            turnRate = dtor(20);
 
-		//Print out sonar readings
-		std::cout << sp << std::endl;
+        if (((sp[3] + sp[4]) / 2) < 0.600)
+            speed = 0.000;
+        else
+            speed = 0.050;
+        //Command the motors
+        pp.SetSpeed(speed, turnRate);
+    }
 
-		//Do simple collision avoidance
-		if((sp[0] + sp[1]) < (sp[6] + sp[7]))
-			turnrate = dtor(-20); //Turn 20 degrees per delta time
-		else
-			turnrate = dtor(20);
-
-		if(sp[3] < 0.500)
-			speed = 0;
-		else
-			speed = 0.100;
-
-		//Command the motors
-		pp.SetSpeed(speed, turnrate);
-
-	}*/
-	
-	robot.Read();
-	
-	for(;;){
-	  robot.Read();
-	  double yaw = rtod(pp.GetYaw());
-	  std::cout << yaw<< std::endl;
-	}
+    /*for (;;) {
+        robot.Read();
+        double currentYaw = rtod(pp.GetYaw());
+        std::cout << currentYaw << std::endl;
+    } */
 }
 
 /*void spinOnTheSpot() {
-	  for(;;){
-	pp.SetSpeed(0, 20);
-	}
+          for(;;){
+        pp.SetSpeed(0, 20);
+        }
 } */
 
-/*double calculateSpeed(Position2dProxy pp, double target_x_coord, double target_y_coord) {
-	double current_x_coord = pp.GetXPos();
-	double current_y_coord = pp.GetYPos();
-	double delta_x_change = target_x_coord - current_x_coord;
-	double delta_y_change = target_y_coord - current_y_coord;
-	double speed;
+/*double calculateSpeed(Position2dProxy pp, double targetY, double targetX) {
+        double currentX = pp.GetXPos();
+        double currentY = pp.GetYPos();
+        double yChange = targetY - currentY;
+        double xChange = targetX - currentX;
+        double speed;
 
-	delta_x_change = delta_x_change * delta_x_change;
-	delta_y_change = delta_y_change * delta_y_change;
-	return sqrt(delta_x_change + delta_y_change) * PGAIN;		
+        xChange = xChange * xChange;
+        yChange = yChange * yChange;
+        return sqrt(xChange + yChange) * PGAIN;		
 } */
+
+/*for(;;)
+        {
+                double turnrate, speed;
+
+                //Read from the proxies
+                robot.Read();
+
+                //Print out sonar readings
+                std::cout << sp << std::endl;
+
+                //Do simple collision avoidance
+                if((sp[0] + sp[1]) < (sp[6] + sp[7]))
+                        turnrate = dtor(-20); //Turn 20 degrees per delta time
+                else
+                        turnrate = dtor(20);
+
+                if(sp[3] < 0.500)
+                        speed = 0;
+                else
+                        speed = 0.100;
+
+                //Command the motors
+                pp.SetSpeed(speed, turnrate);
+
+        }*/

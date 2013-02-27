@@ -17,9 +17,11 @@ int main(int argc, char** argv) {
     oGrid->printGrid();
     oGrid->resizeGrid(RIGHT); /* Increase grid width by 1 to the 'RIGHT'. */
     oGrid->printGrid();
-    oGrid->resizeGrid(UP);
+    oGrid->resizeGrid(UP); /* Increase grid height by 1 to 'UP'. */
     oGrid->printGrid();
-    oGrid->resizeGrid(LEFT);
+    oGrid->resizeGrid(LEFT); /* Increase grid width by 1 to the 'LEFT'. */
+    oGrid->printGrid();
+    oGrid->resizeGrid(DOWN); /* Increase grid height by 1 to 'DOWN'. */
     oGrid->printGrid();
     return 0;
 }
