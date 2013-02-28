@@ -9,6 +9,7 @@
 #ifndef PIONEER_H
 #define PIONEER_H
 
+#include <libplayerc++/playerc++.h>
 #include <cstdio>
 #include <cstdlib>
 
@@ -22,8 +23,6 @@
 
 #define PGAIN 0.5
 #define NEXTSQUARE 0.6
-
-/* Function Prototypes: */
 
 class Pioneer {
 private:
@@ -43,12 +42,12 @@ private:
     int getRightSensorFacing();
     bool atTarget(double currentY, double currentX, double targetY, double targetX);
     int evaluateDirection(double currentYaw);
-    void setFrontSensorDirection(double currentDirection);
-    void setRearSensorDirection(double currentDirection);
-    void setLeftSensorDirection(double currentDirection);
-    void setRightSensorDirection(double currentDirection);
-    void reconfigureSensors(double currentDirection);
-    void surveyCycle(RangerProxy sp, double currentDirection);
+    void setFrontSensorDirection(int currentDirection);
+    void setRearSensorDirection(int currentDirection);
+    void setLeftSensorDirection(int currentDirection);
+    void setRightSensorDirection(int currentDirection);
+    void reconfigureSensors(int currentDirection);
+    void surveyCycle(RangerProxy sp, int currentDirection);
 public:
     void runPioneer();
 };

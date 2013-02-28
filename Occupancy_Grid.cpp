@@ -20,12 +20,17 @@ Occupancy_Grid::Occupancy_Grid() {
     columnWidth = 3;
     rowHeight = 3;
 
+    pathStack = new vector<Cell*>();
     grid.resize(START_COLUMNS);
 
     for (int counter = 0; counter < START_COLUMNS; counter++) grid[counter].resize(START_ROWS);
 }
 
-vector<vector<int> > Occupancy_Grid::getGrid() {
+vector<Cell*> Occupancy_Grid::getPathStack() {
+    return pathStack;
+}
+
+vector<vector<Cell> > Occupancy_Grid::getGrid() {
     return grid;
 }
 
@@ -34,8 +39,16 @@ void Occupancy_Grid::shiftValuesDown() {
 
     for (int rowCounter = rowHeight - 1; rowCounter > 0; rowCounter--) {
         for (int columnCounter = 0; columnCounter < columnWidth; columnCounter++) {
-            grid[rowCounter][columnCounter] = grid[rowCounter - 1][columnCounter]; /* Copies value to the cell below. */
-            grid[rowCounter - 1][columnCounter] = 0; /* Sets value of cell to 0. */
+            grid[rowCounter][columnCounter].isExplored = grid[rowCounter - 1][columnCounter].isExplored; /* Copies value to the cell below. */
+            grid[rowCounter][columnCounter].neighboursUnexplored = grid[rowCounter - 1][columnCounter].neighboursUnexplored;
+            grid[rowCounter][columnCounter].obstacleValue = grid[rowCounter - 1][columnCounter].obstacleValue;
+            grid[rowCounter][columnCounter].yCoord = grid[rowCounter - 1][columnCounter].yCoord;
+            grid[rowCounter][columnCounter].xCoord = grid[rowCounter - 1][columnCounter].xCoord;
+            grid[rowCounter - 1][columnCounter].isExplored = false; /* Sets value of cell to 0. */
+            grid[rowCounter - 1][columnCounter].neighboursUnexplored = 0;
+            grid[rowCounter - 1][columnCounter].obstacleValue = 0;
+            grid[rowCounter - 1][columnCounter].yCoord = 0.00;
+            grid[rowCounter - 1][columnCounter].xCoord = 0.00;
         }
     }
 }
@@ -46,7 +59,16 @@ void Occupancy_Grid::shiftValuesRight() {
     for (int rowCounter = 0; rowCounter < rowHeight; rowCounter++) {
         for (int columnCounter = columnWidth - 1; columnCounter > 0; columnCounter--) {
             grid[rowCounter][columnCounter] = grid[rowCounter][columnCounter - 1]; /* Copies value to the cell to the right. */
-            grid[rowCounter][columnCounter - 1] = 0; /* Sets value of cell to 0. */
+            grid[rowCounter][columnCounter].isExplored = grid[rowCounter][columnCounter - 1].isExplored; /* Copies value to the cell below. */
+            grid[rowCounter][columnCounter].neighboursUnexplored = grid[rowCounter][columnCounter - 1].neighboursUnexplored;
+            grid[rowCounter][columnCounter].obstacleValue = grid[rowCounter][columnCounter - 1].obstacleValue;
+            grid[rowCounter][columnCounter].yCoord = grid[rowCounter][columnCounter - 1].yCoord;
+            grid[rowCounter][columnCounter].xCoord = grid[rowCounter][columnCounter - 1].xCoord;
+            grid[rowCounter][columnCounter - 1].isExplored = false; /* Sets value of cell to 0. */
+            grid[rowCounter][columnCounter - 1].neighboursUnexplored = 0;
+            grid[rowCounter][columnCounter - 1].obstacleValue = 0;
+            grid[rowCounter][columnCounter - 1].yCoord = 0.00;
+            grid[rowCounter][columnCounter - 1].xCoord = 0.00;
         }
     }
 }
@@ -71,17 +93,10 @@ void Occupancy_Grid::printGrid() {
 
     for (int rowCounter = 0; rowCounter < rowHeight; rowCounter++) {
         for (int columnCounter = 0; columnCounter < columnWidth; columnCounter++) {
-            cout << grid[rowCounter][columnCounter];
+            cout << grid[rowCounter][columnCounter].obstacleValue;
         }
         cout << endl;
     }
-}
-
-void Occupancy_Grid::gridUpdate(int direction) {
-    if (direction == UP) grid[robotX][robotY - 1]++;
-    else if (direction == DOWN) grid[robotX][robotY + 1]++;
-    else if (direction == LEFT) grid[robotX - 1][robotY]++;
-    else if (direction == RIGHT)grid[robotX + 1][robotY]++;
 }
 
 void Occupancy_Grid::mapRobotLocation(int direction) {
@@ -92,35 +107,35 @@ void Occupancy_Grid::mapRobotLocation(int direction) {
 }
 
 void Occupancy_Grid::incrementCellUp() {
-    grid[robotY - 1][robotX]++;
+    grid[robotY - 1][robotX].obstacleValue++;
 }
 
 void Occupancy_Grid::incrementCellDown() {
-    grid[robotY + 1][robotX]++;
+    grid[robotY + 1][robotX].obstacleValue++;
 }
 
 void Occupancy_Grid::incrementCellLeft() {
-    grid[robotY][robotX - 1]++;
+    grid[robotY][robotX - 1].obstacleValue++;
 }
 
 void Occupancy_Grid::incrementCellRight() {
-    grid[robotY][robotX + 1]++;
+    grid[robotY][robotX + 1].obstacleValue++;
 }
 
 void Occupancy_Grid::decrementCellUp() {
-    grid[robotY - 1][robotX]--;
+    grid[robotY - 1][robotX].obstacleValue--;
 }
 
 void Occupancy_Grid::decrementCellDown() {
-    grid[robotY + 1][robotX]--;
+    grid[robotY + 1][robotX].obstacleValue--;
 }
 
 void Occupancy_Grid::decrementCellLeft() {
-    grid[robotY][robotX - 1]--;
+    grid[robotY][robotX - 1].obstacleValue--;
 }
 
 void Occupancy_Grid::decrementCellRight() {
-    grid[robotY][robotX + 1]--;
+    grid[robotY][robotX + 1].obstacleValue--;
 }
 
 void Occupancy_Grid::evaluateSonarReading(double sonarReading, int sonarFacing) {
@@ -130,4 +145,10 @@ void Occupancy_Grid::evaluateSonarReading(double sonarReading, int sonarFacing) 
         if (sonarFacing == LEFT) incrementCellLeft();
         if (sonarFacing == RIGHT) incrementCellRight();
     }
+}
+
+void Occupancy_Grid::addCellToPath(double yCoord, double xCoord) {
+    pathStack.push_back(&grid[robotY][robotX]); /* Add pointer of current cell to path stack. */
+    grid[robotY][robotX].yCoord = yCoord;
+    grid[robotY][robotX].yCoord = xCoord;
 }

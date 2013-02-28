@@ -26,10 +26,19 @@
 
 using namespace std;
 
+struct Cell {
+    double yCoord;
+    double xCoord;
+    bool isExplored = false;
+    int neighboursUnexplored;
+    int obstacleValue;
+};
+
 /* Occupancy_Grid class definition */
 class Occupancy_Grid {
 private:
-    vector<vector<int> > grid;
+    vector<Cell*> pathStack;
+    vector<vector<Cell> > grid;
     int columnWidth;
     int rowHeight;
     int robotX;
@@ -46,13 +55,16 @@ private:
 public:
     /* Member Function Prototypes: */
     Occupancy_Grid();
-    vector<vector<int> > getGrid();
+    vector<Cell*> getPathStack();
+    vector<vector<Cell> > getGrid();
     void resizeGrid(int directionToExpand);
     void shiftValuesDown();
     void shiftValuesRight();
     void printGrid();
-    void gridUpdate(int direction);
     void mapRobotLocation(int direction);
     void evaluateSonarReading(double sonarReading, int sonarFacing);
+    void addCellToPath(double yCoord, double xCoord);
 };
+
+
 #endif

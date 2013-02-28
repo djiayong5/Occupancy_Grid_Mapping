@@ -3,16 +3,18 @@
  * File Name: Pioneer.cpp
  * Description: Stores function declarations for Pioneer to use.
  * First Created: 25/02/2013
- * Last Modified: 26/02/2013
+ * Last Modified: 28/02/2013
  */
 
 #include <iostream>
-#include <libplayerc++/playerc++.h>
 #include <cstdio>
 #include <cstdlib>
 #include <math.h>
 #include "Pioneer.h"
 #include "Occupancy_Grid.h"
+
+using namespace PlayerCc;
+using namespace std;
 
 bool Pioneer::atTarget(double currentY, double currentX, double targetY, double targetX) {
     if (currentY <= (targetY + 0.10) && currentY >= (targetY - 0.10)) {
@@ -22,7 +24,7 @@ bool Pioneer::atTarget(double currentY, double currentX, double targetY, double 
 
 double calculateTurnRate(double currentYaw, double targetYaw) {
     double turnRate = (targetYaw - currentYaw) * PGAIN;
-    return dtor(turnRate);
+    return DTOR(turnRate);
 }
 
 int Pioneer::evaluateDirection(double currentYaw) {
@@ -55,21 +57,21 @@ void Pioneer::setFrontSensorDirection(int currentDirection) {
     else if (currentDirection == LEFT) frontSensorFacing = LEFT;
 }
 
-void Pioneer::setRearSensorDirection(double currentDirection) {
+void Pioneer::setRearSensorDirection(int currentDirection) {
     if (currentDirection == UP) rearSensorFacing = DOWN;
     else if (currentDirection == RIGHT) rearSensorFacing = LEFT;
     else if (currentDirection == DOWN) rearSensorFacing = UP;
     else if (currentDirection == LEFT) rearSensorFacing = RIGHT;
 }
 
-void Pioneer::setLeftSensorDirection(double currentDirection) {
+void Pioneer::setLeftSensorDirection(int currentDirection) {
     if (currentDirection == UP) leftSensorFacing = LEFT;
     else if (currentDirection == RIGHT) leftSensorFacing = UP;
     else if (currentDirection == DOWN) leftSensorFacing = RIGHT;
     else if (currentDirection == LEFT) leftSensorFacing = DOWN;
 }
 
-void Pioneer::setRightSensorDirection(double currentDirection) {
+void Pioneer::setRightSensorDirection(int currentDirection) {
     if (currentDirection == UP) rightSensorFacing = RIGHT;
     else if (currentDirection == RIGHT) rightSensorFacing = DOWN;
     else if (currentDirection == DOWN) rightSensorFacing = LEFT;
@@ -82,18 +84,6 @@ double Pioneer::newDirection(double currentYaw) {
 
 }
 
-double Pioneer::getNextYCoordinates(double currentY, int direction) {
-    if (direction == UP) return currentY + 0.6;
-    else if (direction == DOWN) return currentY - 0.6;
-    else return currentY;
-}
-
-double Pioneer::getNextXCoordinates(double currentX, int direction) {
-    if (direction == RIGHT) return currentX + 0.6;
-    else if (direction == LEFT) return currentX - 0.6;
-    else return currentX;
-}
-
 double Pioneer::nextCell(double currentY, double currentX, double targetY, double targetX) {
     double yChange = targetY - currentY;
     double xChange = targetX - currentX;
@@ -103,17 +93,16 @@ double Pioneer::nextCell(double currentY, double currentX, double targetY, doubl
     return xChange + yChange * PGAIN;
 }
 
-void Pioneer::reconfigureSensors(double currentDirection) {
+void Pioneer::reconfigureSensors(int currentDirection) {
     setFrontSensorDirection(currentDirection);
     setRearSensorDirection(currentDirection);
     setLeftSensorDirection(currentDirection);
     setRightSensorDirection(currentDirection);
 }
 
-void Pioneer::surveyCycle(RangerProxy sp, double currentDirection) {
+void Pioneer::surveyCycle(RangerProxy sp, int currentDirection) {
     oG.mapRobotLocation(currentDirection);
     oG.resizeGrid(currentDirection);
-    oG.gridUpdate(currentDirection);
     oG.evaluateSonarReading(((sp[3] + sp[4]) / 2), frontSensorFacing);
     oG.evaluateSonarReading(((sp[12] + sp[11]) / 2), rearSensorFacing);
     oG.evaluateSonarReading(sp[0], leftSensorFacing);
@@ -121,10 +110,6 @@ void Pioneer::surveyCycle(RangerProxy sp, double currentDirection) {
 }
 
 void Pioneer::runPioneer() {
-    using namespace PlayerCc;
-    using namespace Pioneer;
-    using namespace std;
-
     PlayerClient robot("lisa.islnet");
     RangerProxy sp(&robot, 0);
     Position2dProxy pp(&robot, 0);
@@ -137,25 +122,27 @@ void Pioneer::runPioneer() {
     double targetYaw;
     double turnRate = 0.000;
     double speed;
+    int currentDirection;
 
     pp.SetMotorEnable(true);
 
-    for (;;) {
+    do {
         currentYaw = pp.GetYaw();
         currentY = pp.GetYPos();
         currentX = pp.GetXPos();
 
-        if (turnRate != 0.000) {
-            int currentDirection;
 
-            /* Read from proxies. */
-            robot.Read();
-            currentDirection = evaluateDirection(currentYaw);
-            reconfigureSensors(currentDirection);
 
-            /* Determine if at target location. */
-            if (atTarget(currentY, currentX, targetY, targetX) == true) {
+        if (turnRate == 0.000) {
+            if (atTarget(currentY, currentX, targetY, targetX)) { /* Determine if at target location. */
+                robot.Read();
+                currentDirection = evaluateDirection(currentYaw);
+                reconfigureSensors(currentDirection);
                 surveyCycle(sp, currentDirection);
+                
+                if (oG.getGrid()[currentY][currentX].isExplored == false) {
+                    oG.addCellToPath(currentY, currentX);
+                }
             }
 
             /* Decide new target location based on if there is an obstacle dead in front of the Pioneer. */
@@ -164,8 +151,8 @@ void Pioneer::runPioneer() {
                 targetYaw = newDirection(currentYaw); /* Random choice to turn anti-clockwise or clockwise on the spot to avoid collision. */
                 turnRate = calculateTurnRate(currentYaw, targetYaw);
             } else {
-                double targetY = getNextYCoordinates(currentY, currentDirection);
-                double targetX = getNextXCoordinates(currentX, currentDirection);
+                double targetY = oG.getPathStack().front().yCoord;
+                double targetX = oG.getPathStack().front().xCoord;
                 speed = nextCell(currentY, currentX, targetY, targetX);
                 turnRate = 0.000;
             }
@@ -176,7 +163,7 @@ void Pioneer::runPioneer() {
 
         //Command the motors
         pp.SetSpeed(speed, turnRate);
-    }
+    } while (!oG.getPathStack().empty());
 }
 
 int main(int argc, char *argv[]) {
