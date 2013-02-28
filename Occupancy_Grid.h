@@ -30,7 +30,7 @@ struct Cell {
     double yCoord;
     double xCoord;
     bool isExplored = false;
-    int neighboursUnexplored;
+    int neighboursUnexplored = 4;
     int obstacleValue;
 };
 
@@ -43,6 +43,7 @@ private:
     int rowHeight;
     int robotX;
     int robotY;
+    void checkOccupancy(int gridY, int gridX);
     void incrementCellUp();
     void incrementCellDown();
     void incrementCellLeft();
@@ -64,6 +65,11 @@ public:
     void mapRobotLocation(int direction);
     void evaluateSonarReading(double sonarReading, int sonarFacing);
     void addCellToPath(double yCoord, double xCoord);
+    void removeCellFromPath();
+    int chooseNextCell();
+    void checkNeighbours();
+    int chooseNextCell();
+    int getPreviousCellDirection(double currentY, double currentX);
 };
 
 

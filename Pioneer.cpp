@@ -78,12 +78,6 @@ void Pioneer::setRightSensorDirection(int currentDirection) {
     else if (currentDirection == LEFT) rightSensorFacing = UP;
 }
 
-double Pioneer::newDirection(double currentYaw) {
-    if ((rand() % (2 - 1) + 1) == 1) return currentYaw + 90;
-    else return currentYaw - 90;
-
-}
-
 double Pioneer::nextCell(double currentY, double currentX, double targetY, double targetX) {
     double yChange = targetY - currentY;
     double xChange = targetX - currentX;
@@ -134,30 +128,34 @@ void Pioneer::runPioneer() {
 
 
         if (turnRate == 0.000) {
-            if (atTarget(currentY, currentX, targetY, targetX)) { /* Determine if at target location. */
+            if (atTarget(currentY, currentX, targetY, targetX) == true) { /* Determine if at target location. */
+                pp.SetSpeed(0.000, 0.000);
                 robot.Read();
                 currentDirection = evaluateDirection(currentYaw);
                 reconfigureSensors(currentDirection);
                 surveyCycle(sp, currentDirection);
-                
+
                 if (oG.getGrid()[currentY][currentX].isExplored == false) {
                     oG.addCellToPath(currentY, currentX);
+                    int targetDirection = oG.chooseNextCell();
+                } else if (oG.getGrid()[currentY][currentX].neighboursUnexplored == 0) {
+                    oG.removeCellFromPath();
+                    int targetDirection = oG.getPreviousCellDirection(currentY, currentX);
+                } else if (oG.getGrid()[currentY][currentX].neighboursUnexplored != 0) {
+                    int targetDirection = oG.chooseNextCell();
                 }
-            }
 
-            /* Decide new target location based on if there is an obstacle dead in front of the Pioneer. */
-            if (((sp[3] + sp[4]) / 2) < 0.300) {
-                speed = 0.000;
-                targetYaw = newDirection(currentYaw); /* Random choice to turn anti-clockwise or clockwise on the spot to avoid collision. */
+                targetYaw = DTOR(targetDirection);
                 turnRate = calculateTurnRate(currentYaw, targetYaw);
             } else {
-                double targetY = oG.getPathStack().front().yCoord;
-                double targetX = oG.getPathStack().front().xCoord;
+                targetY = oG.getPathStack().back().yCoord;
+                targetX = oG.getPathStack().back().xCoord;
                 speed = nextCell(currentY, currentX, targetY, targetX);
                 turnRate = 0.000;
             }
         } else {
             speed = 0.000;
+            targetYaw = DTOR(targetDirection);
             turnRate = calculateTurnRate(currentYaw, targetYaw); /* Random choice to turn anti-clockwise or clockwise on the spot to avoid collision. */
         }
 

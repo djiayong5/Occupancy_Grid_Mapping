@@ -106,36 +106,59 @@ void Occupancy_Grid::mapRobotLocation(int direction) {
     else if (direction == RIGHT) robotX++; /* Move robot right one cell on the grid. */
 }
 
+void Occupancy_Grid::checkOccupancy(int gridY, int gridX) {
+    if (grid[gridY][gridX].obstacleValue == 0) grid[gridY][gridX].isExplored = true;
+    else grid[gridY][gridX].isExplored = false;
+}
+
 void Occupancy_Grid::incrementCellUp() {
     grid[robotY - 1][robotX].obstacleValue++;
+    checkOccupancy((robotY - 1), robotX);
 }
 
 void Occupancy_Grid::incrementCellDown() {
     grid[robotY + 1][robotX].obstacleValue++;
+    checkOccupancy((robotY + 1), robotX);
 }
 
 void Occupancy_Grid::incrementCellLeft() {
     grid[robotY][robotX - 1].obstacleValue++;
+    checkOccupancy(robotY, (robotX - 1));
 }
 
 void Occupancy_Grid::incrementCellRight() {
     grid[robotY][robotX + 1].obstacleValue++;
+    checkOccupancy(robotY, (robotX + 1));
 }
 
 void Occupancy_Grid::decrementCellUp() {
     grid[robotY - 1][robotX].obstacleValue--;
+    checkOccupancy((robotY - 1), robotX);
 }
 
 void Occupancy_Grid::decrementCellDown() {
     grid[robotY + 1][robotX].obstacleValue--;
+    checkOccupancy((robotY + 1), robotX);
 }
 
 void Occupancy_Grid::decrementCellLeft() {
     grid[robotY][robotX - 1].obstacleValue--;
+    checkOccupancy(robotY, (robotX - 1));
 }
 
 void Occupancy_Grid::decrementCellRight() {
     grid[robotY][robotX + 1].obstacleValue--;
+    checkOccupancy(robotY, (robotX + 1));
+}
+
+void Occupancy_Grid::checkNeighbours() {
+    int neighboursExplored = 0;
+    if (grid[robotY + 1][robotX].isExplored == true) neighboursExplored++;
+    if (grid[robotY - 1][robotX].isExplored == true) neighboursExplored++;
+    if (grid[robotY][robotX + 1].isExplored == true) neighboursExplored++;
+    if (grid[robotY][robotX - 1].isExplored == true) neighboursExplored++;
+
+    grid[robotY][robotX].neighboursUnexplored = neighboursExplored;
 }
 
 void Occupancy_Grid::evaluateSonarReading(double sonarReading, int sonarFacing) {
@@ -151,4 +174,46 @@ void Occupancy_Grid::addCellToPath(double yCoord, double xCoord) {
     pathStack.push_back(&grid[robotY][robotX]); /* Add pointer of current cell to path stack. */
     grid[robotY][robotX].yCoord = yCoord;
     grid[robotY][robotX].yCoord = xCoord;
+    grid[robotY][robotX].isExplored = true;
+}
+
+void Occupancy_Grid::removeCellFromPath() {
+    pathStack.pop_back();
+}
+
+int Occupancy_Grid::chooseNextCell() {
+    int randomDirection;
+    int gridY;
+    int gridX;
+
+    do {
+        randomDirection = rand() % (4 - 1) + 1;
+
+        if (randomDirection == 1) {
+            randomDirection = UP;
+            gridY = robotY - 1;
+            gridX = robotX;
+        } else if (randomDirection == 2) {
+            randomDirection = RIGHT;
+            gridY = robotY;
+            gridX = robotX + 1;
+        } else if (randomDirection == 3) {
+            randomDirection = DOWN;
+            gridY = robotY + 1;
+            gridX = robotX;
+        } else if (randomDirection == 4) {
+            randomDirection = LEFT;
+            gridY = robotY;
+            gridX = robotX - 1;
+        }
+    } while (grid[gridY][gridX].isExplored == true);
+    
+    return randomDirection;
+}
+
+int Occupancy_Grid::getPreviousCellDirection(double currentY, double currentX) {
+    if (pathStack.back().yCoord < currentY) return UP;
+    if (pathStack.back().yCoord > currentY) return DOWN;
+    if (pathStack.back().xCoord < currentX) return LEFT;
+    if (pathStack.back().xCoord > currentX) return RIGHT;
 }
