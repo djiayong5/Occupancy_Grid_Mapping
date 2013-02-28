@@ -23,7 +23,6 @@
 #define PGAIN 0.5
 #define NEXTSQUARE 0.6
 
-
 /* Function Prototypes: */
 
 class Pioneer {
@@ -33,19 +32,24 @@ private:
     int rearSensorFacing; /* Field that describes the direction the rear sensor currently faces relative to its original direction 'DOWN' */
     int leftSensorFacing; /* Field that describes the direction the right sensor currently faces relative to its original direction 'LEFT' */
     int rightSensorFacing; /* Field that describes the direction the left sensor currently faces relative to its original direction 'RIGHT' */
-public:
-    bool atTarget(double currentY, double currentX, double targetY, double targetX);
-    double movePioneer(double distance, double currentX, double currentY, double targetX, double targetY);
-    double calculateTurnRate(double targetYaw, double currentYaw);
-    int evaluateDirection(double currentYaw);
+    double newDirection(double currentYaw);
+    double calculateTurnRate(double currentYaw, double targetYaw);
+    double nextCell(double currentY, double currentX, double targetY, double targetX);
+    double getNextYCoordinates(double currentY, int direction);
+    double getNextXCoordinates(double currentX, int direction);
     int getFrontSensorFacing();
     int getRearSensorFacing();
     int getLeftSensorFacing();
     int getRightSensorFacing();
+    bool atTarget(double currentY, double currentX, double targetY, double targetX);
+    int evaluateDirection(double currentYaw);
     void setFrontSensorDirection(double currentDirection);
     void setRearSensorDirection(double currentDirection);
     void setLeftSensorDirection(double currentDirection);
     void setRightSensorDirection(double currentDirection);
+    void reconfigureSensors(double currentDirection);
+    void surveyCycle(RangerProxy sp, double currentDirection);
+public:
     void runPioneer();
 };
 #endif

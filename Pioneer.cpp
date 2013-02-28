@@ -7,9 +7,10 @@
  */
 
 #include <iostream>
-#include </src/player-3.0.2/client_libs/libplayerc++/playerc++.h>
+#include <libplayerc++/playerc++.h>
 #include <cstdio>
 #include <cstdlib>
+#include <math.h>
 #include "Pioneer.h"
 #include "Occupancy_Grid.h"
 
@@ -19,16 +20,9 @@ bool Pioneer::atTarget(double currentY, double currentX, double targetY, double 
     } else return false;
 }
 
-double movePioneer(double distance, double currentX, double currentY, double targetX, double targetY) {
-    double xChange = targetX - currentX;
-    double yChange = targetY - currentY;
-
-    return (xChange + yChange) * PGAIN;
-}
-
-double calculateTurnRate(double targetYaw, double currentYaw) {
+double calculateTurnRate(double currentYaw, double targetYaw) {
     double turnRate = (targetYaw - currentYaw) * PGAIN;
-    return turnRate;
+    return dtor(turnRate);
 }
 
 int Pioneer::evaluateDirection(double currentYaw) {
@@ -82,61 +76,104 @@ void Pioneer::setRightSensorDirection(double currentDirection) {
     else if (currentDirection == LEFT) rightSensorFacing = UP;
 }
 
+double Pioneer::newDirection(double currentYaw) {
+    if ((rand() % (2 - 1) + 1) == 1) return currentYaw + 90;
+    else return currentYaw - 90;
+
+}
+
+double Pioneer::getNextYCoordinates(double currentY, int direction) {
+    if (direction == UP) return currentY + 0.6;
+    else if (direction == DOWN) return currentY - 0.6;
+    else return currentY;
+}
+
+double Pioneer::getNextXCoordinates(double currentX, int direction) {
+    if (direction == RIGHT) return currentX + 0.6;
+    else if (direction == LEFT) return currentX - 0.6;
+    else return currentX;
+}
+
+double Pioneer::nextCell(double currentY, double currentX, double targetY, double targetX) {
+    double yChange = targetY - currentY;
+    double xChange = targetX - currentX;
+
+    xChange = sqrt(xChange * xChange);
+    yChange = sqrt(yChange * yChange);
+    return xChange + yChange * PGAIN;
+}
+
+void Pioneer::reconfigureSensors(double currentDirection) {
+    setFrontSensorDirection(currentDirection);
+    setRearSensorDirection(currentDirection);
+    setLeftSensorDirection(currentDirection);
+    setRightSensorDirection(currentDirection);
+}
+
+void Pioneer::surveyCycle(RangerProxy sp, double currentDirection) {
+    oG.mapRobotLocation(currentDirection);
+    oG.resizeGrid(currentDirection);
+    oG.gridUpdate(currentDirection);
+    oG.evaluateSonarReading(((sp[3] + sp[4]) / 2), frontSensorFacing);
+    oG.evaluateSonarReading(((sp[12] + sp[11]) / 2), rearSensorFacing);
+    oG.evaluateSonarReading(sp[0], leftSensorFacing);
+    oG.evaluateSonarReading(sp[7], rightSensorFacing);
+}
+
 void Pioneer::runPioneer() {
     using namespace PlayerCc;
     using namespace Pioneer;
     using namespace std;
 
     PlayerClient robot("lisa.islnet");
-    SonarProxy sp(&robot, 0);
+    RangerProxy sp(&robot, 0);
     Position2dProxy pp(&robot, 0);
     Occupancy_Grid oG = new Occupancy_Grid();
-    double currentY, currentX, targetY, targetX; /* Fields to robot's current and target, x/y coordinates. */
+    double currentY = 0.000;
+    double currentX = 0.000;
+    double targetY = 0.000;
+    double targetX = 0.000;
+    double currentYaw = 0.000;
+    double targetYaw;
+    double turnRate = 0.000;
+    double speed;
 
     pp.SetMotorEnable(true);
 
     for (;;) {
-        double turnRate = 0.00;
-        double speed;
-        int currentDirection;
-
-        /* Read from proxies. */
-        robot.Read();
-
-        /* Get robot's current x and y coordinates. */
+        currentYaw = pp.GetYaw();
         currentY = pp.GetYPos();
         currentX = pp.GetXPos();
-        currentDirection = Pioneer::evaluateDirection(pp.GetYaw());
-        Pioneer::setFrontSensorDirection(currentDirection);
-        Pioneer::setRearSensorDirection(currentDirection);
-        Pioneer::setLeftSensorDirection(currentDirection);
-        Pioneer::setRightSensorDirection(currentDirection);
 
-        /* Determine if at target location. */
-        if (Pioneer::atTarget(currentY, currentX, targetY, targetX) == true) {
-            oG.mapRobotLocation(currentDirection);
-            oG.resizeGrid(currentDirection);
-            oG.gridUpdate(currentDirection);
-            oG.evaluateSonarReading(((sp[3] + sp[4]) / 2), frontSensorFacing);
-            oG.evaluateSonarReading(((sp[12] + sp[11]) / 2), rearSensorFacing);
-            oG.evaluateSonarReading(sp[0], leftSensorFacing);
-            oG.evaluateSonarReading(sp[7], rightSensorFacing);
-            
-            //if ()
-        }
-        //Print out sonar readings
-        cout << sp << endl;
+        if (turnRate != 0.000) {
+            int currentDirection;
 
-        //Do simple collision avoidance
-        if ((sp[0] + sp[1]) < (sp[6] + sp[7]))
-            turnRate = dtor(-20); //Turn 20 degrees per delta time
-        else
-            turnRate = dtor(20);
+            /* Read from proxies. */
+            robot.Read();
+            currentDirection = evaluateDirection(currentYaw);
+            reconfigureSensors(currentDirection);
 
-        if (((sp[3] + sp[4]) / 2) < 0.600)
+            /* Determine if at target location. */
+            if (atTarget(currentY, currentX, targetY, targetX) == true) {
+                surveyCycle(sp, currentDirection);
+            }
+
+            /* Decide new target location based on if there is an obstacle dead in front of the Pioneer. */
+            if (((sp[3] + sp[4]) / 2) < 0.300) {
+                speed = 0.000;
+                targetYaw = newDirection(currentYaw); /* Random choice to turn anti-clockwise or clockwise on the spot to avoid collision. */
+                turnRate = calculateTurnRate(currentYaw, targetYaw);
+            } else {
+                double targetY = getNextYCoordinates(currentY, currentDirection);
+                double targetX = getNextXCoordinates(currentX, currentDirection);
+                speed = nextCell(currentY, currentX, targetY, targetX);
+                turnRate = 0.000;
+            }
+        } else {
             speed = 0.000;
-        else
-            speed = 0.050;
+            turnRate = calculateTurnRate(currentYaw, targetYaw); /* Random choice to turn anti-clockwise or clockwise on the spot to avoid collision. */
+        }
+
         //Command the motors
         pp.SetSpeed(speed, turnRate);
     }

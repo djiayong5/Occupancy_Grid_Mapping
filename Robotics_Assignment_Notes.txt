@@ -1,0 +1,12 @@
+Loop Routine:
+- Read from sensors
+- Get robot x and y coordinates.
+- If robot's current x and y meet target x and y (with error allowance), rougly 60cm from original position {
+	- Update robot position, x and y.
+	- Resize grid by one column/row in direction of front facing sensor.
+		- Shift grid values and robot position if required.
+	- Update grid values.
+	- Evaluate if obstacle within 60cm in front of robot. 
+	- Set new speed and direction (if necessary).
+- Else adjust calculate difference in distance and adjust speed to avoid overshooting target.
+- 
