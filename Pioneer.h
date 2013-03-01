@@ -9,6 +9,7 @@
 #ifndef PIONEER_H
 #define PIONEER_H
 
+#include <iostream>
 #include <libplayerc++/playerc++.h>
 #include <cstdio>
 #include <cstdlib>
@@ -27,7 +28,7 @@
 
 using namespace PlayerCc;
 
-class Pioneer {
+class Pioneer {   
 private:
     Occupancy_Grid *oG;
     int frontSensorFacing; /* Field that describes the direction the front sensor currently faces relative to its original direction 'UP' */
@@ -52,5 +53,6 @@ private:
     void surveyCycle(RangerProxy sp, int currentDirection);
 public:
     void runPioneer();
+    ~Pioneer();
 };
 #endif

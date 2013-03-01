@@ -7,6 +7,7 @@
  */
 
 #include <iostream>
+#include <libplayerc++/playerc++.h>
 #include <cstdio>
 #include <cstdlib>
 #include <math.h>
@@ -22,7 +23,7 @@ bool Pioneer::atTarget(double currentY, double currentX, double targetY, double 
     } else return false;
 }
 
-double calculateTurnRate(double currentYaw, double targetYaw) {
+double Pioneer::calculateTurnRate(double currentYaw, double targetYaw) {
     double turnRate = (targetYaw - currentYaw) * PGAIN;
     return dtor(turnRate);
 }
@@ -103,10 +104,12 @@ void Pioneer::surveyCycle(RangerProxy sp, int currentDirection) {
     oG->evaluateSonarReading(sp[7], rightSensorFacing);
 }
 
-void Pioneer::runPioneer() {
-    PlayerClient robot("lisa.islnet");
+void Pioneer::runPioneer() {  
+    PlayerClient robot("localhost");
+    //PlayerClient robot("lisa.islnet");
     RangerProxy sp(&robot, 0);
     Position2dProxy pp(&robot, 0);
+        
     oG = new Occupancy_Grid();
     double currentY = 0.000;
     double currentX = 0.000;
@@ -166,8 +169,13 @@ void Pioneer::runPioneer() {
     } while (!oG->getPathStack().empty());
 }
 
+Pioneer::~Pioneer() {
+    delete(oG);
+}
+
 int main(int argc, char *argv[]) {
     Pioneer *pioneer = new Pioneer();
     pioneer->runPioneer();
+    delete(pioneer);
     return 0;
 }
