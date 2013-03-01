@@ -24,7 +24,7 @@ bool Pioneer::atTarget(double currentY, double currentX, double targetY, double 
 
 double calculateTurnRate(double currentYaw, double targetYaw) {
     double turnRate = (targetYaw - currentYaw) * PGAIN;
-    return DTOR(turnRate);
+    return dtor(turnRate);
 }
 
 int Pioneer::evaluateDirection(double currentYaw) {
@@ -95,19 +95,19 @@ void Pioneer::reconfigureSensors(int currentDirection) {
 }
 
 void Pioneer::surveyCycle(RangerProxy sp, int currentDirection) {
-    oG.mapRobotLocation(currentDirection);
-    oG.resizeGrid(currentDirection);
-    oG.evaluateSonarReading(((sp[3] + sp[4]) / 2), frontSensorFacing);
-    oG.evaluateSonarReading(((sp[12] + sp[11]) / 2), rearSensorFacing);
-    oG.evaluateSonarReading(sp[0], leftSensorFacing);
-    oG.evaluateSonarReading(sp[7], rightSensorFacing);
+    oG->mapRobotLocation(currentDirection);
+    oG->resizeGrid(currentDirection);
+    oG->evaluateSonarReading(((sp[3] + sp[4]) / 2), frontSensorFacing);
+    oG->evaluateSonarReading(((sp[12] + sp[11]) / 2), rearSensorFacing);
+    oG->evaluateSonarReading(sp[0], leftSensorFacing);
+    oG->evaluateSonarReading(sp[7], rightSensorFacing);
 }
 
 void Pioneer::runPioneer() {
     PlayerClient robot("lisa.islnet");
     RangerProxy sp(&robot, 0);
     Position2dProxy pp(&robot, 0);
-    Occupancy_Grid oG = new Occupancy_Grid();
+    oG = new Occupancy_Grid();
     double currentY = 0.000;
     double currentX = 0.000;
     double targetY = 0.000;
@@ -117,6 +117,7 @@ void Pioneer::runPioneer() {
     double turnRate = 0.000;
     double speed;
     int currentDirection;
+    int targetDirection;
 
     pp.SetMotorEnable(true);
 
@@ -135,37 +136,37 @@ void Pioneer::runPioneer() {
                 reconfigureSensors(currentDirection);
                 surveyCycle(sp, currentDirection);
 
-                if (oG.getGrid()[currentY][currentX].isExplored == false) {
-                    oG.addCellToPath(currentY, currentX);
-                    int targetDirection = oG.chooseNextCell();
-                } else if (oG.getGrid()[currentY][currentX].neighboursUnexplored == 0) {
-                    oG.removeCellFromPath();
-                    int targetDirection = oG.getPreviousCellDirection(currentY, currentX);
-                } else if (oG.getGrid()[currentY][currentX].neighboursUnexplored != 0) {
-                    int targetDirection = oG.chooseNextCell();
+                if (oG->getGrid()[currentY][currentX].isExplored == false) {
+                    oG->addCellToPath(currentY, currentX);
+                    targetDirection = oG->chooseNextCell();
+                } else if (oG->getGrid()[currentY][currentX].neighboursUnexplored == 0) {
+                    oG->removeCellFromPath();
+                    targetDirection = oG->getPreviousCellDirection(currentY, currentX);
+                } else if (oG->getGrid()[currentY][currentX].neighboursUnexplored != 0) {
+                    targetDirection = oG->chooseNextCell();
                 }
 
-                targetYaw = DTOR(targetDirection);
+                targetYaw = dtor(targetDirection);
                 turnRate = calculateTurnRate(currentYaw, targetYaw);
             } else {
-                targetY = oG.getPathStack().back().yCoord;
-                targetX = oG.getPathStack().back().xCoord;
+                targetY = oG->getPathStack().back()->yCoord;
+                targetX = oG->getPathStack().back()->xCoord;
                 speed = nextCell(currentY, currentX, targetY, targetX);
                 turnRate = 0.000;
             }
         } else {
             speed = 0.000;
-            targetYaw = DTOR(targetDirection);
+            targetYaw = dtor(targetDirection);
             turnRate = calculateTurnRate(currentYaw, targetYaw); /* Random choice to turn anti-clockwise or clockwise on the spot to avoid collision. */
         }
 
         //Command the motors
         pp.SetSpeed(speed, turnRate);
-    } while (!oG.getPathStack().empty());
+    } while (!oG->getPathStack().empty());
 }
 
 int main(int argc, char *argv[]) {
-    Pioneer pioneer = new Pioneer();
-    pioneer.runPioneer();
+    Pioneer *pioneer = new Pioneer();
+    pioneer->runPioneer();
     return 0;
 }

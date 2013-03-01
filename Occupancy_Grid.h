@@ -29,8 +29,8 @@ using namespace std;
 struct Cell {
     double yCoord;
     double xCoord;
-    bool isExplored = false;
-    int neighboursUnexplored = 4;
+    bool isExplored;
+    int neighboursUnexplored;
     int obstacleValue;
 };
 
@@ -56,6 +56,7 @@ private:
 public:
     /* Member Function Prototypes: */
     Occupancy_Grid();
+    void initialiseCell(Cell *cell);
     vector<Cell*> getPathStack();
     vector<vector<Cell> > getGrid();
     void resizeGrid(int directionToExpand);
@@ -66,11 +67,8 @@ public:
     void evaluateSonarReading(double sonarReading, int sonarFacing);
     void addCellToPath(double yCoord, double xCoord);
     void removeCellFromPath();
-    int chooseNextCell();
     void checkNeighbours();
     int chooseNextCell();
     int getPreviousCellDirection(double currentY, double currentX);
 };
-
-
 #endif

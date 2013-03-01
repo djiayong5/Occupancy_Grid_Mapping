@@ -20,10 +20,20 @@ Occupancy_Grid::Occupancy_Grid() {
     columnWidth = 3;
     rowHeight = 3;
 
-    pathStack = new vector<Cell*>();
+    pathStack.resize(1);
     grid.resize(START_COLUMNS);
-
     for (int counter = 0; counter < START_COLUMNS; counter++) grid[counter].resize(START_ROWS);
+
+    for (int rowCounter = 0; rowCounter < START_ROWS; rowCounter++) {
+        for (int columnCounter = 0; columnCounter < START_COLUMNS; columnCounter++) {
+            initialiseCell(&grid[rowCounter][columnCounter]);
+        }
+    }
+}
+
+void Occupancy_Grid::initialiseCell(Cell *cell) {
+    cell->isExplored = false;
+    cell->neighboursUnexplored = 4;
 }
 
 vector<Cell*> Occupancy_Grid::getPathStack() {
@@ -78,11 +88,20 @@ void Occupancy_Grid::resizeGrid(int directionToExpand) {
     else if (directionToExpand == LEFT || directionToExpand == RIGHT) columnWidth++;
 
     grid.resize(rowHeight);
-
     for (int rowCounter = 0; rowCounter < rowHeight; rowCounter++) grid[rowCounter].resize(columnWidth);
 
     if (directionToExpand == UP) shiftValuesDown();
     else if (directionToExpand == LEFT) shiftValuesRight();
+
+    if (directionToExpand == UP) {
+        for (int columnCounter = 0; columnCounter < columnWidth; columnCounter++) initialiseCell(&grid[0][columnCounter]);
+    } else if (directionToExpand == DOWN) {
+        for (int columnCounter = 0; columnCounter < columnWidth; columnCounter++) initialiseCell(&grid[rowHeight - 1][columnCounter]);
+    } else if (directionToExpand == RIGHT) {
+        for (int rowCounter = 0; rowCounter < rowHeight; rowCounter++) initialiseCell(&grid[rowCounter][columnWidth - 1]);
+    } else if (directionToExpand == LEFT) {
+        for (int rowCounter = 0; rowCounter < rowHeight; rowCounter++) initialiseCell(&grid[rowCounter][0]);
+    }
 }
 
 void Occupancy_Grid::printGrid() {
@@ -207,13 +226,13 @@ int Occupancy_Grid::chooseNextCell() {
             gridX = robotX - 1;
         }
     } while (grid[gridY][gridX].isExplored == true);
-    
+
     return randomDirection;
 }
 
 int Occupancy_Grid::getPreviousCellDirection(double currentY, double currentX) {
-    if (pathStack.back().yCoord < currentY) return UP;
-    if (pathStack.back().yCoord > currentY) return DOWN;
-    if (pathStack.back().xCoord < currentX) return LEFT;
-    if (pathStack.back().xCoord > currentX) return RIGHT;
+    if (pathStack.back()->yCoord < currentY) return UP;
+    if (pathStack.back()->yCoord > currentY) return DOWN;
+    if (pathStack.back()->xCoord < currentX) return LEFT;
+    if (pathStack.back()->xCoord > currentX) return RIGHT;
 }

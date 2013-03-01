@@ -12,6 +12,7 @@
 #include <libplayerc++/playerc++.h>
 #include <cstdio>
 #include <cstdlib>
+#include "Occupancy_Grid.h"
 
 #ifndef DIRECTIONS
 #define DIRECTIONS
@@ -24,9 +25,11 @@
 #define PGAIN 0.5
 #define NEXTSQUARE 0.6
 
+using namespace PlayerCc;
+
 class Pioneer {
 private:
-    Occupancy_Grid oG;
+    Occupancy_Grid *oG;
     int frontSensorFacing; /* Field that describes the direction the front sensor currently faces relative to its original direction 'UP' */
     int rearSensorFacing; /* Field that describes the direction the rear sensor currently faces relative to its original direction 'DOWN' */
     int leftSensorFacing; /* Field that describes the direction the right sensor currently faces relative to its original direction 'LEFT' */
