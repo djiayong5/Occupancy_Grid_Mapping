@@ -135,6 +135,7 @@ void Pioneer::runPioneer() {
                 currentDirection = evaluateDirection(currentYaw);
                 reconfigureSensors(currentDirection);
                 surveyCycle(sp, currentDirection);
+                oG->printGrid();
 
                 if (oG->getGrid()[currentY][currentX].isExplored == false) {
                     oG->addCellToPath(currentY, currentX);
