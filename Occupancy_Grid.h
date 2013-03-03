@@ -18,7 +18,7 @@
 #define UP 0
 #define DOWN 180
 #define LEFT 90
-#define RIGHT 270
+#define RIGHT -90
 #endif
 
 #define START_COLUMNS 3
@@ -32,6 +32,7 @@ struct Cell {
     bool isExplored;
     int neighboursUnexplored;
     int obstacleValue;
+    int directionCameFrom;
 };
 
 /* Occupancy_Grid class definition */
@@ -52,6 +53,7 @@ private:
     void decrementCellDown();
     void decrementCellLeft();
     void decrementCellRight();
+    void setCellDirectionCameFrom(int direction, int yIndex, int xIndex);
 
 public:
     /* Member Function Prototypes: */
@@ -60,6 +62,7 @@ public:
     vector<Cell*> getPathStack();
     vector<vector<Cell> > getGrid();
     void resizeGrid(int directionToExpand);
+    void shrinkGrid(int directionToShrink);
     void shiftValuesDown();
     void shiftValuesRight();
     void printGrid();
@@ -67,8 +70,10 @@ public:
     void evaluateSonarReading(double sonarReading, int sonarFacing);
     void addCellToPath(double yCoord, double xCoord);
     void removeCellFromPath();
+    bool getIsExplored();
     void checkNeighbours();
+    int getNeighboursUnexplored();
     int chooseNextCell();
-    int getPreviousCellDirection(double currentY, double currentX);
+    void setCoordinatesOfCell(double currentY, double currentX, int direction, double *targetY, double *targetX);
 };
 #endif

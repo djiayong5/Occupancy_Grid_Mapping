@@ -102,6 +102,14 @@ void Occupancy_Grid::resizeGrid(int directionToExpand) {
     }
 }
 
+void Occupancy_Grid::shrinkGrid(int directionToShrink) {
+    if (directionToShrink == UP || directionToShrink == DOWN) rowHeight--;
+    else if (directionToShrink == LEFT || directionToShrink == RIGHT) columnWidth--;
+    
+    grid.resize(rowHeight);
+    for (int rowCounter = 0; rowCounter < rowHeight; rowCounter++) grid[rowCounter].resize(columnWidth);
+}
+
 void Occupancy_Grid::printGrid() {
     cout << "Robot's Y location on grid: " << robotY << endl;
     cout << "Robot's X location on grid: " << robotX << endl;
@@ -168,6 +176,10 @@ void Occupancy_Grid::decrementCellRight() {
     checkOccupancy(robotY, (robotX + 1));
 }
 
+bool Occupancy_Grid::getIsExplored() {
+    return grid[robotY][robotX].isExplored;
+}
+
 void Occupancy_Grid::checkNeighbours() {
     int neighboursExplored = 0;
     if (grid[robotY + 1][robotX].isExplored == true) neighboursExplored++;
@@ -178,8 +190,12 @@ void Occupancy_Grid::checkNeighbours() {
     grid[robotY][robotX].neighboursUnexplored = neighboursExplored;
 }
 
+int Occupancy_Grid::getNeighboursUnexplored() {
+    return grid[robotY][robotX].neighboursUnexplored;
+}
+
 void Occupancy_Grid::evaluateSonarReading(double sonarReading, int sonarFacing) {
-    if (sonarReading <= 0.70) {
+    if (sonarReading <= 0.65) {
         if (sonarFacing == UP) incrementCellUp();
         if (sonarFacing == DOWN) incrementCellDown();
         if (sonarFacing == LEFT) incrementCellLeft();
@@ -206,13 +222,12 @@ int Occupancy_Grid::chooseNextCell() {
     do {
         srand(time(NULL));
         randomDirection = (rand() % 4);
-        //cout << "Random Number: " << randomDirection << endl;
 
         if (randomDirection == 0) {
             randomDirection = UP;
             gridY = robotY - 1;
             gridX = robotX;
-           // cout << "Cell Up Explored = " << grid[gridY][gridX].isExplored << endl;
+          // cout << "Cell Up Explored = " << grid[gridY][gridX].isExplored << endl;
         } else if (randomDirection == 1) {
             randomDirection = RIGHT;         
             gridY = robotY;
@@ -234,9 +249,40 @@ int Occupancy_Grid::chooseNextCell() {
     return randomDirection;
 }
 
-int Occupancy_Grid::getPreviousCellDirection(double currentY, double currentX) {
-    if (pathStack.back()->yCoord < currentY) return UP;
-    if (pathStack.back()->yCoord > currentY) return DOWN;
-    if (pathStack.back()->xCoord < currentX) return LEFT;
-    if (pathStack.back()->xCoord > currentX) return RIGHT;
+void Occupancy_Grid::setCellDirectionCameFrom(int direction, int yIndex, int xIndex) {
+    if (direction == UP) grid[yIndex][xIndex].directionCameFrom = DOWN;
+    else if (direction == DOWN) grid[yIndex][xIndex].directionCameFrom = UP;
+    else if (direction == LEFT) grid[yIndex][xIndex].directionCameFrom = RIGHT;
+    else if (direction == RIGHT) grid[yIndex][xIndex].directionCameFrom = LEFT;
+}
+
+void Occupancy_Grid::setCoordinatesOfCell(double currentY, double currentX, int direction, double *targetY, double *targetX) {
+    if (direction == UP) {
+        grid[robotY - 1][robotX].yCoord = currentY + 0.6; /* Change sign when using with Pioneer to -. */
+        grid[robotY - 1][robotX].xCoord = currentX;
+        *targetY = grid[robotY - 1][robotX].yCoord;
+        *targetX = grid[robotX - 1][robotX].xCoord;
+        setCellDirectionCameFrom(direction, robotY - 1, robotX);
+    }
+    else if (direction == DOWN) {
+        grid[robotY + 1][robotX].yCoord = currentY - 0.6; /* Change sign when using with Pioneer to +. */
+        grid[robotX + 1][robotX].xCoord = currentX;
+        *targetY = grid[robotY + 1][robotX].yCoord;
+        *targetX = grid[robotY + 1][robotX].xCoord;
+        setCellDirectionCameFrom(direction, robotY + 1, robotX);
+    }
+    else if (direction == LEFT) {
+        grid[robotY][robotX - 1].yCoord = currentY;
+        grid[robotX][robotX - 1].xCoord = currentX + 0.6; /* Change sign when using with Pioneer to -. */
+        *targetY = grid[robotY][robotX - 1].yCoord;
+        *targetX = grid[robotY][robotX - 1].xCoord;
+        setCellDirectionCameFrom(direction, robotY, robotX - 1);
+    }
+    else if (direction == RIGHT) {
+        grid[robotY][robotX + 1].yCoord = currentY;
+        grid[robotX][robotX + 1].xCoord = currentX - 0.6; /* Change sign when using with Pioneer to +. */
+        *targetY = grid[robotY][robotX + 1].yCoord;
+        *targetX = grid[robotY][robotX + 1].xCoord;
+        setCellDirectionCameFrom(direction, robotY, robotX + 1);
+    }
 }

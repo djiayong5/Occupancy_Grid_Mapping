@@ -20,6 +20,7 @@ using namespace std;
 bool Pioneer::atTarget(double currentY, double currentX, double targetY, double targetX) {
     if (currentY >= (targetY - 0.10) && currentY <= (targetY + 0.10)) {
         if (currentX >= (targetX - 0.10) && currentX <= (targetX + 0.10)) return true;
+        else return false;
     } else return false;
 }
 
@@ -29,10 +30,10 @@ double Pioneer::calculateTurnRate(double currentYaw, double targetYaw) {
 }
 
 int Pioneer::evaluateDirection(double currentYaw) {
-    if (currentYaw < 10.00 || currentYaw > 350.00) return UP;
-    else if (currentYaw < 280.00 && currentYaw > 260.00) return RIGHT;
-    else if (currentYaw < 190 && currentYaw > 170.00) return DOWN;
-    else if (currentYaw < 100 & currentYaw > 80.00) return LEFT;
+    if (currentYaw <= 10.00 || currentYaw >= -10.00) return UP;
+    else if (currentYaw <= -80 || currentYaw >= -100.00) return RIGHT;
+    else if (currentYaw <= -170 || currentYaw >= 170.00) return DOWN;
+    else if (currentYaw < 100.00 || currentYaw > 80.00) return LEFT;
 }
 
 int Pioneer::getFrontSensorFacing() {
@@ -79,13 +80,9 @@ void Pioneer::setRightSensorDirection(int currentDirection) {
     else if (currentDirection == LEFT) rightSensorFacing = UP;
 }
 
-double Pioneer::nextCell(double currentY, double currentX, double targetY, double targetX) {
-    double yChange = targetY - currentY;
-    double xChange = targetX - currentX;
-
-    xChange = sqrt(xChange * xChange);
-    yChange = sqrt(yChange * yChange);
-    return xChange + yChange * PGAIN;
+double Pioneer::nextCell(int direction, double currentY, double currentX, double targetY, double targetX) {
+    if (direction == UP || direction == DOWN) return (targetY - currentY) * PGAIN;
+    if (direction == LEFT || direction == RIGHT) return (targetX - currentX) * PGAIN;
 }
 
 void Pioneer::reconfigureSensors(int currentDirection) {
@@ -126,18 +123,21 @@ void Pioneer::runPioneer() {
     pp.SetMotorEnable(true); /* Enable motors. */
     robot.Read(); /* Read from proxies. */
     currentYaw = rtod(pp.GetYaw()); /* Retrieve current yaw. */
-    currentY = pp.GetYPos(); /* Retrieve current y position. */
-    currentX = pp.GetXPos(); /* Retrieve current x position. */
+    currentY = sqrt(pp.GetYPos() * pp.GetYPos()); /* Retrieve current y position. */
+    currentX = sqrt(pp.GetXPos() * pp.GetYPos()); /* Retrieve current x position. */
     targetY = currentY; /* Initialise targetY to match currentY. */
     targetX = currentX; /* Initialise targetX to match currentX. */
+    currentDirection = evaluateDirection(currentYaw);
+    reconfigureSensors(currentDirection);
+    oG->shrinkGrid(currentDirection);
 
     do {
         cout << endl << endl;
         robot.Read();
         currentYaw = rtod(pp.GetYaw());
         cout << "Current Yaw = " << currentYaw << endl;
-        currentY = pp.GetYPos();
-        currentX = pp.GetXPos();
+        currentY = sqrt(pp.GetYPos() * pp.GetYPos()); /* Retrieve current y position. */
+        currentX = sqrt(pp.GetXPos() * pp.GetYPos()); /* Retrieve current x position. */
         cout << "Current Y Pos = " << currentY << endl;
         cout << "Target Y Pos = " << targetY << endl;
         cout << "Current X Pos = " << currentX << endl;
@@ -154,20 +154,22 @@ void Pioneer::runPioneer() {
                 surveyCycle(((sp[3] + sp[4]) / 2), ((sp[12] + sp[11]) / 2), sp[0], sp[7], currentDirection);
                 oG->printGrid();
 
-                cout << "Current Cell Explored = " << oG->getGrid()[currentY][currentX].isExplored << endl;
-                
-                if (oG->getGrid()[currentY][currentX].isExplored == false) {
+                if (oG->getIsExplored() == false) {
                     cout << "Current Cell not Explored, Adding to Path Stack." << endl;
                     oG->addCellToPath(currentY, currentX);
                     targetDirection = oG->chooseNextCell();
-                } else if (oG->getGrid()[currentY][currentX].neighboursUnexplored == 0) {
+                    oG->setCoordinatesOfCell(currentY, currentX, targetDirection, &targetY, &targetX);
+                    cout << "Set Coordinates for Next Cell." << endl;
+                } else if (oG->getNeighboursUnexplored() == 0) {
                     cout << "No Neighbours Unexplored." << endl;
                     oG->removeCellFromPath();
                     cout << "Removed Current Cell from Path." << endl;
-                    targetDirection = oG->getPreviousCellDirection(currentY, currentX);
-                } else if (oG->getGrid()[currentY][currentX].neighboursUnexplored != 0) {
+                    targetDirection = oG->getPathStack().back()->directionCameFrom;
+                } else if (oG->getNeighboursUnexplored() != 0) {
                     cout << "Not all Neighbours Explored." << endl;
                     targetDirection = oG->chooseNextCell();
+                    oG->setCoordinatesOfCell(currentY, currentX, targetDirection, &targetY, &targetX);
+                    cout << "Set Coordinates for Next Cell." << endl;
                 }
 
                 cout << "New Direction = " << targetDirection << endl;
@@ -175,9 +177,7 @@ void Pioneer::runPioneer() {
                 cout << "Target Yaw = " << targetYaw << endl;
                 turnRate = calculateTurnRate(currentYaw, targetYaw);
             } else {
-                targetY = oG->getPathStack().back()->yCoord;
-                targetX = oG->getPathStack().back()->xCoord;
-                speed = nextCell(currentY, currentX, targetY, targetX);
+                speed = nextCell(currentDirection, currentY, currentX, targetY, targetX);
                 turnRate = dtor(0.000);
             }
         } else {
@@ -191,7 +191,7 @@ void Pioneer::runPioneer() {
                 turnRate = calculateTurnRate(currentYaw, targetYaw); /* Random choice to turn anti-clockwise or clockwise on the spot to avoid collision. */
             }
         }
-        
+
         cout << "Target Yaw = " << targetYaw << endl;
         //Command the motors
         cout << "Speed = " << speed << endl;
@@ -201,7 +201,6 @@ void Pioneer::runPioneer() {
 }
 
 Pioneer::~Pioneer() {
-
     delete(oG);
 }
 

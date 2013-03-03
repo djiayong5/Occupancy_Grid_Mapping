@@ -10,7 +10,6 @@
 #define PIONEER_H
 
 #include <iostream>
-#include <libplayerc++/playerc++.h>
 #include <cstdio>
 #include <cstdlib>
 #include "Occupancy_Grid.h"
@@ -20,13 +19,11 @@
 #define UP 0
 #define DOWN 180
 #define LEFT 90
-#define RIGHT 270
+#define RIGHT -90
 #endif
 
 #define PGAIN 0.5
 #define NEXTSQUARE 0.6
-
-using namespace PlayerCc;
 
 class Pioneer {   
 private:
@@ -36,7 +33,7 @@ private:
     int leftSensorFacing; /* Field that describes the direction the right sensor currently faces relative to its original direction 'LEFT' */
     int rightSensorFacing; /* Field that describes the direction the left sensor currently faces relative to its original direction 'RIGHT' */
     double calculateTurnRate(double currentYaw, double targetYaw);
-    double nextCell(double currentY, double currentX, double targetY, double targetX);
+    double nextCell(int direction, double currentY, double currentX, double targetY, double targetX);
     double getNextYCoordinates(double currentY, int direction);
     double getNextXCoordinates(double currentX, int direction);
     int getFrontSensorFacing();
