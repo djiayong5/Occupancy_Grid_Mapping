@@ -10,14 +10,27 @@ Simulation and Occupancy Grids}
 \newpage
 
 \section{Player}
+\noindent \textbf{Player} is an open source robot interface tool that takes code and translates that code into instructions for a robot. Player communicates with the hardware of a robot and such as a sonar sensor or the motors and allows you to use your code to control them as well as receiving any information that can be given back to the code vice versa. In technical terms, Player is a \textbf{Hardware/Robot Abstraction Layer}, or in simple terms, a middleman between the code and robot hardware.
+
+\vspace{5mm}
+\noindent Player supports a wide variety of devices and robot platforms, used widely in robotics research. Player is also widely used not only because it is part of an open source project for robotics research but because of the number of programming languages and operating systems it supports.
 
 \section{Stage}
+\textbf{Stage} is a 2D robot simulation tool that when used with Player (known as Player/Stage) provides a powerful robot simulation in a simulated world/environment. Gazebo is the 3D simulation version of Stage. Able to simulate multiple robots concurrently, Stage is an excellent robot simulation tool.
+
+\vspace{5mm}
+\noindent Stage is able to interface with Player thus being able simulate a robot in a simulated world. Player would take your code and gives it to Stage which would then simulate the robot taking the translated instructions and acting accordingly. Also Stage is able to give information back to Player such as sonar readings, robot coordinates etc for Player to use with the code. Of course Player would have to request this information from Stage, but this is done in the exact same way as interfacing with a real robot's hardware. This is why Player and Stage are great for robotics research; the code you give to Player works with both a real robot (one supported) and Stage without much changes being made at all.
 
 \section{Solution to Problem}
 
 \subsection{Problem}
+\noindent The problem to be solved is to engineer a way to map out an 'occupancy grid' of an area/environment given through a technique called \textbf{Occupancy Grid Mapping}. The purpose of an occupancy grid is to represent an environment as a grid of evenly sized cells where each cell is either marked as \textbf{full} or \textbf{empty} depending on whether there is an obstacle present in the location the cell \textit{overlays}.
 
+\vspace{5mm}
+\noindent There are certain specifics of the problem include the sizes of the cells being 60cm by 60cm.
+ 
 \subsection{Solution}
+\noindent My approach to solving the problem involved figuring out the capabilities and limitations of the robot platform being used, the \textbf{Pioneer} platform. The 
 
 \subsection{Example Execution of Solution}
 

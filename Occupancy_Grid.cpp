@@ -3,7 +3,7 @@
  * File Name: Occupancy_Grid.cpp
  * Description: Stores member function declarations for Occupancy_Grid class.
  * First Created: 25/02/2013
- * Last Modified: 26/02/2013
+ * Last Modified: 03/03/2013
  */
 
 #include <cstdio>
@@ -126,8 +126,8 @@ void Occupancy_Grid::mapRobotLocation(int direction) {
 }
 
 void Occupancy_Grid::checkOccupancy(int gridY, int gridX) {
-    if (grid[gridY][gridX].obstacleValue == 0) grid[gridY][gridX].isExplored = true;
-    else grid[gridY][gridX].isExplored = false;
+    if (grid[gridY][gridX].obstacleValue == 0) grid[gridY][gridX].isExplored = false;
+    else grid[gridY][gridX].isExplored = true;
 }
 
 void Occupancy_Grid::incrementCellUp() {
@@ -206,24 +206,29 @@ int Occupancy_Grid::chooseNextCell() {
     int gridX;
 
     do {
-        randomDirection = rand() % (4 - 1) + 1;
+        randomDirection = (rand() % 5 - 1) + 1;
+        cout << "Random Number: " << randomDirection << endl;
 
         if (randomDirection == 1) {
             randomDirection = UP;
             gridY = robotY - 1;
             gridX = robotX;
+            cout << "Cell Up Explored = " << grid[gridY][gridX].isExplored << endl;
         } else if (randomDirection == 2) {
-            randomDirection = RIGHT;
+            randomDirection = RIGHT;         
             gridY = robotY;
             gridX = robotX + 1;
+            cout << "Cell Right Explored = " << grid[gridY][gridX].isExplored << endl;
         } else if (randomDirection == 3) {
             randomDirection = DOWN;
             gridY = robotY + 1;
             gridX = robotX;
+            cout << "Cell Down Explored = " << grid[gridY][gridX].isExplored << endl;
         } else if (randomDirection == 4) {
             randomDirection = LEFT;
             gridY = robotY;
             gridX = robotX - 1;
+            cout << "Cell Left Explored = " << grid[gridY][gridX].isExplored << endl;
         }
     } while (grid[gridY][gridX].isExplored == true);
 

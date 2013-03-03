@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.4-1.40.13 (TeX Live 2012/Debian) (format=pdflatex 2013.2.18)  1 MAR 2013 21:13
+This is pdfTeX, Version 3.1415926-2.4-1.40.13 (TeX Live 2012/Debian) (format=pdflatex 2013.2.18)  2 MAR 2013 21:43
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -167,23 +167,24 @@ LaTeX Font Info:    External font `cmex10' loaded for size
  [2] [3]
 (./chs17_Simulation_&_Occupancy_Grids_Report.aux) ) 
 Here is how much of TeX's memory you used:
- 1572 strings out of 495059
- 22752 string characters out of 3182030
- 73755 words of memory out of 3000000
- 4755 multiletter control sequences out of 15000+200000
- 8977 words of font info for 32 fonts, out of 3000000 for 9000
+ 1574 strings out of 495059
+ 22773 string characters out of 3182030
+ 75755 words of memory out of 3000000
+ 4756 multiletter control sequences out of 15000+200000
+ 9324 words of font info for 33 fonts, out of 3000000 for 9000
  14 hyphenation exceptions out of 8191
- 37i,6n,23p,278b,236s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 37i,6n,23p,766b,236s stack positions out of 5000i,500n,10000p,200000b,50000s
 </usr/share/texlive/texmf-di
 st/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/share/texlive/texmf-dist/fon
 ts/type1/public/amsfonts/cm/cmr12.pfb></usr/share/texlive/texmf-dist/fonts/type
 1/public/amsfonts/cm/cmr17.pfb></usr/share/texlive/texmf-dist/fonts/type1/publi
-c/amsfonts/cm/cmtt12.pfb>
-Output written on chs17_Simulation_&_Occupancy_Grids_Report.pdf (3 pages, 42120
+c/amsfonts/cm/cmti12.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsf
+onts/cm/cmtt12.pfb>
+Output written on chs17_Simulation_&_Occupancy_Grids_Report.pdf (3 pages, 57951
  bytes).
 PDF statistics:
- 30 PDF objects out of 1000 (max. 8388607)
- 20 compressed objects within 1 object stream
+ 34 PDF objects out of 1000 (max. 8388607)
+ 23 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
  1 words of extra memory for PDF output out of 10000 (max. 10000000)
 

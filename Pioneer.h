@@ -3,7 +3,7 @@
  * File Name: Pioneer.h
  * Description: Stores function prototypes for Pioneer to use.
  * First Created: 25/02/2013
- * Last Modified: 26/02/2013
+ * Last Modified: 03/03/2013
  */
 
 #ifndef PIONEER_H
@@ -20,7 +20,7 @@
 #define UP 0
 #define DOWN 180
 #define LEFT 90
-#define RIGHT 360
+#define RIGHT 270
 #endif
 
 #define PGAIN 0.5
@@ -50,7 +50,7 @@ private:
     void setLeftSensorDirection(int currentDirection);
     void setRightSensorDirection(int currentDirection);
     void reconfigureSensors(int currentDirection);
-    void surveyCycle(RangerProxy sp, int currentDirection);
+    void surveyCycle(double frontReading, double rearReading, double leftReading, double rightReading, int currentDirection);
 public:
     void runPioneer();
     ~Pioneer();

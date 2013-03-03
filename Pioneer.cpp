@@ -3,7 +3,7 @@
  * File Name: Pioneer.cpp
  * Description: Stores function declarations for Pioneer to use.
  * First Created: 25/02/2013
- * Last Modified: 28/02/2013
+ * Last Modified: 03/03/2013
  */
 
 #include <iostream>
@@ -95,13 +95,13 @@ void Pioneer::reconfigureSensors(int currentDirection) {
     setRightSensorDirection(currentDirection);
 }
 
-void Pioneer::surveyCycle(RangerProxy sp, int currentDirection) {
+void Pioneer::surveyCycle(double frontReading, double rearReading, double leftReading, double rightReading, int currentDirection) {
     oG->mapRobotLocation(currentDirection);
     oG->resizeGrid(currentDirection);
-    oG->evaluateSonarReading(((sp[3] + sp[4]) / 2), frontSensorFacing);
-    oG->evaluateSonarReading(((sp[12] + sp[11]) / 2), rearSensorFacing);
-    oG->evaluateSonarReading(sp[0], leftSensorFacing);
-    oG->evaluateSonarReading(sp[7], rightSensorFacing);
+    oG->evaluateSonarReading(frontReading, frontSensorFacing);
+    oG->evaluateSonarReading(rearReading, rearSensorFacing);
+    oG->evaluateSonarReading(leftReading, leftSensorFacing);
+    oG->evaluateSonarReading(rightReading, rightSensorFacing);
 }
 
 void Pioneer::runPioneer() {  
@@ -122,6 +122,7 @@ void Pioneer::runPioneer() {
     int currentDirection;
     int targetDirection;
 
+    oG->printGrid();
     pp.SetMotorEnable(true);
 
     do {
@@ -129,20 +130,20 @@ void Pioneer::runPioneer() {
         currentY = pp.GetYPos();
         currentX = pp.GetXPos();
 
-
-
         if (turnRate == 0.000) {
             if (atTarget(currentY, currentX, targetY, targetX) == true) { /* Determine if at target location. */
                 pp.SetSpeed(0.000, 0.000);
                 robot.Read();
                 currentDirection = evaluateDirection(currentYaw);
                 reconfigureSensors(currentDirection);
-                surveyCycle(sp, currentDirection);
+                surveyCycle(((sp[3] + sp[4]) / 2), ((sp[12] + sp[11]) / 2), sp[0], sp[7], currentDirection);
                 oG->printGrid();
 
                 if (oG->getGrid()[currentY][currentX].isExplored == false) {
+                    cout << "Current Cell not Explored, Adding to Path Stack." << endl;
                     oG->addCellToPath(currentY, currentX);
                     targetDirection = oG->chooseNextCell();
+                    cout << "New Direction = " << targetDirection << endl;
                 } else if (oG->getGrid()[currentY][currentX].neighboursUnexplored == 0) {
                     oG->removeCellFromPath();
                     targetDirection = oG->getPreviousCellDirection(currentY, currentX);

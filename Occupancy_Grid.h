@@ -18,7 +18,7 @@
 #define UP 0
 #define DOWN 180
 #define LEFT 90
-#define RIGHT 360
+#define RIGHT 270
 #endif
 
 #define START_COLUMNS 3
