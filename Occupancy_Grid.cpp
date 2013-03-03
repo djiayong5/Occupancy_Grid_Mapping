@@ -10,6 +10,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <vector>
+#include <ctime>
 #include "Occupancy_Grid.h"
 
 using namespace std;
@@ -27,8 +28,13 @@ Occupancy_Grid::Occupancy_Grid() {
     for (int rowCounter = 0; rowCounter < START_ROWS; rowCounter++) {
         for (int columnCounter = 0; columnCounter < START_COLUMNS; columnCounter++) {
             initialiseCell(&grid[rowCounter][columnCounter]);
+            cout << "Initial Cell: " << rowCounter << ", " << columnCounter << " Explored = "
+                    << grid[rowCounter][columnCounter].isExplored << ", Neighbours Unexplored = "
+                    << grid[rowCounter][columnCounter].neighboursUnexplored << endl; 
         }
     }
+    
+    cout << endl;
 }
 
 void Occupancy_Grid::initialiseCell(Cell *cell) {
@@ -54,11 +60,7 @@ void Occupancy_Grid::shiftValuesDown() {
             grid[rowCounter][columnCounter].obstacleValue = grid[rowCounter - 1][columnCounter].obstacleValue;
             grid[rowCounter][columnCounter].yCoord = grid[rowCounter - 1][columnCounter].yCoord;
             grid[rowCounter][columnCounter].xCoord = grid[rowCounter - 1][columnCounter].xCoord;
-            grid[rowCounter - 1][columnCounter].isExplored = false; /* Sets value of cell to 0. */
-            grid[rowCounter - 1][columnCounter].neighboursUnexplored = 0;
-            grid[rowCounter - 1][columnCounter].obstacleValue = 0;
-            grid[rowCounter - 1][columnCounter].yCoord = 0.00;
-            grid[rowCounter - 1][columnCounter].xCoord = 0.00;
+            initialiseCell(&grid[rowCounter - 1][columnCounter]);
         }
     }
 }
@@ -74,11 +76,7 @@ void Occupancy_Grid::shiftValuesRight() {
             grid[rowCounter][columnCounter].obstacleValue = grid[rowCounter][columnCounter - 1].obstacleValue;
             grid[rowCounter][columnCounter].yCoord = grid[rowCounter][columnCounter - 1].yCoord;
             grid[rowCounter][columnCounter].xCoord = grid[rowCounter][columnCounter - 1].xCoord;
-            grid[rowCounter][columnCounter - 1].isExplored = false; /* Sets value of cell to 0. */
-            grid[rowCounter][columnCounter - 1].neighboursUnexplored = 0;
-            grid[rowCounter][columnCounter - 1].obstacleValue = 0;
-            grid[rowCounter][columnCounter - 1].yCoord = 0.00;
-            grid[rowCounter][columnCounter - 1].xCoord = 0.00;
+            initialiseCell(&grid[rowCounter][columnCounter - 1]);
         }
     }
 }
@@ -206,29 +204,30 @@ int Occupancy_Grid::chooseNextCell() {
     int gridX;
 
     do {
-        randomDirection = (rand() % 5 - 1) + 1;
-        cout << "Random Number: " << randomDirection << endl;
+        srand(time(NULL));
+        randomDirection = (rand() % 4);
+        //cout << "Random Number: " << randomDirection << endl;
 
-        if (randomDirection == 1) {
+        if (randomDirection == 0) {
             randomDirection = UP;
             gridY = robotY - 1;
             gridX = robotX;
-            cout << "Cell Up Explored = " << grid[gridY][gridX].isExplored << endl;
-        } else if (randomDirection == 2) {
+           // cout << "Cell Up Explored = " << grid[gridY][gridX].isExplored << endl;
+        } else if (randomDirection == 1) {
             randomDirection = RIGHT;         
             gridY = robotY;
             gridX = robotX + 1;
-            cout << "Cell Right Explored = " << grid[gridY][gridX].isExplored << endl;
-        } else if (randomDirection == 3) {
+          //  cout << "Cell Right Explored = " << grid[gridY][gridX].isExplored << endl;
+        } else if (randomDirection == 2) {
             randomDirection = DOWN;
             gridY = robotY + 1;
             gridX = robotX;
-            cout << "Cell Down Explored = " << grid[gridY][gridX].isExplored << endl;
-        } else if (randomDirection == 4) {
+          //  cout << "Cell Down Explored = " << grid[gridY][gridX].isExplored << endl;
+        } else if (randomDirection == 3) {
             randomDirection = LEFT;
             gridY = robotY;
             gridX = robotX - 1;
-            cout << "Cell Left Explored = " << grid[gridY][gridX].isExplored << endl;
+          //  cout << "Cell Left Explored = " << grid[gridY][gridX].isExplored << endl;
         }
     } while (grid[gridY][gridX].isExplored == true);
 
