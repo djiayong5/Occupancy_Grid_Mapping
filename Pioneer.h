@@ -33,8 +33,8 @@ private:
     int leftSensorFacing; /* Field that describes the direction the right sensor currently faces relative to its original direction 'LEFT' */
     int rightSensorFacing; /* Field that describes the direction the left sensor currently faces relative to its original direction 'RIGHT' */
     double calculateTurnRate(double currentYaw, double targetYaw);
-    double nextCell(double distanceToGo, double targetDistance);
-    double calculateDistanceToGo(int targetDirection, double currentY, double currentX, double targetY, double targetX);
+    double calculateSpeed(double distanceRemaining);
+    double calculateDistanceRemaining(int targetDirection, double currentY, double currentX, double targetY, double targetX);
     double getNextYCoordinates(double currentY, int direction);
     double getNextXCoordinates(double currentX, int direction);
     int getFrontSensorFacing();

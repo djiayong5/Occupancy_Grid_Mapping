@@ -80,15 +80,25 @@ void Pioneer::setRightSensorDirection(int currentDirection) {
     else if (currentDirection == LEFT) rightSensorFacing = UP;
 }
 
-double Pioneer::nextCell(double distanceToGo, double targetDistance) {
-    double speed = (distanceToGo - targetDistance) * PGAIN;
-    speed = sqrt(speed * speed); // Gets absolute value.
+double Pioneer::calculateSpeed(double distanceRemaining) {
+    double speed;
+    speed = distanceRemaining * PGAIN;
     return speed;
 }
 
-double Pioneer::calculateDistanceToGo(int targetDirection, double currentY, double currentX, double targetY, double targetX) {
-    if (targetDirection == UP || targetDirection == DOWN) return targetY - currentY;
-    else if (targetDirection == LEFT || targetDirection == RIGHT) return targetX - currentX;
+double Pioneer::calculateDistanceRemaining(int targetDirection, double currentY, double currentX, double targetY, double targetX) {
+    double distanceRemaining;
+
+    if (targetDirection == UP || targetDirection == DOWN) {
+        distanceRemaining = targetY - currentY;
+        cout << "Distance To: " << targetY << ", From: " << currentY << " = " << distanceRemaining << endl;
+    } else if (targetDirection == LEFT || targetDirection == RIGHT) {
+        distanceRemaining = targetX - currentX;
+        cout << "Distance To: " << targetX << ", From: " << currentX << " = " << distanceRemaining << endl;
+    }
+
+    distanceRemaining = sqrt(distanceRemaining * distanceRemaining);
+    return distanceRemaining;
 }
 
 void Pioneer::reconfigureSensors(int currentDirection) {
@@ -132,9 +142,7 @@ void Pioneer::runPioneer() {
     double targetYaw;
     double turnRate = 0.000;
     double speed;
-    double distanceToGo;
-    double lastY;
-    double lastX;
+    double distanceRemaining;
     int currentDirection;
     int targetDirection;
 
@@ -163,8 +171,6 @@ void Pioneer::runPioneer() {
     do {
         robot.Read();
         currentYaw = rtod(pp.GetYaw());
-        lastY = currentY;
-        lastX = currentX;
         currentY = sqrt(pp.GetYPos() * pp.GetYPos()); /* Retrieve current y position. */
         currentX = sqrt(pp.GetXPos() * pp.GetYPos()); /* Retrieve current x position. */
 
@@ -203,9 +209,8 @@ void Pioneer::runPioneer() {
                 targetYaw = targetDirection;
                 turnRate = calculateTurnRate(currentYaw, targetYaw);
             } else {
-                distanceToGo += calculateDistanceToGo(targetDirection, currentY, currentX, lastY, lastX);
-                cout << "Distance Change: " << sqrt(distanceToGo * distanceToGo) << endl;
-                speed = nextCell(distanceToGo, NEXTSQUARE);
+                distanceRemaining = calculateDistanceRemaining(targetDirection, currentY, currentX, targetY, targetX);
+                speed = calculateSpeed(distanceRemaining);
                 cout << "Speed: " << speed << endl;
                 turnRate = dtor(0.000);
             }

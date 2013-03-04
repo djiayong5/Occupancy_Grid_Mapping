@@ -1,6 +1,7 @@
 \contentsline {section}{\numberline {1}Player}{3}
 \contentsline {section}{\numberline {2}Stage}{3}
-\contentsline {section}{\numberline {3}Solution to Problem}{3}
-\contentsline {subsection}{\numberline {3.1}Problem}{3}
-\contentsline {subsection}{\numberline {3.2}Solution}{3}
-\contentsline {subsection}{\numberline {3.3}Example Execution of Solution}{3}
+\contentsline {section}{\numberline {3}Developing Robots with Player and Stage}{3}
+\contentsline {section}{\numberline {4}Solution to Problem}{4}
+\contentsline {subsection}{\numberline {4.1}Problem}{4}
+\contentsline {subsection}{\numberline {4.2}Solution}{4}
+\contentsline {subsection}{\numberline {4.3}Example Execution of Solution}{5}
