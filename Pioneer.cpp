@@ -81,8 +81,8 @@ void Pioneer::setRightSensorDirection(int currentDirection) {
 }
 
 double Pioneer::nextCell(int direction, double currentY, double currentX, double targetY, double targetX) {
-    if (direction == UP || direction == DOWN) return (targetY - currentY) * PGAIN;
-    if (direction == LEFT || direction == RIGHT) return (targetX - currentX) * PGAIN;
+    if (direction == UP || direction == DOWN) return sqrt((targetY - currentY) * (targetY - currentY)) * PGAIN;
+    if (direction == LEFT || direction == RIGHT) return sqrt((targetX - currentX) * (targetX - currentX)) * PGAIN;
 }
 
 void Pioneer::reconfigureSensors(int currentDirection) {
