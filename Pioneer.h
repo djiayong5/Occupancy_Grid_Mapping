@@ -33,7 +33,8 @@ private:
     int leftSensorFacing; /* Field that describes the direction the right sensor currently faces relative to its original direction 'LEFT' */
     int rightSensorFacing; /* Field that describes the direction the left sensor currently faces relative to its original direction 'RIGHT' */
     double calculateTurnRate(double currentYaw, double targetYaw);
-    double nextCell(int direction, double currentY, double currentX, double targetY, double targetX);
+    double nextCell(double distanceToGo, double targetDistance);
+    double calculateDistanceToGo(int targetDirection, double currentY, double currentX, double targetY, double targetX);
     double getNextYCoordinates(double currentY, int direction);
     double getNextXCoordinates(double currentX, int direction);
     int getFrontSensorFacing();
@@ -48,6 +49,7 @@ private:
     void setRightSensorDirection(int currentDirection);
     void reconfigureSensors(int currentDirection);
     void surveyCycle(double frontReading, double rearReading, double leftReading, double rightReading, int currentDirection);
+    void printNewMoveDetails(double currentY, double currentX, double targetY, double targetX, int currentDirection, int targetDirection);
 public:
     void runPioneer();
     ~Pioneer();

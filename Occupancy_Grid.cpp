@@ -122,6 +122,8 @@ void Occupancy_Grid::printGrid() {
         }
         cout << endl;
     }
+    
+    cout << endl;
 }
 
 void Occupancy_Grid::mapRobotLocation(int direction) {
@@ -195,6 +197,8 @@ int Occupancy_Grid::getNeighboursUnexplored() {
 }
 
 void Occupancy_Grid::evaluateSonarReading(double sonarReading, int sonarFacing) {
+    cout << "Sonar Facing " << sonarFacing << ", Reading: " << sonarReading << endl;
+    
     if (sonarReading <= 0.65) {
         if (sonarFacing == UP) incrementCellUp();
         if (sonarFacing == DOWN) incrementCellDown();
@@ -258,29 +262,29 @@ void Occupancy_Grid::setCellDirectionCameFrom(int direction, int yIndex, int xIn
 
 void Occupancy_Grid::setCoordinatesOfCell(double currentY, double currentX, int direction, double *targetY, double *targetX) {
     if (direction == UP) {
-        grid[robotY - 1][robotX].yCoord = currentY - 0.6; /* Change sign when using with Pioneer to -. */
-        grid[robotY - 1][robotX].xCoord = currentX;
+        grid[robotY - 1][robotX].yCoord = currentX - 0.6; /* Change sign when using with Pioneer to -. */
+        grid[robotY - 1][robotX].xCoord = currentY;
         *targetY = grid[robotY - 1][robotX].yCoord;
-        *targetX = grid[robotX - 1][robotX].xCoord;
+        *targetX = grid[robotY - 1][robotX].xCoord;
         setCellDirectionCameFrom(direction, robotY - 1, robotX);
     }
     else if (direction == DOWN) {
-        grid[robotY + 1][robotX].yCoord = currentY + 0.6; /* Change sign when using with Pioneer to +. */
-        grid[robotX + 1][robotX].xCoord = currentX;
+        grid[robotY + 1][robotX].yCoord = currentX + 0.6; /* Change sign when using with Pioneer to +. */
+        grid[robotY + 1][robotX].xCoord = currentY;
         *targetY = grid[robotY + 1][robotX].yCoord;
         *targetX = grid[robotY + 1][robotX].xCoord;
         setCellDirectionCameFrom(direction, robotY + 1, robotX);
     }
     else if (direction == LEFT) {
-        grid[robotY][robotX - 1].yCoord = currentY;
-        grid[robotX][robotX - 1].xCoord = currentX - 0.6; /* Change sign when using with Pioneer to -. */
+        grid[robotY][robotX - 1].yCoord = currentX;
+        grid[robotY][robotX - 1].xCoord = currentY - 0.6; /* Change sign when using with Pioneer to -. */
         *targetY = grid[robotY][robotX - 1].yCoord;
         *targetX = grid[robotY][robotX - 1].xCoord;
         setCellDirectionCameFrom(direction, robotY, robotX - 1);
     }
     else if (direction == RIGHT) {
-        grid[robotY][robotX + 1].yCoord = currentY;
-        grid[robotX][robotX + 1].xCoord = currentX + 0.6; /* Change sign when using with Pioneer to +. */
+        grid[robotY][robotX + 1].yCoord = currentX;
+        grid[robotY][robotX + 1].xCoord = currentY + 0.6; /* Change sign when using with Pioneer to +. */
         *targetY = grid[robotY][robotX + 1].yCoord;
         *targetX = grid[robotY][robotX + 1].xCoord;
         setCellDirectionCameFrom(direction, robotY, robotX + 1);
