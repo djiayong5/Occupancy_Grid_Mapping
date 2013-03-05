@@ -12,21 +12,59 @@
 #include <cstdlib>
 #include <math.h>
 #include "Pioneer.h"
+#include <time.h>
 #include "Occupancy_Grid.h"
 
 using namespace PlayerCc;
 using namespace std;
 
-bool Pioneer::atTarget(double currentY, double currentX, double targetY, double targetX) {
-    if (currentY >= (targetY - 0.075) && currentY <= (targetY + 0.075)) {
-        if (currentX >= (targetX - 0.075) && currentX <= (targetX + 0.075)) return true;
-        else return false;
-    } else return false;
-}
-
 double Pioneer::calculateTurnRate(double currentYaw, double targetYaw) {
     double turnRate = (targetYaw - currentYaw) * PGAIN;
     return dtor(turnRate);
+}
+
+void Pioneer::turnToNewDirection(double targetYaw, Position2dProxy *pp, PlayerClient *robot) {
+    bool yawAcheived = false;
+    double currentYaw;
+    double turnRate = 0.00;
+
+    while (yawAcheived != true) {
+        *robot->Read();
+        currentYaw = rtod(*pp->GetYaw());
+        turnRate = calculateTurnRate(currentYaw, targetYaw);
+        *pp->SetSpeed(0.000, turnRate);
+    }
+}
+
+void Pioneer::moveToNextCell(Position2dProxy *pp) {
+    time_t currentTime;
+    time_t lastTime;
+    double timeDifference = 0.000;
+    double speed = 0.000;
+    double lastSpeed = 0.000;
+    double distance = 0.000;
+    bool travelledDistance = false;
+
+    while (travelledDistance == false) {
+        lastTime = currentTime;
+        currentTime = time(NULL);
+        timeDifference = difftime(currentTime, lastTime);
+        cout << "Time Difference: " << timeDifference << endl;
+
+        if ((distance <= (CELLWIDTH + ERRORBOUND)) && (distance >= (CELLWIDTH - ERRORBOUND))) {
+            speed = 0.000;
+            lastSpeed = 0.000;
+            distance = 0.000;
+            travelledDistance = true;
+            cout << "Arrived at next cell." << endl;
+        } else {
+            lastSpeed = speed;
+            distance += lastSpeed * timeDifference; //Speed in m/sec, time in sec.
+            speed = CELLWIDTH - distance * PGAIN;
+        }
+
+        *pp->SetSpeed(speed, 0.000);
+    }
 }
 
 int Pioneer::evaluateDirection(double currentYaw) {
@@ -80,27 +118,6 @@ void Pioneer::setRightSensorDirection(int currentDirection) {
     else if (currentDirection == LEFT) rightSensorFacing = UP;
 }
 
-double Pioneer::calculateSpeed(double distanceRemaining) {
-    double speed;
-    speed = distanceRemaining * PGAIN;
-    return speed;
-}
-
-double Pioneer::calculateDistanceRemaining(int targetDirection, double currentY, double currentX, double targetY, double targetX) {
-    double distanceRemaining;
-
-    if (targetDirection == UP || targetDirection == DOWN) {
-        distanceRemaining = targetY - currentY;
-        cout << "Distance To: " << targetY << ", From: " << currentY << " = " << distanceRemaining << endl;
-    } else if (targetDirection == LEFT || targetDirection == RIGHT) {
-        distanceRemaining = targetX - currentX;
-        cout << "Distance To: " << targetX << ", From: " << currentX << " = " << distanceRemaining << endl;
-    }
-
-    distanceRemaining = sqrt(distanceRemaining * distanceRemaining);
-    return distanceRemaining;
-}
-
 void Pioneer::reconfigureSensors(int currentDirection) {
     setFrontSensorDirection(currentDirection);
     setRearSensorDirection(currentDirection);
@@ -118,15 +135,6 @@ void Pioneer::surveyCycle(double frontReading, double rearReading, double leftRe
     cout << endl;
 }
 
-void Pioneer::printNewMoveDetails(double currentY, double currentX, double targetY, double targetX, int currentDirection, int targetDirection) {
-    cout << endl << "Old Direction: " << currentDirection << endl;
-    cout << "New Direction: " << targetDirection << endl;
-    cout << "Old Y Coord: " << currentY << endl;
-    cout << "New Y Coord: " << targetY << endl;
-    cout << "Old X Coord: " << currentX << endl;
-    cout << "New X Coord: " << targetX << endl << endl;
-}
-
 void Pioneer::runPioneer() {
     PlayerClient robot("localhost");
     //PlayerClient robot("lisa.islnet");
@@ -136,13 +144,8 @@ void Pioneer::runPioneer() {
     oG = new Occupancy_Grid();
     double currentY = 0.000;
     double currentX = 0.000;
-    double targetY = 0.000;
-    double targetX = 0.000;
     double currentYaw = 0.000;
     double targetYaw;
-    double turnRate = 0.000;
-    double speed;
-    double distanceRemaining;
     int currentDirection;
     int targetDirection;
 
@@ -152,19 +155,13 @@ void Pioneer::runPioneer() {
     currentYaw = rtod(pp.GetYaw()); /* Retrieve current yaw. */
     cout << "Start Yaw: " << currentYaw << endl;
 
-    while (currentYaw >= 0.3 || currentYaw <= -0.3) {
-        robot.Read();
-        currentYaw = rtod(pp.GetYaw());
-        turnRate = calculateTurnRate(currentYaw, 0);
-        pp.SetSpeed(0, turnRate);
-    }
+    turnToNewDirection(0.000, &pp, &robot);
 
     cout << "Start Yaw Corrected to: " << currentYaw << endl;
     currentY = sqrt(pp.GetYPos() * pp.GetYPos()); /* Retrieve current y position. */
-    currentX = sqrt(pp.GetXPos() * pp.GetYPos()); /* Retrieve current x position. */
-    targetY = currentY; /* Initialise targetY to match currentY. */
-    targetX = currentX; /* Initialise targetX to match currentX. */
+    currentX = sqrt(pp.GetXPos() * pp.GetXPos()); /* Retrieve current x position. */
     currentDirection = evaluateDirection(currentYaw);
+    targetDirection = currentDirection;
     reconfigureSensors(currentDirection);
     oG->shrinkGrid(currentDirection);
 
@@ -172,65 +169,36 @@ void Pioneer::runPioneer() {
         robot.Read();
         currentYaw = rtod(pp.GetYaw());
         currentY = sqrt(pp.GetYPos() * pp.GetYPos()); /* Retrieve current y position. */
-        currentX = sqrt(pp.GetXPos() * pp.GetYPos()); /* Retrieve current x position. */
+        currentX = sqrt(pp.GetXPos() * pp.GetXPos()); /* Retrieve current x position. */
 
-        if (turnRate == dtor(0.000)) {
-            if (atTarget(currentY, currentX, targetY, targetX) == true) { /* Determine if at target location. */
-                cout << "At Target Cell." << endl << endl;
-                speed = 0.000;
-                turnRate = dtor(0.000);
-                pp.SetSpeed(speed, turnRate);
-                currentDirection = evaluateDirection(currentYaw);
-                reconfigureSensors(currentDirection);
-                surveyCycle(((sp[3] + sp[4]) / 2), ((sp[12] + sp[11]) / 2), sp[0], sp[7], currentDirection);
-                oG->printGrid();
+        currentDirection = evaluateDirection(currentYaw);
+        reconfigureSensors(currentDirection);
+        surveyCycle(((sp[3] + sp[4]) / 2), ((sp[12] + sp[11]) / 2), sp[0], sp[7], currentDirection);
+        oG->printGrid();
 
-                if (oG->getIsExplored() == false) {
-                    cout << "Current Cell not Explored, Adding to Path Stack." << endl;
-                    oG->addCellToPath(currentY, currentX);
-                    targetDirection = oG->chooseNextCell();
-                    oG->setCoordinatesOfCell(currentY, currentX, targetDirection, &targetY, &targetX);
-                    cout << "Set Coordinates for Next Cell." << endl;
-                    printNewMoveDetails(currentY, currentX, targetY, targetX, currentDirection, targetDirection);
-                } else if (oG->getNeighboursUnexplored() == 0) {
-                    cout << "No Neighbours Unexplored." << endl;
-                    oG->removeCellFromPath();
-                    cout << "Removed Current Cell from Path." << endl;
-                    printNewMoveDetails(currentY, currentX, targetY, targetX, currentDirection, targetDirection);
-                    targetDirection = oG->getPathStack().back()->directionCameFrom;
-                } else if (oG->getNeighboursUnexplored() != 0) {
-                    cout << "Not all Neighbours Explored." << endl;
-                    targetDirection = oG->chooseNextCell();
-                    oG->setCoordinatesOfCell(currentY, currentX, targetDirection, &targetY, &targetX);
-                    cout << "Set Coordinates for Next Cell." << endl;
-                    printNewMoveDetails(currentY, currentX, targetY, targetX, currentDirection, targetDirection);
-                }
-
-                targetYaw = targetDirection;
-                turnRate = calculateTurnRate(currentYaw, targetYaw);
-            } else {
-                distanceRemaining = calculateDistanceRemaining(targetDirection, currentY, currentX, targetY, targetX);
-                speed = calculateSpeed(distanceRemaining);
-                cout << "Speed: " << speed << endl;
-                turnRate = dtor(0.000);
-            }
-        } else {
-            speed = 0.000;
-
-            if ((dtor(currentYaw) >= (dtor(targetYaw) - dtor(1.0))) && (dtor(currentYaw) <= (dtor(targetYaw) + dtor(1.0)))) {
-                cout << "New Yaw Achieved." << endl;
-                turnRate = dtor(0.000);
-            } else {
-                targetYaw = targetDirection;
-                turnRate = calculateTurnRate(currentYaw, targetYaw); /* Random choice to turn anti-clockwise or clockwise on the spot to avoid collision. */
-            }
+        if (oG->getIsExplored() == false) {
+            cout << "Current Cell not Explored, Adding to Path Stack." << endl;
+            oG->addCellToPath(currentY, currentX);
+            targetDirection = oG->chooseNextCell();
+            oG->setCellDirectionCameFrom(targetDirection);
+            cout << "Set Coordinates for Next Cell." << endl;
+        } else if (oG->getNeighboursUnexplored() == 0) {
+            cout << "No Neighbours Unexplored." << endl;
+            oG->removeCellFromPath();
+            cout << "Removed Current Cell from Path." << endl;
+            targetDirection = oG->getPathStack().back()->directionCameFrom;
+        } else if (oG->getNeighboursUnexplored() != 0) {
+            cout << "Not all Neighbours Explored." << endl;
+            targetDirection = oG->chooseNextCell();
+            oG->setCellDirectionCameFrom(targetDirection);
+            cout << "Set Coordinates for Next Cell." << endl;
         }
 
-        //cout << "Target Yaw = " << targetYaw << endl;
-        //Command the motors
-        //cout << "Speed = " << speed << endl;
-        //cout << "Turn Rate = " << turnRate << endl;
-        pp.SetSpeed(speed, turnRate);
+        targetYaw = targetDirection;
+        
+        if (targetDirection != currentDirection) turnToNewDirection(targetYaw, &pp, &robot);
+        moveToNextCell(&pp);
+        
     } while (!oG->getPathStack().empty());
 }
 

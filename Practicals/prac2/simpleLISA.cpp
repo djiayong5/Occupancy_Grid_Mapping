@@ -27,57 +27,80 @@
  *                                           */
 
 #include <iostream>
-#include </src/player-3.0.2/client_libs/libplayerc++/playerc++.h>
+#include <time.h>
+#include <libplayerc++/playerc++.h>
 
 #define PGAIN 0.5
+#define CELLWIDTH 0.6
+#define ERRORBOUND 0.05
 
 //void spinOnTheSpot();
 //double calculateSpeed(Position2dProxy pp, double target_x_coord, double target_y_coord);
 
 int main(int argc, char *argv[]) {
     using namespace PlayerCc;
+    using namespace std;
 
-    PlayerClient robot("lisa.islnet");
-    SonarProxy sp(&robot, 0);
+    PlayerClient robot("localhost");
+    RangerProxy sp(&robot, 0);
     Position2dProxy pp(&robot, 0);
-    double currentY, currentX, targetY, targetX; /* Fields to robot's current and target, x/y coordinates. */
-    
-    pp.SetMotorEnable(true);
+    clock_t clock;
+    double currentSecs;
+    double lastSecs;
+    double timeDifference;
+    double turnRate = 0.00;
+    double speed;
+    double lastSpeed;
+    double currentY;
+    double currentX;
+    double distance;
+    bool travelledDistance = false;
 
-    for (;;) {
-        double turnRate = 0.00;
-        double speed;
+    pp.SetMotorEnable(true);
+    pp.SetSpeed(CELLWIDTH, 0.000);
+
+    while (travelledDistance == false) {
+        clock = clock();
+        lastSecs = currentSecs;
+        currentSecs = (double) clock / CLOCKS_PER_SEC;
+        timeDifference = lastSecs - currentSecs;
+
+        //Print out second values.
+        cout << "Current Secs: " << currentSecs << endl;
+        cout << "Last Secs: " << lastSecs << endl;
+        cout << "Time Difference: " << timeDifference << endl;
+
 
         /* Read from proxies. */
         robot.Read();
-        
-        /* Get robot's curent x and y coordinates. */
+        /* Get robot's current x and y coordinates. */
         currentY = pp.GetYPos();
+        cout << "Current Y : " << currentY << endl;
         currentX = pp.GetXPos();
-        
-        /**/
-        //Print out sonar readings
-        std::cout << sp << std::endl;
+        cout << "Current X : " << currentX << endl;
 
-        //Do simple collision avoidance
-        if ((sp[0] + sp[1]) < (sp[6] + sp[7]))
-            turnRate = dtor(-20); //Turn 20 degrees per delta time
-        else
-            turnRate = dtor(20);
-
-        if (((sp[3] + sp[4]) / 2) < 0.600)
+        if (distance <= (CELLWIDTH + ERRORBOUND) && distance >= (CELLWIDTH - ERRORBOUND)) {
             speed = 0.000;
-        else
-            speed = 0.050;
-        //Command the motors
+            lastSpeed = 0.000;
+            distance = 0.000;
+            turnRate = 0.000;
+            travelledDistance = true;
+        } else {
+            lastSpeed = speed;
+            distance += lastSpeed * timeDifference; //Speed in m/sec, time in sec.
+            speed = CELLWIDTH - distance * PGAIN;
+            turnRate = 0.000;
+        }
+        
         pp.SetSpeed(speed, turnRate);
     }
+}
 
-    /*for (;;) {
-        robot.Read();
-        double currentYaw = rtod(pp.GetYaw());
-        std::cout << currentYaw << std::endl;
-    } */
+/*for (;;) {
+    robot.Read();
+    double currentYaw = rtod(pp.GetYaw());
+    std::cout << currentYaw << std::endl;
+} */
 }
 
 /*void spinOnTheSpot() {

@@ -10,6 +10,7 @@
 #define PIONEER_H
 
 #include <iostream>
+#include <libplayerc++/playerc++.h>
 #include <cstdio>
 #include <cstdlib>
 #include "Occupancy_Grid.h"
@@ -23,9 +24,12 @@
 #endif
 
 #define PGAIN 0.5
+#define ERRORBOUND 0.05
 #define NEXTSQUARE 0.6
 
-class Pioneer {   
+using namespace PlayerCc;
+
+class Pioneer {
 private:
     Occupancy_Grid *oG;
     int frontSensorFacing; /* Field that describes the direction the front sensor currently faces relative to its original direction 'UP' */
@@ -33,15 +37,12 @@ private:
     int leftSensorFacing; /* Field that describes the direction the right sensor currently faces relative to its original direction 'LEFT' */
     int rightSensorFacing; /* Field that describes the direction the left sensor currently faces relative to its original direction 'RIGHT' */
     double calculateTurnRate(double currentYaw, double targetYaw);
-    double calculateSpeed(double distanceRemaining);
-    double calculateDistanceRemaining(int targetDirection, double currentY, double currentX, double targetY, double targetX);
-    double getNextYCoordinates(double currentY, int direction);
-    double getNextXCoordinates(double currentX, int direction);
+    void turnToNewDirection(double targetYaw, Position2dProxy *pp, PlayerClient *robot);
+    void moveToNextCell(Position2dProxy *pp);
     int getFrontSensorFacing();
     int getRearSensorFacing();
     int getLeftSensorFacing();
     int getRightSensorFacing();
-    bool atTarget(double currentY, double currentX, double targetY, double targetX);
     int evaluateDirection(double currentYaw);
     void setFrontSensorDirection(int currentDirection);
     void setRearSensorDirection(int currentDirection);
@@ -49,7 +50,7 @@ private:
     void setRightSensorDirection(int currentDirection);
     void reconfigureSensors(int currentDirection);
     void surveyCycle(double frontReading, double rearReading, double leftReading, double rightReading, int currentDirection);
-    void printNewMoveDetails(double currentY, double currentX, double targetY, double targetX, int currentDirection, int targetDirection);
+
 public:
     void runPioneer();
     ~Pioneer();

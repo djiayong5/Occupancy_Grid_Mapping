@@ -21,6 +21,7 @@
 #define RIGHT -90
 #endif
 
+#define CELLWIDTH 0.6
 #define START_COLUMNS 3
 #define START_ROWS 3
 
@@ -42,8 +43,8 @@ private:
     vector<vector<Cell> > grid;
     int columnWidth;
     int rowHeight;
-    int robotX;
     int robotY;
+    int robotX;
     void checkOccupancy(int gridY, int gridX);
     void incrementCellUp();
     void incrementCellDown();
@@ -53,7 +54,6 @@ private:
     void decrementCellDown();
     void decrementCellLeft();
     void decrementCellRight();
-    void setCellDirectionCameFrom(int direction, int yIndex, int xIndex);
 
 public:
     /* Member Function Prototypes: */
@@ -74,6 +74,6 @@ public:
     void checkNeighbours();
     int getNeighboursUnexplored();
     int chooseNextCell();
-    void setCoordinatesOfCell(double currentY, double currentX, int direction, double *targetY, double *targetX);
+    void setCellDirectionCameFrom(int direction);
 };
 #endif
