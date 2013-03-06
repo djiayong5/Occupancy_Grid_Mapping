@@ -19,25 +19,37 @@ using namespace PlayerCc;
 using namespace std;
 
 double Pioneer::calculateTurnRate(double currentYaw, double targetYaw) {
-    double turnRate = (targetYaw - currentYaw) * TURN_PGAIN;
+    double turnRate = (targetYaw - currentYaw) * PGAIN;
     return dtor(turnRate);
 }
 
 /*void Pioneer::turnToNewDirection(double targetYaw, Position2dProxy *pp, PlayerClient *robot) {
-    bool yawAchieved = false;
+ * 
+ * if (currentYaw >= -0.1 && currentYaw <= 0.1) {
+            yawAcheived = true;
+            pp.SetSpeed(0.000, 0.000);
+        } 
+ * else {
+            robot.Read();
+            currentYaw = rtod(pp.GetYaw());
+            turnRate = calculateTurnRate(currentYaw, 0.000);
+            pp.SetSpeed(0.000, turnRate);
+        }
+    bool yawAcheived = false;
     double currentYaw;
     double turnRate = 0.00;
 
-    while (yawAchieved != true) {
+    while (yawAcheived != true) {
+ * if (currentYaw >= -0.1 && currentYaw <= 0.1) {
+            yawAcheived = true;
+ *pp->SetSpeed(0.000, 0.000);
+ * } 
+ * else {
  *robot->Read();
         currentYaw = rtod(*pp->GetYaw());
-
-        if (currentYaw >= (targetYaw - TURNERRORBOUND) && currentYaw <= (targetYaw + TURNERRORBOUND)) {
-            turnRate = 0.000;
-            yawAchieved = true;
-        } else turnRate = calculateTurnRate(currentYaw, targetYaw);
-
+        turnRate = calculateTurnRate(currentYaw, targetYaw);
  *pp->SetSpeed(0.000, turnRate);
+ * }
     }
 }
 
@@ -54,8 +66,9 @@ void Pioneer::moveToNextCell(Position2dProxy *pp) {
         lastTime = currentTime;
         currentTime = time(NULL);
         timeDifference = difftime(currentTime, lastTime);
+        cout << "Time Difference: " << timeDifference << endl;
 
-        if ((distance <= (CELLWIDTH + MOVEERRORBOUND)) && (distance >= (CELLWIDTH - MOVEERRORBOUND))) {
+        if ((distance <= (CELLWIDTH + ERRORBOUND)) && (distance >= (CELLWIDTH - ERRORBOUND))) {
             speed = 0.000;
             lastSpeed = 0.000;
             distance = 0.000;
@@ -64,7 +77,7 @@ void Pioneer::moveToNextCell(Position2dProxy *pp) {
         } else {
             lastSpeed = speed;
             distance += lastSpeed * timeDifference; //Speed in m/sec, time in sec.
-            speed = CELLWIDTH - distance * MOVEPGAIN;
+            speed = CELLWIDTH - distance * PGAIN;
         }
 
  *pp->SetSpeed(speed, 0.000);
@@ -72,10 +85,10 @@ void Pioneer::moveToNextCell(Position2dProxy *pp) {
 }*/
 
 int Pioneer::evaluateDirection(double currentYaw) {
-    if (currentYaw <= 10.00 || currentYaw >= -10.00) return ZERO;
-    else if (currentYaw <= -80 || currentYaw >= -100.00) return MINUS_NIGHTY;
-    else if (currentYaw <= -170 || currentYaw >= 170.00) return ONE_EIGHTY;
-    else if (currentYaw < 100.00 || currentYaw > 80.00) return NIGHTY;
+    if (currentYaw <= 10.00 || currentYaw >= -10.00) return UP;
+    else if (currentYaw <= -80 || currentYaw >= -100.00) return RIGHT;
+    else if (currentYaw <= -170 || currentYaw >= 170.00) return DOWN;
+    else if (currentYaw < 100.00 || currentYaw > 80.00) return LEFT;
 }
 
 int Pioneer::getFrontSensorFacing() {
@@ -95,31 +108,31 @@ int Pioneer::getRightSensorFacing() {
 }
 
 void Pioneer::setFrontSensorDirection(int currentDirection) {
-    if (currentDirection == ZERO) frontSensorFacing = ZERO;
-    else if (currentDirection == MINUS_NIGHTY) frontSensorFacing = MINUS_NIGHTY;
-    else if (currentDirection == ONE_EIGHTY) frontSensorFacing = ONE_EIGHTY;
-    else if (currentDirection == NIGHTY) frontSensorFacing = NIGHTY;
+    if (currentDirection == UP) frontSensorFacing = UP;
+    else if (currentDirection == RIGHT) frontSensorFacing = RIGHT;
+    else if (currentDirection == DOWN) frontSensorFacing = DOWN;
+    else if (currentDirection == LEFT) frontSensorFacing = LEFT;
 }
 
 void Pioneer::setRearSensorDirection(int currentDirection) {
-    if (currentDirection == ZERO) rearSensorFacing = ONE_EIGHTY;
-    else if (currentDirection == MINUS_NIGHTY) rearSensorFacing = NIGHTY;
-    else if (currentDirection == ONE_EIGHTY) rearSensorFacing = ZERO;
-    else if (currentDirection == NIGHTY) rearSensorFacing = MINUS_NIGHTY;
+    if (currentDirection == UP) rearSensorFacing = DOWN;
+    else if (currentDirection == RIGHT) rearSensorFacing = LEFT;
+    else if (currentDirection == DOWN) rearSensorFacing = UP;
+    else if (currentDirection == LEFT) rearSensorFacing = RIGHT;
 }
 
 void Pioneer::setLeftSensorDirection(int currentDirection) {
-    if (currentDirection == ZERO) leftSensorFacing = NIGHTY;
-    else if (currentDirection == MINUS_NIGHTY) leftSensorFacing = ZERO;
-    else if (currentDirection == ONE_EIGHTY) leftSensorFacing = MINUS_NIGHTY;
-    else if (currentDirection == NIGHTY) leftSensorFacing = ONE_EIGHTY;
+    if (currentDirection == UP) leftSensorFacing = LEFT;
+    else if (currentDirection == RIGHT) leftSensorFacing = UP;
+    else if (currentDirection == DOWN) leftSensorFacing = RIGHT;
+    else if (currentDirection == LEFT) leftSensorFacing = DOWN;
 }
 
 void Pioneer::setRightSensorDirection(int currentDirection) {
-    if (currentDirection == ZERO) rightSensorFacing = MINUS_NIGHTY;
-    else if (currentDirection == MINUS_NIGHTY) rightSensorFacing = ONE_EIGHTY;
-    else if (currentDirection == ONE_EIGHTY) rightSensorFacing = NIGHTY;
-    else if (currentDirection == NIGHTY) rightSensorFacing = ZERO;
+    if (currentDirection == UP) rightSensorFacing = RIGHT;
+    else if (currentDirection == RIGHT) rightSensorFacing = DOWN;
+    else if (currentDirection == DOWN) rightSensorFacing = LEFT;
+    else if (currentDirection == LEFT) rightSensorFacing = UP;
 }
 
 void Pioneer::reconfigureSensors(int currentDirection) {
@@ -146,6 +159,8 @@ void Pioneer::runPioneer() {
     Position2dProxy pp(&robot, 0);
 
     oG = new Occupancy_Grid();
+    double currentY = 0.000;
+    double currentX = 0.000;
     double currentYaw = 0.000;
     double targetYaw;
     int currentDirection;
@@ -157,24 +172,25 @@ void Pioneer::runPioneer() {
     currentYaw = rtod(pp.GetYaw()); /* Retrieve current yaw. */
     cout << "Start Yaw: " << currentYaw << endl;
 
-    //turnToNewDirection(0.000, &pp, &robot);
-    targetYaw = 0.000;
-    bool yawAchieved = false;
+    bool yawAcheived = false;
     double turnRate = 0.00;
 
-    while (yawAchieved != true) {
-        robot.Read();
-        currentYaw = rtod(pp.GetYaw());
-
-        if (currentYaw >= (targetYaw - TURN_ERROR_BOUND) && currentYaw <= (targetYaw + TURN_ERROR_BOUND)) {
-            turnRate = 0.000;
-            yawAchieved = true;
-        } else turnRate = calculateTurnRate(currentYaw, targetYaw);
-
-        pp.SetSpeed(0.000, turnRate);
+    while (yawAcheived != true) {
+        if (currentYaw >= -0.1 && currentYaw <= 0.1) {
+            yawAcheived = true;
+            pp.SetSpeed(0.000, 0.000);
+        } else {
+            robot.Read();
+            currentYaw = rtod(pp.GetYaw());
+            turnRate = calculateTurnRate(currentYaw, 0.000);
+            pp.SetSpeed(0.000, turnRate);
+        }
     }
+    //turnToNewDirection(0.000, &pp, &robot);
 
     cout << "Start Yaw Corrected to: " << currentYaw << endl;
+    currentY = sqrt(pp.GetYPos() * pp.GetYPos()); /* Retrieve current y position. */
+    currentX = sqrt(pp.GetXPos() * pp.GetXPos()); /* Retrieve current x position. */
     currentDirection = evaluateDirection(currentYaw);
     targetDirection = currentDirection;
     reconfigureSensors(currentDirection);
@@ -183,6 +199,8 @@ void Pioneer::runPioneer() {
     do {
         robot.Read();
         currentYaw = rtod(pp.GetYaw());
+        currentY = sqrt(pp.GetYPos() * pp.GetYPos()); /* Retrieve current y position. */
+        currentX = sqrt(pp.GetXPos() * pp.GetXPos()); /* Retrieve current x position. */
 
         currentDirection = evaluateDirection(currentYaw);
         reconfigureSensors(currentDirection);
@@ -191,44 +209,39 @@ void Pioneer::runPioneer() {
 
         if (oG->getIsExplored() == false) {
             cout << "Current Cell not Explored, Adding to Path Stack." << endl;
-            oG->addCellToPath();
+            oG->addCellToPath(currentY, currentX);
             targetDirection = oG->chooseNextCell();
-            oG->setCellDirectionToComeFrom(targetDirection);
+            oG->setCellDirectionCameFrom(targetDirection);
             cout << "Set Coordinates for Next Cell." << endl;
         } else if (oG->getNeighboursUnexplored() == 0) {
             cout << "No Neighbours Unexplored." << endl;
             oG->removeCellFromPath();
             cout << "Removed Current Cell from Path." << endl;
-            targetDirection = oG->getPathStack().back()->directionToComeFrom;
+            targetDirection = oG->getPathStack().back()->directionCameFrom;
         } else if (oG->getNeighboursUnexplored() != 0) {
             cout << "Not all Neighbours Explored." << endl;
             targetDirection = oG->chooseNextCell();
-            oG->setCellDirectionToComeFrom(targetDirection);
+            oG->setCellDirectionCameFrom(targetDirection);
             cout << "Set Coordinates for Next Cell." << endl;
         }
 
         targetYaw = targetDirection;
 
         if (targetDirection != currentDirection) {
-            //turnToNewDirection(targetYaw, &pp, &robot);
-            bool yawAchieved = false;
-            double currentYaw;
-            double turnRate = 0.00;
-
-            while (yawAchieved != true) {
-                robot.Read();
-                currentYaw = rtod(pp.GetYaw());
-
-                if (currentYaw >= (targetYaw - TURN_ERROR_BOUND) && currentYaw <= (targetYaw + TURN_ERROR_BOUND)) {
-                    turnRate = 0.000;
-                    yawAchieved = true;
-                } else turnRate = calculateTurnRate(currentYaw, targetYaw);
-
-                pp.SetSpeed(0.000, turnRate);
+            while (yawAcheived != true) {
+                if (currentYaw >= (targetYaw - 0.1) && currentYaw <= (targetYaw + 0.1)) {
+                    yawAcheived = true;
+                    pp.SetSpeed(0.000, 0.000);
+                } else {
+                    robot.Read();
+                    currentYaw = rtod(pp.GetYaw());
+                    turnRate = calculateTurnRate(currentYaw, 0.000);
+                    pp.SetSpeed(0.000, turnRate);
+                }
             }
         }
+        //turnToNewDirection(targetYaw, &pp, &robot);
 
-        //moveToNextCell(&pp);
         time_t currentTime;
         time_t lastTime;
         double timeDifference = 0.000;
@@ -241,8 +254,9 @@ void Pioneer::runPioneer() {
             lastTime = currentTime;
             currentTime = time(NULL);
             timeDifference = difftime(currentTime, lastTime);
+            cout << "Time Difference: " << timeDifference << endl;
 
-            if ((distance <= (CELL_WIDTH + MOVE_ERROR_BOUND)) && (distance >= (CELL_WIDTH - MOVE_ERROR_BOUND))) {
+            if ((distance <= (CELLWIDTH + ERRORBOUND)) && (distance >= (CELLWIDTH - ERRORBOUND))) {
                 speed = 0.000;
                 lastSpeed = 0.000;
                 distance = 0.000;
@@ -251,11 +265,12 @@ void Pioneer::runPioneer() {
             } else {
                 lastSpeed = speed;
                 distance += lastSpeed * timeDifference; //Speed in m/sec, time in sec.
-                speed = CELL_WIDTH - distance * MOVE_PGAIN;
+                speed = CELLWIDTH - distance * PGAIN;
             }
 
             pp.SetSpeed(speed, 0.000);
         }
+        //moveToNextCell(&pp);
 
     } while (!oG->getPathStack().empty());
 }

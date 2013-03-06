@@ -15,15 +15,15 @@
 
 #ifndef DIRECTIONS
 #define DIRECTIONS
-#define UP 0
-#define DOWN 180
-#define LEFT 90
-#define RIGHT -90
+#define ZERO 0
+#define ONE_EIGHTY 180
+#define NIGHTY 90
+#define MINUS_NIGHTY -90
 #endif
 
-#define CELLWIDTH 0.6
-#define START_COLUMNS 3
-#define START_ROWS 3
+#define CELL_WIDTH 0.6
+#define START_X_LENGTH 3
+#define START_Y_LENGTH 3
 
 using namespace std;
 
@@ -41,13 +41,13 @@ class Occupancy_Grid {
 private:
     vector<Cell*> pathStack;
     vector<vector<Cell> > grid;
-    int columnWidth;
-    int rowHeight;
+    int yLength;
+    int xLength;
     int robotY;
     int robotX;
-    void checkOccupancy(int gridY, int gridX);
-    void incrementCell(int gridY, int gridX);
-    void decrementCell(int gridY, int gridX);
+    void checkOccupancy(int gridX, int gridY);
+    void incrementCell(int gridX, int gridY);
+    void decrementCell(int gridX, int gridY);
 
 public:
     /* Member Function Prototypes: */
@@ -57,7 +57,7 @@ public:
     vector<vector<Cell> > getGrid();
     void resizeGrid(int directionToExpand);
     void shrinkGrid(int directionToShrink);
-    void shiftValuesDown();
+    void shiftValuesUp();
     void shiftValuesRight();
     void printGrid();
     void mapRobotLocation(int direction);

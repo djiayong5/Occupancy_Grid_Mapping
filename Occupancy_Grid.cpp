@@ -19,19 +19,19 @@ using namespace std;
 Occupancy_Grid::Occupancy_Grid() {
     robotX = 1;
     robotY = 1;
-    columnWidth = 3;
-    rowHeight = 3;
+    xLength = 3;
+    yLength = 3;
 
     pathStack.resize(1);
-    grid.resize(START_COLUMNS);
-    for (int counter = 0; counter < START_COLUMNS; counter++) grid[counter].resize(START_ROWS);
+    grid.resize(START_X_LENGTH);
+    for (int counter = 0; counter < START_X_LENGTH; counter++) grid[counter].resize(START_Y_LENGTH);
 
-    for (int rowCounter = 0; rowCounter < START_ROWS; rowCounter++) {
-        for (int columnCounter = 0; columnCounter < START_COLUMNS; columnCounter++) {
-            initialiseCell(&grid[rowCounter][columnCounter]);
-            cout << "Initial Cell: " << rowCounter << ", " << columnCounter << " Explored = "
-                    << grid[rowCounter][columnCounter].isExplored << ", Neighbours Unexplored = "
-                    << grid[rowCounter][columnCounter].neighboursUnexplored << endl;
+    for (int xCounter = 0; xCounter < START_X_LENGTH; xCounter++) {
+        for (int yCounter = 0; yCounter < START_Y_LENGTH; yCounter++) {
+            initialiseCell(&grid[xCounter][yCounter]);
+            cout << "Initial Cell: " << xCounter << ", " << yCounter << " Explored = "
+                    << grid[xCounter][yCounter].isExplored << ", Neighbours Unexplored = "
+                    << grid[xCounter][yCounter].neighboursUnexplored << endl;
         }
     }
 
@@ -54,35 +54,35 @@ vector<vector<Cell> > Occupancy_Grid::getGrid() {
     return grid;
 }
 
-/* Member function to shift all the values in the occupancy grid 1 cell down.*/
-void Occupancy_Grid::shiftValuesDown() {
-    robotY++; /* Adjust robot's location to match grid shifting. */
+/* Member function to shift all the values in the occupancy grid 1 cell up.*/
+void Occupancy_Grid::shiftValuesUp() {
+    robotY--; /* Adjust robot's location to match grid shifting. */
 
-    for (int rowCounter = rowHeight - 1; rowCounter > 0; rowCounter--) {
-        for (int columnCounter = 0; columnCounter < columnWidth; columnCounter++) {
-            grid[rowCounter][columnCounter].isExplored = grid[rowCounter - 1][columnCounter].isExplored; /* Copies value to the cell below. */
-            grid[rowCounter][columnCounter].neighboursUnexplored = grid[rowCounter - 1][columnCounter].neighboursUnexplored;
-            grid[rowCounter][columnCounter].obstacleValue = grid[rowCounter - 1][columnCounter].obstacleValue;
-            grid[rowCounter][columnCounter].yCoord = grid[rowCounter - 1][columnCounter].yCoord;
-            grid[rowCounter][columnCounter].xCoord = grid[rowCounter - 1][columnCounter].xCoord;
-            initialiseCell(&grid[rowCounter - 1][columnCounter]);
+    for (int xCounter = 0; xCounter <= xLength; xCounter++) {
+        for (int yCounter = yLength - 1; yCounter >= 0; yCounter--) {
+            grid[xCounter][yCounter].isExplored = grid[xCounter][yCounter - 1].isExplored; //Copies value to the cell above.
+            grid[xCounter][yCounter].neighboursUnexplored = grid[xCounter][yCounter - 1].neighboursUnexplored;
+            grid[xCounter][yCounter].obstacleValue = grid[xCounter][yCounter - 1].obstacleValue;
+            grid[xCounter][yCounter].yCoord = grid[xCounter][yCounter - 1].yCoord;
+            grid[xCounter][yCounter].xCoord = grid[xCounter][yCounter - 1].xCoord;
+            initialiseCell(&grid[xCounter][yCounter - 1]);
         }
     }
 }
 
 /* Member function to shift all the values in the occupancy grid right 1 cell. */
 void Occupancy_Grid::shiftValuesRight() {
-    robotX++; /* Adjust robot's location to match grid shifting. */
+    robotX++; //Adjust robot's location to match grid shifting.
 
-    for (int rowCounter = 0; rowCounter < rowHeight; rowCounter++) {
-        for (int columnCounter = columnWidth - 1; columnCounter > 0; columnCounter--) {
-            grid[rowCounter][columnCounter] = grid[rowCounter][columnCounter - 1]; /* Copies value to the cell to the right. */
-            grid[rowCounter][columnCounter].isExplored = grid[rowCounter][columnCounter - 1].isExplored; /* Copies value to the cell below. */
-            grid[rowCounter][columnCounter].neighboursUnexplored = grid[rowCounter][columnCounter - 1].neighboursUnexplored;
-            grid[rowCounter][columnCounter].obstacleValue = grid[rowCounter][columnCounter - 1].obstacleValue;
-            grid[rowCounter][columnCounter].yCoord = grid[rowCounter][columnCounter - 1].yCoord;
-            grid[rowCounter][columnCounter].xCoord = grid[rowCounter][columnCounter - 1].xCoord;
-            initialiseCell(&grid[rowCounter][columnCounter - 1]);
+    for (int xCounter = xLength - 1; xCounter >= 0; xCounter--) {
+        for (int yCounter = 0; yCounter <= yLength; yCounter++) {
+            grid[xCounter][yCounter] = grid[xCounter - 1][yCounter]; //Copies value to the cell to the right.
+            grid[xCounter][yCounter].isExplored = grid[xCounter - 1][yCounter].isExplored; //Copies value to the cell to the right.
+            grid[xCounter][yCounter].neighboursUnexplored = grid[xCounter - 1][yCounter].neighboursUnexplored;
+            grid[xCounter][yCounter].obstacleValue = grid[xCounter - 1][yCounter].obstacleValue;
+            grid[xCounter][yCounter].yCoord = grid[xCounter - 1][yCounter].yCoord;
+            grid[xCounter][yCounter].xCoord = grid[xCounter - 1][yCounter].xCoord;
+            initialiseCell(&grid[xCounter - 1][yCounter]);
         }
     }
 }
@@ -92,23 +92,27 @@ void Occupancy_Grid::shiftValuesRight() {
  * @param directionToExpand The direction to expand the occupancy grid.
  */
 void Occupancy_Grid::resizeGrid(int directionToExpand) {
-    if (directionToExpand == UP || directionToExpand == DOWN) rowHeight++;
-    else if (directionToExpand == LEFT || directionToExpand == RIGHT) columnWidth++;
+    if (directionToExpand == ZERO || directionToExpand == ONE_EIGHTY) xLength++;
+    else if (directionToExpand == NIGHTY || directionToExpand == MINUS_NIGHTY) xLength++;
 
-    grid.resize(rowHeight); //Resizes grid rows.
-    for (int rowCounter = 0; rowCounter < rowHeight; rowCounter++) grid[rowCounter].resize(columnWidth); //Resize grid columns.
+    grid.resize(xLength); //Resizes grid xs.
+    for (int xCounter = 0; xCounter < xLength; xCounter++) grid[xCounter].resize(yLength); //Resize grid ys.
 
-    if (directionToExpand == UP) shiftValuesDown(); //Calls member function to shift the values down one.
-    else if (directionToExpand == LEFT) shiftValuesRight(); //Calls member function to shift the values right one.
+    if (directionToExpand == NIGHTY) shiftValuesRight(); //Calls member function to shift the values right one.
+    else if (directionToExpand == ONE_EIGHTY) shiftValuesUp(); //Calls member function to shift the values up one.
 
-    if (directionToExpand == UP) {
-        for (int columnCounter = 0; columnCounter < columnWidth; columnCounter++) initialiseCell(&grid[0][columnCounter]);
-    } else if (directionToExpand == DOWN) {
-        for (int columnCounter = 0; columnCounter < columnWidth; columnCounter++) initialiseCell(&grid[rowHeight - 1][columnCounter]);
-    } else if (directionToExpand == RIGHT) {
-        for (int rowCounter = 0; rowCounter < rowHeight; rowCounter++) initialiseCell(&grid[rowCounter][columnWidth - 1]);
-    } else if (directionToExpand == LEFT) {
-        for (int rowCounter = 0; rowCounter < rowHeight; rowCounter++) initialiseCell(&grid[rowCounter][0]);
+    if (directionToExpand == ZERO) {
+        robotY++;
+        for (int xCounter = 0; xCounter < xLength; xCounter++) initialiseCell(&grid[xCounter][yLength - 1]);
+    } else if (directionToExpand == ONE_EIGHTY) {
+        robotY--;
+        for (int xCounter = 0; xCounter < xLength; xCounter++) initialiseCell(&grid[xCounter][0]);
+    } else if (directionToExpand == MINUS_NIGHTY) {
+        robotX++;
+        for (int yCounter = 0; yCounter < yLength; yCounter++) initialiseCell(&grid[xLength - 1][yCounter]);
+    } else if (directionToExpand == NIGHTY) {
+        robotX--;
+        for (int yCounter = 0; yCounter < yLength; yCounter++) initialiseCell(&grid[0][yCounter]);
     }
 }
 
@@ -116,25 +120,25 @@ void Occupancy_Grid::resizeGrid(int directionToExpand) {
  * @param directionToShrink The direction in which to shrink the grid by 1 whole row/column.
  */
 void Occupancy_Grid::shrinkGrid(int directionToShrink) {
-    if (directionToShrink == UP || directionToShrink == DOWN) rowHeight--;
-    else if (directionToShrink == LEFT || directionToShrink == RIGHT) columnWidth--;
+    if (directionToShrink == ZERO || directionToShrink == ONE_EIGHTY) yLength--;
+    else if (directionToShrink == NIGHTY || directionToShrink == MINUS_NIGHTY) xLength--;
 
-    grid.resize(rowHeight);
-    for (int rowCounter = 0; rowCounter < rowHeight; rowCounter++) grid[rowCounter].resize(columnWidth);
+    grid.resize(xLength);
+    for (int xCounter = 0; xCounter < xLength; xCounter++) grid[xCounter].resize(yLength);
 }
 
 /* Member function to print out the whole occupancy grid with the cells' obstacle values.
  * A '0' represents no obstacle present/empty cell and anything else represents an obstacle present/full cell.
  */
 void Occupancy_Grid::printGrid() {
-    cout << "Robot's Y location on grid: " << robotY << endl;
     cout << "Robot's X location on grid: " << robotX << endl;
-    cout << "Number of rows: " << rowHeight << endl;
-    cout << "Number of columns: " << columnWidth << endl;
+    cout << "Robot's Y location on grid: " << robotY << endl;
+    cout << "x Length: " << xLength << endl;
+    cout << "y Length: " << yLength << endl;
 
-    for (int rowCounter = 0; rowCounter < rowHeight; rowCounter++) {
-        for (int columnCounter = 0; columnCounter < columnWidth; columnCounter++) {
-            cout << grid[rowCounter][columnCounter].obstacleValue;
+    for (int xCounter = 0; xCounter < xLength; xCounter++) {
+        for (int yCounter = 0; yCounter < yLength; yCounter++) {
+            cout << grid[xCounter][yCounter].obstacleValue;
         }
         cout << endl;
     }
@@ -146,58 +150,58 @@ void Occupancy_Grid::printGrid() {
  * @param direction The direction the robot moved.
  */
 void Occupancy_Grid::mapRobotLocation(int direction) {
-    if (direction == UP) robotY--; /* Move robot up one cell on the grid. */
-    else if (direction == DOWN) robotY++; /* Move robot down one cell on the grid. */
-    else if (direction == LEFT) robotX--; /* Move robot left one cell on the grid. */
-    else if (direction == RIGHT) robotX++; /* Move robot right one cell on the grid. */
+    if (direction == ZERO) robotY++; //Move robot up one cell on the grid.
+    else if (direction == ONE_EIGHTY) robotY--; //Move robot down one cell on the grid.
+    else if (direction == NIGHTY) robotX--; //Move robot left one cell on the grid.
+    else if (direction == MINUS_NIGHTY) robotX++; //Move robot right one cell on the grid.
 }
 
 /* Member function to check the occupancy value of a cell and if the value >0, mark it as explored
  * to prevent the robot from exploring the cell/colliding into the obstacle.
  */
-void Occupancy_Grid::checkOccupancy(int gridY, int gridX) {
-    if (grid[gridY][gridX].obstacleValue > 0) grid[gridY][gridX].isExplored = true;
+void Occupancy_Grid::checkOccupancy(int gridX, int gridY) {
+    if (grid[gridX][gridY].obstacleValue > 0) grid[gridX][gridY].isExplored = true;
 }
 
 /* Member function to increment the cell's obstacleValue field value by 1.
  * @param gridY the 'y' index of the grid cell.
  * @param gridX the 'x' index of the grid cell.
  */
-void Occupancy_Grid::incrementCell(int gridY, int gridX) {
-    grid[gridY][gridX].obstacleValue++;
+void Occupancy_Grid::incrementCell(int gridX, int gridY) {
+    grid[gridX][gridY].obstacleValue++;
 }
 
 /* Member function to decrement the cell's obstacleValue field value 1.
  * @param gridY the 'y' index of the grid cell.
  * @param gridX the 'x' index of the grid cell.
  */
-void Occupancy_Grid::decrementCell(int gridY, int gridX) {
-    if (grid[gridY][gridX].obstacleValue > 0) {
-        grid[gridY][gridX].obstacleValue--; //Decrements obstacle value of cell if it had a obstacle value >0.
-        checkOccupancy(gridY, gridX); //Double checks occupancy after obstacle value decremented.
-        if (grid[gridY][gridX].obstacleValue == 0) grid[gridY][gridX].isExplored = false; //Makes cell now explorable.
+void Occupancy_Grid::decrementCell(int gridX, int gridY) {
+    if (grid[gridX][gridY].obstacleValue > 0) {
+        grid[gridX][gridY].obstacleValue--; //Decrements obstacle value of cell if it had a obstacle value >0.
+        checkOccupancy(gridX, gridY); //Double checks occupancy after obstacle value decremented.
+        if (grid[gridX][gridY].obstacleValue == 0) grid[gridX][gridY].isExplored = false; //Makes cell now explorable.
     }
 }
 
 /* Member function to return the isExplored field value of the cell the robot currently occupies.*/
 bool Occupancy_Grid::getIsExplored() {
-    return grid[robotY][robotX].isExplored;
+    return grid[robotX][robotY].isExplored;
 }
 
 /* Member function to check the neighbours of the cell the robot currently occupies for their exploration state.*/
 void Occupancy_Grid::checkNeighbours() {
     int neighboursUnexplored = 0;
-    if (grid[robotY + 1][robotX].isExplored == false) neighboursUnexplored++;
-    if (grid[robotY - 1][robotX].isExplored == false) neighboursUnexplored++;
-    if (grid[robotY][robotX + 1].isExplored == false) neighboursUnexplored++;
-    if (grid[robotY][robotX - 1].isExplored == false) neighboursUnexplored++;
+    if (grid[robotX + 1][robotY].isExplored == false) neighboursUnexplored++;
+    if (grid[robotX - 1][robotY].isExplored == false) neighboursUnexplored++;
+    if (grid[robotX][robotY + 1].isExplored == false) neighboursUnexplored++;
+    if (grid[robotX][robotY - 1].isExplored == false) neighboursUnexplored++;
 
-    grid[robotY][robotX].neighboursUnexplored = neighboursUnexplored;
+    grid[robotX][robotY].neighboursUnexplored = neighboursUnexplored;
 }
 
 /* Member function to return the neighboursUnexplored field value of the cell the robot currently occupies.*/
 int Occupancy_Grid::getNeighboursUnexplored() {
-    return grid[robotY][robotX].neighboursUnexplored;
+    return grid[robotX][robotY].neighboursUnexplored;
 }
 
 /* Member function to evaluate the sonar reading and calling the relevant increment/decrement member functions.
@@ -208,22 +212,22 @@ void Occupancy_Grid::evaluateSonarReading(double sonarReading, int sonarFacing) 
     cout << "Sonar Facing " << sonarFacing << ", Reading: " << sonarReading << endl;
 
     if (sonarReading <= 0.65) {
-        if (sonarFacing == UP) incrementCell(robotY - 1, robotX);
-        if (sonarFacing == DOWN) incrementCell(robotY + 1, robotX);
-        if (sonarFacing == LEFT) incrementCell(robotY, robotX - 1);
-        if (sonarFacing == RIGHT) incrementCell(robotY, robotX + 1);
+        if (sonarFacing == ZERO) incrementCell(robotX, robotY + 1);
+        if (sonarFacing == ONE_EIGHTY) incrementCell(robotX, robotY - 1);
+        if (sonarFacing == NIGHTY) incrementCell(robotX - 1, robotY);
+        if (sonarFacing == MINUS_NIGHTY) incrementCell(robotX + 1, robotY);
     } else {
-        if (sonarFacing == UP) decrementCell(robotY - 1, robotX);
-        if (sonarFacing == DOWN) decrementCell(robotY + 1, robotX);
-        if (sonarFacing == LEFT) decrementCell(robotY, robotX - 1);
-        if (sonarFacing == RIGHT) decrementCell(robotY, robotX + 1);
+        if (sonarFacing == ZERO) decrementCell(robotX, robotY + 1);
+        if (sonarFacing == ONE_EIGHTY) decrementCell(robotX, robotY - 1);
+        if (sonarFacing == NIGHTY) decrementCell(robotX - 1, robotY);
+        if (sonarFacing == MINUS_NIGHTY) decrementCell(robotX + 1, robotY);
     }
 }
 
 /* Member function to add the cell the robot currently occupies to the pathStack. */
 void Occupancy_Grid::addCellToPath() {
-    pathStack.push_back(&grid[robotY][robotX]); /* Add pointer of current cell to path stack. */
-    grid[robotY][robotX].isExplored = true;
+    pathStack.push_back(&grid[robotX][robotY]); //Add pointer of current cell to path stack.
+    grid[robotX][robotY].isExplored = true;
 }
 
 /* Member function to remove the cell that the robot currently occupies from the pathStack. */
@@ -244,31 +248,31 @@ int Occupancy_Grid::chooseNextCell() {
         randomDirection = (rand() % 4);
 
         if (randomDirection == 0) {
-            randomDirection = UP;
-            gridY = robotY - 1;
+            randomDirection = ZERO;
             gridX = robotX;
+            gridY = robotY + 1;           
         } else if (randomDirection == 1) {
-            randomDirection = RIGHT;
-            gridY = robotY;
+            randomDirection = MINUS_NIGHTY;
             gridX = robotX + 1;
-        } else if (randomDirection == 2) {
-            randomDirection = DOWN;
-            gridY = robotY + 1;
-            gridX = robotX;
-        } else if (randomDirection == 3) {
-            randomDirection = LEFT;
             gridY = robotY;
+        } else if (randomDirection == 2) {
+            randomDirection = ONE_EIGHTY;
+            gridX = robotX;
+            gridY = robotY - 1;
+        } else if (randomDirection == 3) {
+            randomDirection = NIGHTY;
             gridX = robotX - 1;
+            gridY = robotY;    
         }
-    } while (grid[gridY][gridX].isExplored == true);
+    } while (grid[gridX][gridY].isExplored == true);
 
     return randomDirection;
 }
 
 /* Member function to set the direction that*/
 void Occupancy_Grid::setCellDirectionToComeFrom(int direction) {
-    if (direction == UP) grid[robotY][robotX].directionToComeFrom = DOWN;
-    else if (direction == DOWN) grid[robotY][robotX].directionToComeFrom = UP;
-    else if (direction == LEFT) grid[robotY][robotX].directionToComeFrom = RIGHT;
-    else if (direction == RIGHT) grid[robotY][robotX].directionToComeFrom = LEFT;
+    if (direction == ZERO) grid[robotX][robotY].directionToComeFrom = ONE_EIGHTY;
+    else if (direction == ONE_EIGHTY) grid[robotX][robotY].directionToComeFrom = ZERO;
+    else if (direction == NIGHTY) grid[robotX][robotY].directionToComeFrom = MINUS_NIGHTY;
+    else if (direction == MINUS_NIGHTY) grid[robotX][robotY].directionToComeFrom = NIGHTY;
 }

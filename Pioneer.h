@@ -17,16 +17,16 @@
 
 #ifndef DIRECTIONS
 #define DIRECTIONS
-#define UP 0
-#define DOWN 180
-#define LEFT 90
-#define RIGHT -90
+#define ZERO 0
+#define ONE_EIGHTY 180
+#define NIGHTY 90
+#define MINUS_NIGHTY -90
 #endif
 
-#define MOVEPGAIN 0.2
-#define TURNPGAIN 0.5
-#define ERRORBOUND 0.05
-#define NEXTSQUARE 0.6
+#define MOVE_PGAIN 0.2
+#define TURN_PGAIN 0.5
+#define MOVE_ERROR_BOUND 0.05
+#define TURN_ERROR_BOUND 1.00
 
 using namespace PlayerCc;
 
@@ -38,8 +38,8 @@ private:
     int leftSensorFacing; /* Field that describes the direction the right sensor currently faces relative to its original direction 'LEFT' */
     int rightSensorFacing; /* Field that describes the direction the left sensor currently faces relative to its original direction 'RIGHT' */
     double calculateTurnRate(double currentYaw, double targetYaw);
-    void turnToNewDirection(double targetYaw, Position2dProxy *pp, PlayerClient *robot);
-    void moveToNextCell(Position2dProxy *pp);
+    //void turnToNewDirection(double targetYaw, Position2dProxy *pp, PlayerClient *robot);
+    //void moveToNextCell(Position2dProxy *pp);
     int getFrontSensorFacing();
     int getRearSensorFacing();
     int getLeftSensorFacing();
