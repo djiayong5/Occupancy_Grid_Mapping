@@ -72,26 +72,10 @@ void Pioneer::moveToNextCell(Position2dProxy *pp) {
 }*/
 
 int Pioneer::evaluateDirection(double currentYaw) {
-    if (currentYaw <= 10.00 || currentYaw >= -10.00) return ZERO;
-    else if (currentYaw <= -80 || currentYaw >= -100.00) return MINUS_NIGHTY;
-    else if (currentYaw <= -170 || currentYaw >= 170.00) return ONE_EIGHTY;
-    else if (currentYaw < 100.00 || currentYaw > 80.00) return NIGHTY;
-}
-
-int Pioneer::getFrontSensorFacing() {
-    return frontSensorFacing;
-}
-
-int Pioneer::getRearSensorFacing() {
-    return rearSensorFacing;
-}
-
-int Pioneer::getLeftSensorFacing() {
-    return leftSensorFacing;
-}
-
-int Pioneer::getRightSensorFacing() {
-    return rightSensorFacing;
+    if (currentYaw <= -80 && currentYaw >= -100.00) return MINUS_NIGHTY;   
+    else if (currentYaw <= 100.00 && currentYaw >= 80.00) return NIGHTY;
+    else if ((currentYaw <= -170 && currentYaw >= -179.99) || (currentYaw >= 170.00 && currentYaw <= 180.00)) return ONE_EIGHTY;
+    if ((currentYaw <= 10.00 && currentYaw >= 0.00) || (currentYaw >= -10.00 && currentYaw <= 0.00)) return ZERO;
 }
 
 void Pioneer::setFrontSensorDirection(int currentDirection) {
@@ -130,7 +114,6 @@ void Pioneer::reconfigureSensors(int currentDirection) {
 }
 
 void Pioneer::surveyCycle(double frontReading, double rearReading, double leftReading, double rightReading, int currentDirection) {
-    oG->mapRobotLocation(currentDirection);
     oG->resizeGrid(currentDirection);
     oG->evaluateSonarReading(frontReading, frontSensorFacing);
     oG->evaluateSonarReading(rearReading, rearSensorFacing);
@@ -185,6 +168,7 @@ void Pioneer::runPioneer() {
         currentYaw = rtod(pp.GetYaw());
 
         currentDirection = evaluateDirection(currentYaw);
+        cout << "Current Direction: " << currentDirection << endl;
         reconfigureSensors(currentDirection);
         surveyCycle(((sp[3] + sp[4]) / 2), ((sp[12] + sp[11]) / 2), sp[0], sp[7], currentDirection);
         oG->printGrid();
@@ -194,23 +178,24 @@ void Pioneer::runPioneer() {
             oG->addCellToPath();
             targetDirection = oG->chooseNextCell();
             oG->setCellDirectionToComeFrom(targetDirection);
-            cout << "Set Coordinates for Next Cell." << endl;
-        } else if (oG->getNeighboursUnexplored() == 0) {
-            cout << "No Neighbours Unexplored." << endl;
-            oG->removeCellFromPath();
-            cout << "Removed Current Cell from Path." << endl;
-            targetDirection = oG->getPathStack().back()->directionToComeFrom;
-        } else if (oG->getNeighboursUnexplored() != 0) {
-            cout << "Not all Neighbours Explored." << endl;
+        }
+        else if (oG->getNeighboursUnexplored() != 0) {
+            cout << "Picking a Neighbour to Explore..." << endl;
             targetDirection = oG->chooseNextCell();
             oG->setCellDirectionToComeFrom(targetDirection);
-            cout << "Set Coordinates for Next Cell." << endl;
+        } else if (oG->getNeighboursUnexplored() == 0) {
+            cout << "All Neighbours Explored." << endl;
+            targetDirection = oG->getPathStack().back()->cameFrom;
+            oG->removeCellFromPath();
+            cout << "Removed Current Cell from Path." << endl;  
         }
+
 
         targetYaw = targetDirection;
 
         if (targetDirection != currentDirection) {
             //turnToNewDirection(targetYaw, &pp, &robot);
+            cout << "Turning to: " << "..." << targetYaw << endl;
             bool yawAchieved = false;
             double currentYaw;
             double turnRate = 0.00;
@@ -226,9 +211,11 @@ void Pioneer::runPioneer() {
 
                 pp.SetSpeed(0.000, turnRate);
             }
+            cout << "Turn Complete, Now Facing: " << currentYaw << endl;
         }
 
         //moveToNextCell(&pp);
+        cout << "Now Moving to Next Cell..." << endl;
         time_t currentTime;
         time_t lastTime;
         double timeDifference = 0.000;
@@ -247,7 +234,7 @@ void Pioneer::runPioneer() {
                 lastSpeed = 0.000;
                 distance = 0.000;
                 travelledDistance = true;
-                cout << "Arrived at next cell." << endl;
+                cout << "Arrived at Next Cell." << endl;
             } else {
                 lastSpeed = speed;
                 distance += lastSpeed * timeDifference; //Speed in m/sec, time in sec.
@@ -256,8 +243,7 @@ void Pioneer::runPioneer() {
 
             pp.SetSpeed(speed, 0.000);
         }
-
-    } while (!oG->getPathStack().empty());
+    }    while (!oG->getPathStack().empty());
 }
 
 Pioneer::~Pioneer() {

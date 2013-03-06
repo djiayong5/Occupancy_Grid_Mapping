@@ -33,7 +33,7 @@ struct Cell {
     bool isExplored;
     int neighboursUnexplored;
     int obstacleValue;
-    int directionToComeFrom;
+    int cameFrom;
 };
 
 /* Occupancy_Grid class definition */
@@ -60,7 +60,6 @@ public:
     void shiftValuesUp();
     void shiftValuesRight();
     void printGrid();
-    void mapRobotLocation(int direction);
     void evaluateSonarReading(double sonarReading, int sonarFacing);
     void addCellToPath();
     void removeCellFromPath();

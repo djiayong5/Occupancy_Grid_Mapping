@@ -40,10 +40,6 @@ private:
     double calculateTurnRate(double currentYaw, double targetYaw);
     //void turnToNewDirection(double targetYaw, Position2dProxy *pp, PlayerClient *robot);
     //void moveToNextCell(Position2dProxy *pp);
-    int getFrontSensorFacing();
-    int getRearSensorFacing();
-    int getLeftSensorFacing();
-    int getRightSensorFacing();
     int evaluateDirection(double currentYaw);
     void setFrontSensorDirection(int currentDirection);
     void setRearSensorDirection(int currentDirection);

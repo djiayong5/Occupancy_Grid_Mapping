@@ -56,8 +56,6 @@ vector<vector<Cell> > Occupancy_Grid::getGrid() {
 
 /* Member function to shift all the values in the occupancy grid 1 cell up.*/
 void Occupancy_Grid::shiftValuesUp() {
-    robotY--; /* Adjust robot's location to match grid shifting. */
-
     for (int xCounter = 0; xCounter <= xLength; xCounter++) {
         for (int yCounter = yLength - 1; yCounter >= 0; yCounter--) {
             grid[xCounter][yCounter].isExplored = grid[xCounter][yCounter - 1].isExplored; //Copies value to the cell above.
@@ -72,8 +70,6 @@ void Occupancy_Grid::shiftValuesUp() {
 
 /* Member function to shift all the values in the occupancy grid right 1 cell. */
 void Occupancy_Grid::shiftValuesRight() {
-    robotX++; //Adjust robot's location to match grid shifting.
-
     for (int xCounter = xLength - 1; xCounter >= 0; xCounter--) {
         for (int yCounter = 0; yCounter <= yLength; yCounter++) {
             grid[xCounter][yCounter] = grid[xCounter - 1][yCounter]; //Copies value to the cell to the right.
@@ -92,7 +88,7 @@ void Occupancy_Grid::shiftValuesRight() {
  * @param directionToExpand The direction to expand the occupancy grid.
  */
 void Occupancy_Grid::resizeGrid(int directionToExpand) {
-    if (directionToExpand == ZERO || directionToExpand == ONE_EIGHTY) xLength++;
+    if (directionToExpand == ZERO || directionToExpand == ONE_EIGHTY) yLength++;
     else if (directionToExpand == NIGHTY || directionToExpand == MINUS_NIGHTY) xLength++;
 
     grid.resize(xLength); //Resizes grid xs.
@@ -120,8 +116,13 @@ void Occupancy_Grid::resizeGrid(int directionToExpand) {
  * @param directionToShrink The direction in which to shrink the grid by 1 whole row/column.
  */
 void Occupancy_Grid::shrinkGrid(int directionToShrink) {
-    if (directionToShrink == ZERO || directionToShrink == ONE_EIGHTY) yLength--;
-    else if (directionToShrink == NIGHTY || directionToShrink == MINUS_NIGHTY) xLength--;
+    if (directionToShrink == ZERO || directionToShrink == ONE_EIGHTY) {
+        robotY--;
+        yLength--;
+    } else if (directionToShrink == NIGHTY || directionToShrink == MINUS_NIGHTY) {
+        robotX--;
+        xLength--;
+    }
 
     grid.resize(xLength);
     for (int xCounter = 0; xCounter < xLength; xCounter++) grid[xCounter].resize(yLength);
@@ -144,16 +145,6 @@ void Occupancy_Grid::printGrid() {
     }
 
     cout << endl;
-}
-
-/* Member function to move the robot on the grid after it has moved in the real world.
- * @param direction The direction the robot moved.
- */
-void Occupancy_Grid::mapRobotLocation(int direction) {
-    if (direction == ZERO) robotY++; //Move robot up one cell on the grid.
-    else if (direction == ONE_EIGHTY) robotY--; //Move robot down one cell on the grid.
-    else if (direction == NIGHTY) robotX--; //Move robot left one cell on the grid.
-    else if (direction == MINUS_NIGHTY) robotX++; //Move robot right one cell on the grid.
 }
 
 /* Member function to check the occupancy value of a cell and if the value >0, mark it as explored
@@ -240,8 +231,8 @@ void Occupancy_Grid::removeCellFromPath() {
  */
 int Occupancy_Grid::chooseNextCell() {
     int randomDirection;
-    int gridY;
     int gridX;
+    int gridY;
 
     do {
         srand(time(NULL));
@@ -250,7 +241,7 @@ int Occupancy_Grid::chooseNextCell() {
         if (randomDirection == 0) {
             randomDirection = ZERO;
             gridX = robotX;
-            gridY = robotY + 1;           
+            gridY = robotY + 1;
         } else if (randomDirection == 1) {
             randomDirection = MINUS_NIGHTY;
             gridX = robotX + 1;
@@ -262,7 +253,7 @@ int Occupancy_Grid::chooseNextCell() {
         } else if (randomDirection == 3) {
             randomDirection = NIGHTY;
             gridX = robotX - 1;
-            gridY = robotY;    
+            gridY = robotY;
         }
     } while (grid[gridX][gridY].isExplored == true);
 
@@ -271,8 +262,8 @@ int Occupancy_Grid::chooseNextCell() {
 
 /* Member function to set the direction that*/
 void Occupancy_Grid::setCellDirectionToComeFrom(int direction) {
-    if (direction == ZERO) grid[robotX][robotY].directionToComeFrom = ONE_EIGHTY;
-    else if (direction == ONE_EIGHTY) grid[robotX][robotY].directionToComeFrom = ZERO;
-    else if (direction == NIGHTY) grid[robotX][robotY].directionToComeFrom = MINUS_NIGHTY;
-    else if (direction == MINUS_NIGHTY) grid[robotX][robotY].directionToComeFrom = NIGHTY;
+    if (direction == ZERO) grid[robotX][robotY].cameFrom = ONE_EIGHTY;
+    else if (direction == ONE_EIGHTY) grid[robotX][robotY].cameFrom = ZERO;
+    else if (direction == NIGHTY) grid[robotX][robotY].cameFrom = MINUS_NIGHTY;
+    else if (direction == MINUS_NIGHTY) grid[robotX][robotY].cameFrom = NIGHTY;
 }
