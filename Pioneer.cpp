@@ -158,8 +158,6 @@ void Pioneer::runPioneer() {
     turnToNewDirection(0.000, &pp, &robot);
 
     cout << "Start Yaw Corrected to: " << currentYaw << endl;
-    currentY = sqrt(pp.GetYPos() * pp.GetYPos()); /* Retrieve current y position. */
-    currentX = sqrt(pp.GetXPos() * pp.GetXPos()); /* Retrieve current x position. */
     currentDirection = evaluateDirection(currentYaw);
     targetDirection = currentDirection;
     reconfigureSensors(currentDirection);
@@ -168,8 +166,6 @@ void Pioneer::runPioneer() {
     do {
         robot.Read();
         currentYaw = rtod(pp.GetYaw());
-        currentY = sqrt(pp.GetYPos() * pp.GetYPos()); /* Retrieve current y position. */
-        currentX = sqrt(pp.GetXPos() * pp.GetXPos()); /* Retrieve current x position. */
 
         currentDirection = evaluateDirection(currentYaw);
         reconfigureSensors(currentDirection);
@@ -180,17 +176,17 @@ void Pioneer::runPioneer() {
             cout << "Current Cell not Explored, Adding to Path Stack." << endl;
             oG->addCellToPath(currentY, currentX);
             targetDirection = oG->chooseNextCell();
-            oG->setCellDirectionCameFrom(targetDirection);
+            oG->setCellDirectionToComeFrom(targetDirection);
             cout << "Set Coordinates for Next Cell." << endl;
         } else if (oG->getNeighboursUnexplored() == 0) {
             cout << "No Neighbours Unexplored." << endl;
             oG->removeCellFromPath();
             cout << "Removed Current Cell from Path." << endl;
-            targetDirection = oG->getPathStack().back()->directionCameFrom;
+            targetDirection = oG->getPathStack().back()->directionToComeFrom;
         } else if (oG->getNeighboursUnexplored() != 0) {
             cout << "Not all Neighbours Explored." << endl;
             targetDirection = oG->chooseNextCell();
-            oG->setCellDirectionCameFrom(targetDirection);
+            oG->setCellDirectionToComeFrom(targetDirection);
             cout << "Set Coordinates for Next Cell." << endl;
         }
 

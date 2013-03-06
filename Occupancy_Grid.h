@@ -33,7 +33,7 @@ struct Cell {
     bool isExplored;
     int neighboursUnexplored;
     int obstacleValue;
-    int directionCameFrom;
+    int directionToComeFrom;
 };
 
 /* Occupancy_Grid class definition */
@@ -46,14 +46,8 @@ private:
     int robotY;
     int robotX;
     void checkOccupancy(int gridY, int gridX);
-    void incrementCellUp();
-    void incrementCellDown();
-    void incrementCellLeft();
-    void incrementCellRight();
-    void decrementCellUp();
-    void decrementCellDown();
-    void decrementCellLeft();
-    void decrementCellRight();
+    void incrementCell(int gridY, int gridX);
+    void decrementCell(int gridY, int gridX);
 
 public:
     /* Member Function Prototypes: */
@@ -74,6 +68,6 @@ public:
     void checkNeighbours();
     int getNeighboursUnexplored();
     int chooseNextCell();
-    void setCellDirectionCameFrom(int direction);
+    void setCellDirectionToComeFrom(int direction);
 };
 #endif
