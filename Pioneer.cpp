@@ -19,20 +19,26 @@ using namespace PlayerCc;
 using namespace std;
 
 double Pioneer::calculateTurnRate(double currentYaw, double targetYaw) {
-    double turnRate = (targetYaw - currentYaw) * PGAIN;
+    double turnRate = (targetYaw - currentYaw) * TURNPGAIN;
     return dtor(turnRate);
 }
 
 void Pioneer::turnToNewDirection(double targetYaw, Position2dProxy *pp, PlayerClient *robot) {
-    bool yawAcheived = false;
+    bool yawAchieved = false;
     double currentYaw;
     double turnRate = 0.00;
 
-    while (yawAcheived != true) {
-        *robot->Read();
+    while (yawAchieved != true) {
+        (void)*robot->Read();
         currentYaw = rtod(*pp->GetYaw());
-        turnRate = calculateTurnRate(currentYaw, targetYaw);
-        *pp->SetSpeed(0.000, turnRate);
+        
+        if (currentYaw >= (targetYaw - ERRORBOUND) && currentYaw <= (targetYaw + ERRORBOUND)) {
+            turnRate = 0.000;
+            yawAchieved = true;
+        }
+        else turnRate = calculateTurnRate(currentYaw, targetYaw);
+
+        (void)*pp->SetSpeed(0.000, turnRate);
     }
 }
 
@@ -49,7 +55,6 @@ void Pioneer::moveToNextCell(Position2dProxy *pp) {
         lastTime = currentTime;
         currentTime = time(NULL);
         timeDifference = difftime(currentTime, lastTime);
-        cout << "Time Difference: " << timeDifference << endl;
 
         if ((distance <= (CELLWIDTH + ERRORBOUND)) && (distance >= (CELLWIDTH - ERRORBOUND))) {
             speed = 0.000;
@@ -60,7 +65,7 @@ void Pioneer::moveToNextCell(Position2dProxy *pp) {
         } else {
             lastSpeed = speed;
             distance += lastSpeed * timeDifference; //Speed in m/sec, time in sec.
-            speed = CELLWIDTH - distance * PGAIN;
+            speed = CELLWIDTH - distance * MOVEPGAIN;
         }
 
         *pp->SetSpeed(speed, 0.000);
@@ -142,8 +147,6 @@ void Pioneer::runPioneer() {
     Position2dProxy pp(&robot, 0);
 
     oG = new Occupancy_Grid();
-    double currentY = 0.000;
-    double currentX = 0.000;
     double currentYaw = 0.000;
     double targetYaw;
     int currentDirection;
@@ -174,7 +177,7 @@ void Pioneer::runPioneer() {
 
         if (oG->getIsExplored() == false) {
             cout << "Current Cell not Explored, Adding to Path Stack." << endl;
-            oG->addCellToPath(currentY, currentX);
+            oG->addCellToPath();
             targetDirection = oG->chooseNextCell();
             oG->setCellDirectionToComeFrom(targetDirection);
             cout << "Set Coordinates for Next Cell." << endl;

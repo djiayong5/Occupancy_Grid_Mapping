@@ -62,7 +62,7 @@ public:
     void printGrid();
     void mapRobotLocation(int direction);
     void evaluateSonarReading(double sonarReading, int sonarFacing);
-    void addCellToPath(double yCoord, double xCoord);
+    void addCellToPath();
     void removeCellFromPath();
     bool getIsExplored();
     void checkNeighbours();

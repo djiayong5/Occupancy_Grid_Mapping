@@ -23,7 +23,8 @@
 #define RIGHT -90
 #endif
 
-#define PGAIN 0.5
+#define MOVEPGAIN 0.2
+#define TURNPGAIN 0.5
 #define ERRORBOUND 0.05
 #define NEXTSQUARE 0.6
 

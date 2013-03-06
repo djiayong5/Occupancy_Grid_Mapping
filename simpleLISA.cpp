@@ -30,10 +30,15 @@
 #include <time.h>
 #include <libplayerc++/playerc++.h>
 
-#define MOVEPGAIN 0.2
+#define MOVEPGAIN 0.1
 #define TURNPGAIN 0.5
 #define CELLWIDTH 0.6
 #define ERRORBOUND 0.05
+
+double calculateTurnRate(double currentYaw, double targetYaw) {
+    double turnRate = (targetYaw - currentYaw) * TURNPGAIN;
+    return turnRate;
+}
 
 int main(int argc, char *argv[]) {
     using namespace PlayerCc;
@@ -50,10 +55,33 @@ int main(int argc, char *argv[]) {
     double distance = 0.000;
     bool travelledDistance = false;
 
+    bool yawAchieved = false;
+    double currentYaw;
+    double turnRate = 0.00;
+    double targetYaw = 0.000;
+
+    while (yawAchieved != true) {
+        robot.Read();
+        currentYaw = rtod(pp.GetYaw());
+        
+        if (currentYaw >= (targetYaw - ERRORBOUND) && currentYaw <= (targetYaw + ERRORBOUND)) {
+            turnRate = 0.000;
+            yawAchieved = true;
+        }
+        else turnRate = dtor(calculateTurnRate(currentYaw, targetYaw));
+
+        pp.SetSpeed(0.000, turnRate);
+    }
+    
+    currentTime = time(NULL);
+    
     while (travelledDistance == false) {
         lastTime = currentTime;
+        cout << "Last Time: " << lastTime << endl;
         currentTime = time(NULL);
+        cout << "Current Time: " << currentTime << endl;
         timeDifference = difftime(currentTime, lastTime);
+        cout << "Time Difference: " << timeDifference << endl;
 
         if ((distance <= (CELLWIDTH + ERRORBOUND)) && (distance >= (CELLWIDTH - ERRORBOUND))) {
             speed = 0.000;
@@ -64,7 +92,9 @@ int main(int argc, char *argv[]) {
         } else {
             lastSpeed = speed;
             distance += lastSpeed * timeDifference; //Speed in m/sec, time in sec.
-            speed = CELLWIDTH - distance * MOVEPGAIN;
+            cout << "Distance Travelled So Far: " << distance << endl;
+            speed = (CELLWIDTH - distance) * MOVEPGAIN;
+            cout << "Speed: " << speed << endl << endl;
         }
 
         pp.SetSpeed(speed, 0.000);
