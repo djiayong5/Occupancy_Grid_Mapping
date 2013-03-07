@@ -8,12 +8,12 @@
 
 #include <iostream>
 #include <libplayerc++/playerc++.h>
+#include "Pioneer.h"
+#include "Occupancy_Grid.h"
 #include <cstdio>
 #include <cstdlib>
 #include <math.h>
-#include "Pioneer.h"
 #include <time.h>
-#include "Occupancy_Grid.h"
 
 using namespace PlayerCc;
 using namespace std;
@@ -178,7 +178,7 @@ void Pioneer::runPioneer() {
             cout << "All neighbours of current cell explored." << endl;
             oG->removeCellFromPath(); //Pops the current cell off the path stack.
             cout << "Removed current cell from path." << endl;
-            targetDirection = oG->getDirectionOfLastCell(oG->getPathStack().back()->leavingDirection); //Gets direction of cell on top of he path stack.
+            targetDirection = oG->getDirectionOfLastCell(); //Gets direction of cell on top of the path stack.
         }
         
         targetYaw = targetDirection;
@@ -193,12 +193,12 @@ void Pioneer::runPioneer() {
 }
 
 Pioneer::~Pioneer() {
-    delete(oG);
+    delete(oG); //Ensures the deletion of the occupancy grid.
 }
 
 int main(int argc, char *argv[]) {
-    Pioneer *pioneer = new Pioneer();
+    Pioneer *pioneer = new Pioneer(); //Creates new pioneer on heap.
     pioneer->runPioneer();
-    delete(pioneer);
+    delete(pioneer); //Ensures the deletion of pioneer.
     return 0;
 }

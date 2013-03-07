@@ -61,8 +61,6 @@ void Occupancy_Grid::shiftValuesUp() {
             grid[xCounter][yCounter].isExplored = grid[xCounter][yCounter - 1].isExplored; //Copies value to the cell above.
             grid[xCounter][yCounter].neighboursUnexplored = grid[xCounter][yCounter - 1].neighboursUnexplored;
             grid[xCounter][yCounter].obstacleValue = grid[xCounter][yCounter - 1].obstacleValue;
-            grid[xCounter][yCounter].yCoord = grid[xCounter][yCounter - 1].yCoord;
-            grid[xCounter][yCounter].xCoord = grid[xCounter][yCounter - 1].xCoord;
             initialiseCell(&grid[xCounter][yCounter - 1]);
         }
     }
@@ -76,8 +74,6 @@ void Occupancy_Grid::shiftValuesRight() {
             grid[xCounter][yCounter].isExplored = grid[xCounter - 1][yCounter].isExplored; //Copies value to the cell to the right.
             grid[xCounter][yCounter].neighboursUnexplored = grid[xCounter - 1][yCounter].neighboursUnexplored;
             grid[xCounter][yCounter].obstacleValue = grid[xCounter - 1][yCounter].obstacleValue;
-            grid[xCounter][yCounter].yCoord = grid[xCounter - 1][yCounter].yCoord;
-            grid[xCounter][yCounter].xCoord = grid[xCounter - 1][yCounter].xCoord;
             initialiseCell(&grid[xCounter - 1][yCounter]);
         }
     }
@@ -271,9 +267,9 @@ void Occupancy_Grid::setLeavingDirection(int targetDirection) {
 }
 
 /* Member function to set the direction that*/
-void Occupancy_Grid::getDirectionOfLastCell() {
-    if (grid[robotX][robotY].leavingDirection == ZERO) return ONE_EIGHTY;
-    else if (grid[robotX][robotY].leavingDirection == ONE_EIGHTY) return ZERO;
-    else if (grid[robotX][robotY].leavingDirection == NIGHTY) return MINUS_NIGHTY;
-    else if (grid[robotX][robotY].leavingDirection == MINUS_NIGHTY) return NIGHTY;
+int Occupancy_Grid::getDirectionOfLastCell() {
+    if (pathStack.back()->leavingDirection == ZERO) return ONE_EIGHTY;
+    else if (pathStack.back()->leavingDirection == ONE_EIGHTY) return ZERO;
+    else if (pathStack.back()->leavingDirection == NIGHTY) return MINUS_NIGHTY;
+    else if (pathStack.back()->leavingDirection == MINUS_NIGHTY) return NIGHTY;
 }
