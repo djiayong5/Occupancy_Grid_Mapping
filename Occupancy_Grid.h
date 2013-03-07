@@ -28,12 +28,10 @@
 using namespace std;
 
 struct Cell {
-    double yCoord;
-    double xCoord;
-    bool isExplored;
-    int neighboursUnexplored;
-    int obstacleValue;
-    int cameFrom;
+    bool isExplored; //The cell's state of exploration.
+    int neighboursUnexplored; //The number of neighbours around the cell unexplored.
+    int obstacleValue; //The current obstacle value of the cell.
+    int leavingDirection; //The direction th robot will leave the current cell.
 };
 
 /* Occupancy_Grid class definition */
@@ -67,6 +65,7 @@ public:
     void checkNeighbours();
     int getNeighboursUnexplored();
     int chooseNextCell();
-    void setCellDirectionToComeFrom(int direction);
+    void setLeavingDirection(int targetDirection);
+    int getDirectionOfLastCell();
 };
 #endif

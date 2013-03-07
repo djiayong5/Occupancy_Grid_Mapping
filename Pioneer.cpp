@@ -46,21 +46,18 @@ void Pioneer::turnToNewDirection(double targetYaw, Position2dProxy *pp, PlayerCl
 }
 
 void Pioneer::moveToNextCell(Position2dProxy *pp) {
-    time_t currentTime = time(NULL);
-    time_t lastTime = time(NULL);
-    double timeDifference = 0.000;
-    double speed = 0.000;
-    double lastSpeed = 0.000;
-    double distance = 0.000;
-    bool travelledDistance = false;
+    time_t currentTime = time(NULL); //Stores the current time.
+    time_t lastTime = time(NULL); //Stores the previous current time.
+    double timeDifference = 0.000; //Stores the time difference between lastTime and currentTime in seconds.
+    double speed = 0.000; //Stores the current speed the robot is travelling at.
+    double lastSpeed = 0.000; //Stores the speed the robot was last travelling at.
+    double distance = 0.000; //Stores the distance the robot has travelled. 
+    bool travelledDistance = false; //Boolean condition to break out of while loop.
 
     while (travelledDistance == false) {
-        lastTime = currentTime;
-        //sleep(1.0); //Sleeps program to make sure there is at least a 1 second difference.
-        currentTime = time(NULL);
-        //cout << "Secs: " << currentTime << endl;
-        timeDifference = difftime(currentTime, lastTime);
-        //printf("Time Difference: %.2f\n", timeDifference);
+        lastTime = currentTime; //Sets time to the time stored in currentTime before it updates ready for time difference calculation.
+        currentTime = time(NULL); //Sets time to the current time ready for time difference calculation, 
+        timeDifference = difftime(currentTime, lastTime); //Calculates time difference in seconds.
 
         if ((distance <= (CELL_WIDTH + MOVE_ERROR_BOUND)) && (distance >= (CELL_WIDTH - MOVE_ERROR_BOUND))) {
             speed = 0.000;
@@ -72,11 +69,9 @@ void Pioneer::moveToNextCell(Position2dProxy *pp) {
             lastSpeed = speed;
             distance += (lastSpeed * timeDifference); //Speed in m/sec, time in sec.
             speed = ((CELL_WIDTH - distance) * MOVE_PGAIN);
-            //cout << "Distance Travelled: " << distance << endl;
         }
 
-        pp->SetSpeed(speed, 0.000);
-        
+        pp->SetSpeed(speed, 0.000);      
     }
 }
 
@@ -123,33 +118,26 @@ void Pioneer::reconfigureSensors(int currentDirection) {
 }
 
 void Pioneer::surveyCycle(double frontReading, double rearReading, double leftReading, double rightReading, int currentDirection) {
-    oG->resizeGrid(currentDirection);
+    oG->resizeGrid(currentDirection); //Expands grid in the direction the robot is currently facing by 1.
     oG->evaluateSonarReading(frontReading, frontSensorFacing);
     oG->evaluateSonarReading(rearReading, rearSensorFacing);
     oG->evaluateSonarReading(leftReading, leftSensorFacing);
     oG->evaluateSonarReading(rightReading, rightSensorFacing);
-    cout << endl;
+    cout << endl; //Used for formatting output.
 }
 
 void Pioneer::runPioneer() {
     PlayerClient robot("localhost");
     //PlayerClient robot("lisa.islnet");
     RangerProxy sp(&robot, 0);
+    //SonarProxy sp(&robot, 0);
     Position2dProxy pp(&robot, 0);
 
-    oG = new Occupancy_Grid();
+    oG = new Occupancy_Grid(); //Creates new occupancy grid on the heap;
     double currentYaw = 0.000;
-    double targetYaw;
+    double targetYaw = 0.000;
     int currentDirection;
     int targetDirection;
-
-    time_t currentTime;
-    time_t lastTime;
-    double timeDifference = 0.000;
-    double speed = 0.000;
-    double lastSpeed = 0.000;
-    double distance = 0.000;
-    bool travelledDistance = false;
 
     oG->printGrid(); /* Print out initial grid. */
     pp.SetMotorEnable(true); /* Enable motors. */
@@ -157,50 +145,51 @@ void Pioneer::runPioneer() {
     currentYaw = rtod(pp.GetYaw()); /* Retrieve current yaw. */
     cout << "Start Yaw: " << currentYaw << endl;
 
-    turnToNewDirection(0.000, &pp, &robot);
+    turnToNewDirection(0.000, &pp, &robot); //Gets robot to turn to 0 degrees (with error bounds).
 
     cout << "Start Yaw Corrected to: " << currentYaw << endl;
     currentDirection = evaluateDirection(currentYaw);
     targetDirection = currentDirection;
     reconfigureSensors(currentDirection);
-    oG->shrinkGrid(currentDirection);
+    oG->shrinkGrid(currentDirection); //Shrinks grid in the direction the robot faces as the grid will expand in that same direction once it enters the loop ahead.
 
     do {
-        robot.Read();
-        currentYaw = rtod(pp.GetYaw());
+        robot.Read(); //Reads from the proxies.
+        currentYaw = rtod(pp.GetYaw()); //Gets the robot's current yaw and converts it from radians to degrees.
 
-        currentDirection = evaluateDirection(currentYaw);
-        cout << "Current Direction: " << currentDirection << endl;
+        currentDirection = evaluateDirection(currentYaw); //Evaluates the robots direction.
+        cout << "Current direction: " << currentDirection << endl;
         reconfigureSensors(currentDirection);
-        cout << "Reconfigured Sensors." << endl;
-        surveyCycle(((sp[3] + sp[4]) / 2), ((sp[12] + sp[11]) / 2), sp[0], sp[7], currentDirection);
-        oG->printGrid();
+        cout << "Reconfigured sensors." << endl;
+        surveyCycle(((sp[3] + sp[4]) / 2), ((sp[12] + sp[11]) / 2), sp[0], sp[7], currentDirection); //Takes the sonar readings and marks cells as appropriate.
+        oG->printGrid(); //Prints the occupancy grid.
 
         if (oG->getIsExplored() == false) {
-            cout << "Current Cell not Explored, Adding to Path Stack." << endl;
-            oG->addCellToPath();
-            targetDirection = oG->chooseNextCell();
-            oG->setCellDirectionToComeFrom(targetDirection);
+            cout << "Current cell not explored, adding cell to path stack." << endl;
+            oG->addCellToPath(); //Adds current cell to the top of the path stack.
+            cout << "Picking next cell to travel to..." << endl;
+            targetDirection = oG->chooseNextCell(); //Chooses the next unexplored neighbour cell to travel to.
+            oG->setLeavingDirection(targetDirection); //Sets the direction in which the robot will leave the current cell.
         } else if (oG->getNeighboursUnexplored() != 0) {
-            cout << "Picking a Neighbour to Explore..." << endl;
-            targetDirection = oG->chooseNextCell();
-            oG->setCellDirectionToComeFrom(targetDirection);
+            cout << "Picking a neighbour to explore..." << endl;
+            targetDirection = oG->chooseNextCell(); //Chooses the next unexplored neighbour cell to travel to.
+            oG->setLeavingDirection(targetDirection); //Sets the direction in which the robot will leave the current cell.
         } else if (oG->getNeighboursUnexplored() == 0) {
-            cout << "All Neighbours Explored." << endl;
-            targetDirection = oG->getPathStack().back()->cameFrom;
-            oG->removeCellFromPath();
-            cout << "Removed Current Cell from Path." << endl;
+            cout << "All neighbours of current cell explored." << endl;
+            oG->removeCellFromPath(); //Pops the current cell off the path stack.
+            cout << "Removed current cell from path." << endl;
+            targetDirection = oG->getDirectionOfLastCell(oG->getPathStack().back()->leavingDirection); //Gets direction of cell on top of he path stack.
         }
         
         targetYaw = targetDirection;
 
         if (targetDirection != currentDirection) {
-            turnToNewDirection(targetYaw, &pp, &robot);      
+            turnToNewDirection(targetYaw, &pp, &robot);  //Turns robot to face direction of next cell to travel to.    
         }
 
-        moveToNextCell(&pp);
+        moveToNextCell(&pp); //Moves robot roughly 0.6m/60cm in the current direction it is facing.
         
-    } while (!oG->getPathStack().empty());
+    } while (!oG->getPathStack().empty()); //Keeps the loop going while the path stack is not empty.
 }
 
 Pioneer::~Pioneer() {

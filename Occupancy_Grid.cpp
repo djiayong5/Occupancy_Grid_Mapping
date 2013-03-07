@@ -255,15 +255,25 @@ int Occupancy_Grid::chooseNextCell() {
             gridX = robotX - 1;
             gridY = robotY;
         }
+        
+        cout << "Cell in Direction: " << randomDirection << ", Explored State: " << grid[gridX][gridY].isExplored << endl;
     } while (grid[gridX][gridY].isExplored == true);
-
+    
+    cout << "Direction: " << randomDirection << " Selected, Explored State: " << grid[gridX][gridY].isExplored << endl;
     return randomDirection;
 }
 
+/* Member function to set the direction the robot is leaving in. 
+ * @param targetDirection The direction the robot will leave in.
+ */
+void Occupancy_Grid::setLeavingDirection(int targetDirection) {
+    grid[robotX][robotY].leavingDirection = targetDirection;
+}
+
 /* Member function to set the direction that*/
-void Occupancy_Grid::setCellDirectionToComeFrom(int direction) {
-    if (direction == ZERO) grid[robotX][robotY].cameFrom = ONE_EIGHTY;
-    else if (direction == ONE_EIGHTY) grid[robotX][robotY].cameFrom = ZERO;
-    else if (direction == NIGHTY) grid[robotX][robotY].cameFrom = MINUS_NIGHTY;
-    else if (direction == MINUS_NIGHTY) grid[robotX][robotY].cameFrom = NIGHTY;
+void Occupancy_Grid::getDirectionOfLastCell() {
+    if (grid[robotX][robotY].leavingDirection == ZERO) return ONE_EIGHTY;
+    else if (grid[robotX][robotY].leavingDirection == ONE_EIGHTY) return ZERO;
+    else if (grid[robotX][robotY].leavingDirection == NIGHTY) return MINUS_NIGHTY;
+    else if (grid[robotX][robotY].leavingDirection == MINUS_NIGHTY) return NIGHTY;
 }
