@@ -30,7 +30,7 @@
 #include <time.h>
 #include <libplayerc++/playerc++.h>
 
-#define MOVEPGAIN 0.1
+#define MOVEPGAIN 0.4
 #define TURNPGAIN 0.5
 #define CELLWIDTH 0.6
 #define ERRORBOUND 0.05
@@ -47,13 +47,6 @@ int main(int argc, char *argv[]) {
     PlayerClient robot("localhost");
     RangerProxy sp(&robot, 0);
     Position2dProxy pp(&robot, 0);
-    time_t currentTime;
-    time_t lastTime;
-    double timeDifference = 0.000;
-    double speed = 0.000;
-    double lastSpeed = 0.000;
-    double distance = 0.000;
-    bool travelledDistance = false;
 
     bool yawAchieved = false;
     double currentYaw;
@@ -72,16 +65,22 @@ int main(int argc, char *argv[]) {
 
         pp.SetSpeed(0.000, turnRate);
     }
-    
-    currentTime = time(NULL);
-    
+
+    time_t currentTime = time(NULL);
+    time_t lastTime = time(NULL);
+    double timeDifference = 0.000;
+    double speed = 0.000;
+    double lastSpeed = 0.000;
+    double distance = 0.000;
+    bool travelledDistance = false;
+
     while (travelledDistance == false) {
         lastTime = currentTime;
-        cout << "Last Time: " << lastTime << endl;
+        //sleep(1.0); //Sleeps program to make sure there is at least a 1 second difference.
         currentTime = time(NULL);
-        cout << "Current Time: " << currentTime << endl;
+        cout << "Secs: " << currentTime << endl;
         timeDifference = difftime(currentTime, lastTime);
-        cout << "Time Difference: " << timeDifference << endl;
+        printf("Time Difference: %.2f\n", timeDifference);
 
         if ((distance <= (CELLWIDTH + ERRORBOUND)) && (distance >= (CELLWIDTH - ERRORBOUND))) {
             speed = 0.000;
@@ -91,12 +90,12 @@ int main(int argc, char *argv[]) {
             cout << "Arrived at next cell." << endl;
         } else {
             lastSpeed = speed;
-            distance += lastSpeed * timeDifference; //Speed in m/sec, time in sec.
-            cout << "Distance Travelled So Far: " << distance << endl;
-            speed = (CELLWIDTH - distance) * MOVEPGAIN;
-            cout << "Speed: " << speed << endl << endl;
+            distance += (lastSpeed * timeDifference); //Speed in m/sec, time in sec.
+            speed = ((CELLWIDTH - distance) * MOVEPGAIN);
+            cout << "Distance Travelled: " << distance << endl;
         }
 
         pp.SetSpeed(speed, 0.000);
+        
     }
 }

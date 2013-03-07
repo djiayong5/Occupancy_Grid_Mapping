@@ -30,7 +30,7 @@
 #include <time.h>
 #include <libplayerc++/playerc++.h>
 
-#define MOVEPGAIN 0.2
+#define MOVEPGAIN 0.4
 #define TURNPGAIN 0.5
 #define CELLWIDTH 0.6
 #define ERRORBOUND 0.05
@@ -42,8 +42,8 @@ int main(int argc, char *argv[]) {
     PlayerClient robot("localhost");
     RangerProxy sp(&robot, 0);
     Position2dProxy pp(&robot, 0);
-    time_t currentTime;
-    time_t lastTime;
+    time_t currentTime = time(NULL);
+    time_t lastTime = time(NULL);
     double timeDifference = 0.000;
     double speed = 0.000;
     double lastSpeed = 0.000;
@@ -54,6 +54,8 @@ int main(int argc, char *argv[]) {
         lastTime = currentTime;
         currentTime = time(NULL);
         timeDifference = difftime(currentTime, lastTime);
+        //cout << "Time Difference: " << timeDifference << endl;
+        printf("Time Difference: %.2f\n", timeDifference);
 
         if ((distance <= (CELLWIDTH + ERRORBOUND)) && (distance >= (CELLWIDTH - ERRORBOUND))) {
             speed = 0.000;
