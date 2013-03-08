@@ -164,8 +164,8 @@ void Pioneer::runPioneer() {
     oG->shrinkGrid(currentDirection); //Shrinks grid in the direction the robot faces as the grid will expand in that same direction once it enters the loop ahead.
 
     do {
-        oG->moveRobotOnGrid(currentDirection);
         configureCycle(&robot, &pp, &currentYaw, &currentDirection);
+        oG->moveRobotOnGrid(currentDirection);
         surveyCycle(((sp[3] + sp[4]) / 2), ((sp[12] + sp[11]) / 2), sp[0], sp[7], currentDirection); //Takes the sonar readings and marks cells as appropriate.
         oG->printGrid(); //Prints the occupancy grid.
         cout << "Neighbours unexplored: " << oG->getNeighboursUnexplored() << endl;
@@ -179,7 +179,8 @@ void Pioneer::runPioneer() {
                     targetDirection = oG->getDirectionOfLastCell(); //Gets direction of cell on top of the path stack.
                     oG->removeCellFromPath(); //Pops the current cell off the path stack.
                 }
-            } else {      
+            } else {
+                cout << "Picking a neighbour to explore..." << endl;
                 targetDirection = oG->chooseNextCell(); //Chooses the next unexplored neighbour cell to travel to.
                 oG->addCellToPath(targetDirection); //Adds direction the robot is leaving in to the top of the path stack.
             }
@@ -208,7 +209,7 @@ void Pioneer::runPioneer() {
         moveToNextCell(&pp); //Moves robot roughly 0.6m/60cm in the current direction it is facing.
 
     } while (!oG->getPathStack().empty()); //Keeps the loop going while the path stack is not empty.
-    
+
     cout << "Path stack empty, mapping finished." << endl << endl;
 }
 

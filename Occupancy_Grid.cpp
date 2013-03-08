@@ -38,6 +38,7 @@ Occupancy_Grid::Occupancy_Grid() {
 void Occupancy_Grid::initialiseCell(Cell *cell) {
     cell->isExplored = false;
     cell->neighboursUnexplored = 4;
+    cell->obstacleValue = 0;
 }
 
 /* Member function to return the pathStack. */
