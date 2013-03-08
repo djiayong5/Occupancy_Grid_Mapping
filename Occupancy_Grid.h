@@ -3,7 +3,7 @@
  * File Name: Occupancy_Grid.h
  * Description: Stores member function prototypes and class definition for Occupancy_Grid class.
  * First Created: 25/02/2013
- * Last Modified: 26/02/2013
+ * Last Modified: 08/03/2013
  */
 
 #ifndef OCCUPANCY_GRID_H
@@ -53,6 +53,10 @@ public:
     void initialiseCell(Cell *cell);
     vector<Cell*> getPathStack();
     vector<vector<Cell> > getGrid();
+    void resizeZero();
+    void resizeOneEighty();
+    void resizeNighty();
+    void resizeMinusNighty();   
     void resizeGrid(int directionToExpand);
     void shrinkGrid(int directionToShrink);
     void shiftValuesUp();

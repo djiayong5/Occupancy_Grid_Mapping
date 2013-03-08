@@ -3,7 +3,7 @@
  * File Name: Pioneer.cpp
  * Description: Stores function declarations for Pioneer to use.
  * First Created: 25/02/2013
- * Last Modified: 03/03/2013
+ * Last Modified: 08/03/2013
  */
 
 #include <iostream>
@@ -13,7 +13,8 @@
 #include <cstdio>
 #include <cstdlib>
 #include <math.h>
-#include <time.h>
+#include <ctime>
+#include <unistd.h>
 
 using namespace PlayerCc;
 using namespace std;
@@ -71,7 +72,8 @@ void Pioneer::moveToNextCell(Position2dProxy *pp) {
             speed = ((CELL_WIDTH - distance) * MOVE_PGAIN);
         }
 
-        pp->SetSpeed(speed, 0.000);      
+        pp->SetSpeed(speed, 0.000);
+        sleep(1);
     }
 }
 
@@ -119,6 +121,7 @@ void Pioneer::reconfigureSensors(int currentDirection) {
 
 void Pioneer::surveyCycle(double frontReading, double rearReading, double leftReading, double rightReading, int currentDirection) {
     oG->resizeGrid(currentDirection); //Expands grid in the direction the robot is currently facing by 1.
+    cout << "Grid resized." << endl;
     oG->evaluateSonarReading(frontReading, frontSensorFacing);
     oG->evaluateSonarReading(rearReading, rearSensorFacing);
     oG->evaluateSonarReading(leftReading, leftSensorFacing);
@@ -160,8 +163,8 @@ void Pioneer::runPioneer() {
         currentDirection = evaluateDirection(currentYaw); //Evaluates the robots direction.
         cout << "Current direction: " << currentDirection << endl;
         reconfigureSensors(currentDirection);
-        cout << "Reconfigured sensors." << endl;
         surveyCycle(((sp[3] + sp[4]) / 2), ((sp[12] + sp[11]) / 2), sp[0], sp[7], currentDirection); //Takes the sonar readings and marks cells as appropriate.
+        cout << "Sensor readings taken." << endl;
         oG->printGrid(); //Prints the occupancy grid.
 
         if (oG->getIsExplored() == false) {
@@ -169,6 +172,7 @@ void Pioneer::runPioneer() {
             oG->addCellToPath(); //Adds current cell to the top of the path stack.
             cout << "Picking next cell to travel to..." << endl;
             targetDirection = oG->chooseNextCell(); //Chooses the next unexplored neighbour cell to travel to.
+            //targetDirection = currentDirection;
             oG->setLeavingDirection(targetDirection); //Sets the direction in which the robot will leave the current cell.
         } else if (oG->getNeighboursUnexplored() != 0) {
             cout << "Picking a neighbour to explore..." << endl;
