@@ -61,6 +61,7 @@ public:
     void shrinkGrid(int directionToShrink);
     void shiftValuesUp();
     void shiftValuesRight();
+    void moveRobotOnGrid(int direction);
     void printGrid();
     void evaluateSonarReading(double sonarReading, int sonarFacing);
     void addCellToPath();
