@@ -47,6 +47,7 @@ private:
     void setRightSensorDirection(int currentDirection);
     void reconfigureSensors(int currentDirection);
     void surveyCycle(double frontReading, double rearReading, double leftReading, double rightReading, int currentDirection);
+    void readCycle(PlayerClient *robot, Position2dProxy *pp, Ranger2dProxy, *sp, double *currentYaw, int *currentDirection);
 
 public:
     void runPioneer();

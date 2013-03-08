@@ -29,8 +29,8 @@ void Pioneer::turnToNewDirection(double targetYaw, Position2dProxy *pp, PlayerCl
     double currentYaw;
     double turnRate = 0.00;
 
-    cout << "Turning to: " << targetYaw << "..." << endl;         
-            
+    cout << "Turning to: " << targetYaw << "..." << endl;
+
     while (yawAchieved != true) {
         robot->Read();
         currentYaw = rtod(pp->GetYaw());
@@ -42,7 +42,7 @@ void Pioneer::turnToNewDirection(double targetYaw, Position2dProxy *pp, PlayerCl
 
         pp->SetSpeed(0.000, turnRate);
     }
-    
+
     cout << "Turn Complete, Now Facing: " << currentYaw << endl;
 }
 
@@ -128,6 +128,18 @@ void Pioneer::surveyCycle(double frontReading, double rearReading, double leftRe
     cout << endl; //Used for formatting output.
 }
 
+void Pioneer::readCycle(PlayerClient *robot, Position2dProxy *pp, Ranger2dProxy, *sp, double *currentYaw, int *currentDirection) {
+    robot->Read(); //Reads from the proxies.
+    currentYaw = rtod(pp->GetYaw()); //Gets the robot's current yaw and converts it from radians to degrees.
+
+    currentDirection = evaluateDirection(currentYaw); //Evaluates the robots direction.
+    cout << "Current direction: " << currentDirection << endl;
+    reconfigureSensors(currentDirection);
+    surveyCycle(((*sp[3] + *sp[4]) / 2), ((*sp[12] + *sp[11]) / 2), *sp[0], *sp[7], currentDirection); //Takes the sonar readings and marks cells as appropriate.
+    cout << "Sensor readings taken." << endl;
+    oG->printGrid(); //Prints the occupancy grid.
+}
+
 void Pioneer::runPioneer() {
     PlayerClient robot("localhost");
     //PlayerClient robot("lisa.islnet");
@@ -156,15 +168,7 @@ void Pioneer::runPioneer() {
     oG->shrinkGrid(currentDirection); //Shrinks grid in the direction the robot faces as the grid will expand in that same direction once it enters the loop ahead.
 
     do {
-        robot.Read(); //Reads from the proxies.
-        currentYaw = rtod(pp.GetYaw()); //Gets the robot's current yaw and converts it from radians to degrees.
-
-        currentDirection = evaluateDirection(currentYaw); //Evaluates the robots direction.
-        cout << "Current direction: " << currentDirection << endl;
-        reconfigureSensors(currentDirection);
-        surveyCycle(((sp[3] + sp[4]) / 2), ((sp[12] + sp[11]) / 2), sp[0], sp[7], currentDirection); //Takes the sonar readings and marks cells as appropriate.
-        cout << "Sensor readings taken." << endl;
-        oG->printGrid(); //Prints the occupancy grid.
+        readCycle(&robot, &pp, &sp, &currentYaw, &currentDirection);
 
         if (oG->getIsExplored() == false) {
             cout << "Current cell not explored, adding cell to path stack." << endl;
@@ -181,15 +185,16 @@ void Pioneer::runPioneer() {
             cout << "Removed current cell from path." << endl;
             targetDirection = oG->getDirectionOfLastCell(); //Gets direction of cell on top of the path stack.
         }
-        
+
         targetYaw = targetDirection;
 
         if (targetDirection != currentDirection) {
-            turnToNewDirection(targetYaw, &pp, &robot);  //Turns robot to face direction of next cell to travel to.    
+            turnToNewDirection(targetYaw, &pp, &robot); //Turns robot to face direction of next cell to travel to.    
         }
 
+        readCycle(&robot, &pp, &sp, &currentYaw, &currentDirection);
         moveToNextCell(&pp); //Moves robot roughly 0.6m/60cm in the current direction it is facing.
-        
+
     } while (!oG->getPathStack().empty()); //Keeps the loop going while the path stack is not empty.
 }
 

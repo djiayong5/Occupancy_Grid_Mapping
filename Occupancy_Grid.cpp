@@ -82,7 +82,7 @@ void Occupancy_Grid::shiftValuesRight() {
 /* Member function that expands the grid in the zero direction by 1 if needed. */
 void Occupancy_Grid::resizeZero() {
     robotY++;
-    if (robotY >= yLength - 2) {
+    if (robotY == yLength - 1) {
         yLength++;
         grid.resize(xLength); //Resizes grid xs.
         for (int xCounter = 0; xCounter < xLength; xCounter++) grid[xCounter].resize(yLength); //Resize grid ys.
@@ -93,8 +93,8 @@ void Occupancy_Grid::resizeZero() {
 /* Member function that expands the grid in the one eighty direction by 1 if needed. */
 void Occupancy_Grid::resizeOneEighty() {
     robotY--;
-    cout << "Robot Y before resize: " << robotY << endl;
-    if (robotY <= 1) {
+    if (robotY == 0) {
+        cout << "Robot Y before resize: " << robotY << endl;
         yLength++;
         grid.resize(xLength); //Resizes grid xs.
         for (int xCounter = 0; xCounter < xLength; xCounter++) grid[xCounter].resize(yLength); //Resize grid ys.
@@ -106,7 +106,7 @@ void Occupancy_Grid::resizeOneEighty() {
 /* Member function that expands the grid in the nighty direction by 1 if needed. */
 void Occupancy_Grid::resizeNighty() {
     robotX--;
-    if (robotX <= 1) {
+    if (robotX == 0) {
         xLength++;
         grid.resize(xLength); //Resizes grid xs.
         for (int xCounter = 0; xCounter < xLength; xCounter++) grid[xCounter].resize(yLength); //Resize grid ys.
@@ -118,7 +118,7 @@ void Occupancy_Grid::resizeNighty() {
 /* Member function that expands the grid in the minus nighty direction by 1 if needed. */
 void Occupancy_Grid::resizeMinusNighty() {
     robotX++;
-    if (robotX >= xLength - 2) {
+    if (robotX == xLength - 1) {
         xLength++;
         grid.resize(xLength); //Resizes grid xs.
         for (int xCounter = 0; xCounter < xLength; xCounter++) grid[xCounter].resize(yLength); //Resize grid ys.   

@@ -43,6 +43,10 @@ private:
     int xLength;
     int robotY;
     int robotX;
+    void resizeZero();
+    void resizeOneEighty();
+    void resizeNighty();
+    void resizeMinusNighty();
     void checkOccupancy(int gridX, int gridY);
     void incrementCell(int gridX, int gridY);
     void decrementCell(int gridX, int gridY);
@@ -53,10 +57,6 @@ public:
     void initialiseCell(Cell *cell);
     vector<Cell*> getPathStack();
     vector<vector<Cell> > getGrid();
-    void resizeZero();
-    void resizeOneEighty();
-    void resizeNighty();
-    void resizeMinusNighty();   
     void resizeGrid(int directionToExpand);
     void shrinkGrid(int directionToShrink);
     void shiftValuesUp();
