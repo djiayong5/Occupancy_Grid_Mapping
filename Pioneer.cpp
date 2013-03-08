@@ -177,6 +177,7 @@ void Pioneer::runPioneer() {
                 if (oG->getPathStack().empty() == false) {
                     cout << "All neighbours of current cell explored." << endl;
                     targetDirection = oG->getDirectionOfLastCell(); //Gets direction of cell on top of the path stack.
+                    oG->removeCellFromPath(); //Pops the current cell off the path stack.
                 }
             } else {      
                 targetDirection = oG->chooseNextCell(); //Chooses the next unexplored neighbour cell to travel to.
@@ -190,9 +191,8 @@ void Pioneer::runPioneer() {
             cout << "All neighbours of current cell explored." << endl;
 
             if (oG->getPathStack().empty() == false) {
-                oG->removeCellFromPath(); //Pops the current cell off the path stack.
-                cout << "Removed current cell from path." << endl;
                 targetDirection = oG->getDirectionOfLastCell(); //Gets direction of cell on top of the path stack.
+                oG->removeCellFromPath(); //Pops the current cell off the path stack.
             }
         }
 
