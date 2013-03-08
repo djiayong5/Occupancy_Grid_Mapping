@@ -31,13 +31,12 @@ struct Cell {
     bool isExplored; //The cell's state of exploration.
     int neighboursUnexplored; //The number of neighbours around the cell unexplored.
     int obstacleValue; //The current obstacle value of the cell.
-    int leavingDirection; //The direction th robot will leave the current cell.
 };
 
 /* Occupancy_Grid class definition */
 class Occupancy_Grid {
 private:
-    vector<Cell*> pathStack;
+    vector<int> pathStack;
     vector<vector<Cell> > grid;
     int yLength;
     int xLength;
@@ -55,7 +54,7 @@ public:
     /* Member Function Prototypes: */
     Occupancy_Grid();
     void initialiseCell(Cell *cell);
-    vector<Cell*> getPathStack();
+    vector<int> getPathStack();
     vector<vector<Cell> > getGrid();
     void resizeGrid(int directionToExpand);
     void shrinkGrid(int directionToShrink);
@@ -64,13 +63,12 @@ public:
     void moveRobotOnGrid(int direction);
     void printGrid();
     void evaluateSonarReading(double sonarReading, int sonarFacing);
-    void addCellToPath();
+    void addCellToPath(int direction);
     void removeCellFromPath();
     bool getIsExplored();
     void checkNeighbours();
     int getNeighboursUnexplored();
     int chooseNextCell();
-    void setLeavingDirection(int targetDirection);
     int getDirectionOfLastCell();
 };
 #endif

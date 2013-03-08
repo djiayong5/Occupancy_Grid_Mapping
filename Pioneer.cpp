@@ -125,6 +125,7 @@ void Pioneer::surveyCycle(double frontReading, double rearReading, double leftRe
     oG->evaluateSonarReading(rearReading, rearSensorFacing);
     oG->evaluateSonarReading(leftReading, leftSensorFacing);
     oG->evaluateSonarReading(rightReading, rightSensorFacing);
+    oG->checkNeighbours();
     cout << endl; //Used for formatting output.
 }
 
@@ -167,28 +168,34 @@ void Pioneer::runPioneer() {
         configureCycle(&robot, &pp, &currentYaw, &currentDirection);
         surveyCycle(((sp[3] + sp[4]) / 2), ((sp[12] + sp[11]) / 2), sp[0], sp[7], currentDirection); //Takes the sonar readings and marks cells as appropriate.
         oG->printGrid(); //Prints the occupancy grid.
+        cout << "Neighbours unexplored: " << oG->getNeighboursUnexplored() << endl;
 
         if (oG->getIsExplored() == false) {
-            cout << "Current cell not explored, adding cell to path stack." << endl;
-            oG->addCellToPath(); //Adds current cell to the top of the path stack.
+            cout << "Current cell not explored." << endl;
 
             if (oG->getNeighboursUnexplored() == 0) {
-                cout << "All neighbours of current cell explored." << endl;
-                oG->removeCellFromPath();
-                targetDirection = oG->getDirectionOfLastCell(); //Gets direction of cell on top of the path stack.
+                if (oG->getPathStack().empty() == false) {
+                    cout << "All neighbours of current cell explored." << endl;
+                    oG->removeCellFromPath();
+                    targetDirection = oG->getDirectionOfLastCell(); //Gets direction of cell on top of the path stack.
+                }
             } else {
                 targetDirection = oG->chooseNextCell(); //Chooses the next unexplored neighbour cell to travel to.
-                oG->setLeavingDirection(targetDirection); //Sets the direction in which the robot will leave the current cell.
             }
+
+            oG->addCellToPath(targetDirection); //Adds direction the robot is leaving in to the top of the path stack.
         } else if (oG->getNeighboursUnexplored() != 0) {
             cout << "Picking a neighbour to explore..." << endl;
             targetDirection = oG->chooseNextCell(); //Chooses the next unexplored neighbour cell to travel to.
-            oG->setLeavingDirection(targetDirection); //Sets the direction in which the robot will leave the current cell.
+            oG->addCellToPath(targetDirection); //Adds direction the robot is leaving in to the top of the path stack.
         } else if (oG->getNeighboursUnexplored() == 0) {
             cout << "All neighbours of current cell explored." << endl;
-            oG->removeCellFromPath(); //Pops the current cell off the path stack.
-            cout << "Removed current cell from path." << endl;
-            targetDirection = oG->getDirectionOfLastCell(); //Gets direction of cell on top of the path stack.
+
+            if (oG->getPathStack().empty() == false) {
+                oG->removeCellFromPath(); //Pops the current cell off the path stack.
+                cout << "Removed current cell from path." << endl;
+                targetDirection = oG->getDirectionOfLastCell(); //Gets direction of cell on top of the path stack.
+            }
         }
 
         targetYaw = targetDirection;
@@ -203,6 +210,8 @@ void Pioneer::runPioneer() {
         moveToNextCell(&pp); //Moves robot roughly 0.6m/60cm in the current direction it is facing.
 
     } while (!oG->getPathStack().empty()); //Keeps the loop going while the path stack is not empty.
+    
+    cout << "Path stack empty, mapping finished." << endl << endl;
 }
 
 Pioneer::~Pioneer() {

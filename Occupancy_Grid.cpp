@@ -22,7 +22,6 @@ Occupancy_Grid::Occupancy_Grid() {
     xLength = 3;
     yLength = 3;
 
-    pathStack.resize(1);
     grid.resize(START_X_LENGTH);
     for (int counter = 0; counter < START_X_LENGTH; counter++) grid[counter].resize(START_Y_LENGTH);
 
@@ -42,7 +41,7 @@ void Occupancy_Grid::initialiseCell(Cell *cell) {
 }
 
 /* Member function to return the pathStack. */
-vector<Cell*> Occupancy_Grid::getPathStack() {
+vector<int> Occupancy_Grid::getPathStack() {
     return pathStack;
 }
 
@@ -66,8 +65,8 @@ void Occupancy_Grid::shiftValuesUp() {
 
 /* Member function to shift all the values in the occupancy grid right 1 cell. */
 void Occupancy_Grid::shiftValuesRight() {
-    for (int xCounter = xLength - 1; xCounter >= 0; xCounter--) {
-        for (int yCounter = 0; yCounter <= yLength; yCounter++) {
+    for (int xCounter = xLength - 1; xCounter > 0; xCounter--) {
+        for (int yCounter = 0; yCounter < yLength; yCounter++) {
             grid[xCounter][yCounter] = grid[xCounter - 1][yCounter]; //Copies value to the cell to the right.
             grid[xCounter][yCounter].isExplored = grid[xCounter - 1][yCounter].isExplored; //Copies value to the cell to the right.
             grid[xCounter][yCounter].neighboursUnexplored = grid[xCounter - 1][yCounter].neighboursUnexplored;
@@ -245,8 +244,8 @@ void Occupancy_Grid::evaluateSonarReading(double sonarReading, int sonarFacing) 
 }
 
 /* Member function to add the cell the robot currently occupies to the pathStack. */
-void Occupancy_Grid::addCellToPath() {
-    pathStack.push_back(&grid[robotX][robotY]); //Add pointer of current cell to path stack.
+void Occupancy_Grid::addCellToPath(int direction) {
+    pathStack.push_back(direction); //Add pointer of current cell to path stack.
     grid[robotX][robotY].isExplored = true;
 }
 
@@ -289,17 +288,10 @@ int Occupancy_Grid::chooseNextCell() {
     return randomDirection;
 }
 
-/* Member function to set the direction the robot is leaving in. 
- * @param targetDirection The direction the robot will leave in.
- */
-void Occupancy_Grid::setLeavingDirection(int targetDirection) {
-    grid[robotX][robotY].leavingDirection = targetDirection;
-}
-
 /* Member function to set the direction that*/
 int Occupancy_Grid::getDirectionOfLastCell() {
-    if (pathStack.back()->leavingDirection == ZERO) return ONE_EIGHTY;
-    else if (pathStack.back()->leavingDirection == ONE_EIGHTY) return ZERO;
-    else if (pathStack.back()->leavingDirection == NIGHTY) return MINUS_NIGHTY;
-    else if (pathStack.back()->leavingDirection == MINUS_NIGHTY) return NIGHTY;
+    if (pathStack.back() == ZERO) return ONE_EIGHTY;
+    else if (pathStack.back() == ONE_EIGHTY) return ZERO;
+    else if (pathStack.back() == NIGHTY) return MINUS_NIGHTY;
+    else if (pathStack.back() == MINUS_NIGHTY) return NIGHTY;
 }
