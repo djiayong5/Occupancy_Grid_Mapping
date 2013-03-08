@@ -67,14 +67,13 @@ void Occupancy_Grid::shiftValuesUp() {
 void Occupancy_Grid::shiftValuesRight() {
     for (int xCounter = xLength - 1; xCounter > 0; xCounter--) {
         for (int yCounter = 0; yCounter < yLength; yCounter++) {
-            grid[xCounter][yCounter] = grid[xCounter - 1][yCounter]; //Copies value to the cell to the right.
             grid[xCounter][yCounter].isExplored = grid[xCounter - 1][yCounter].isExplored; //Copies value to the cell to the right.
             grid[xCounter][yCounter].neighboursUnexplored = grid[xCounter - 1][yCounter].neighboursUnexplored;
             grid[xCounter][yCounter].obstacleValue = grid[xCounter - 1][yCounter].obstacleValue;
             initialiseCell(&grid[xCounter - 1][yCounter]);
         }
     }
-    robotX++;
+    robotX++; //Corrects robot's position on grid.
 }
 
 /* Member function that expands the grid in the zero direction by 1 if needed. */
@@ -90,14 +89,10 @@ void Occupancy_Grid::resizeZero() {
 /* Member function that expands the grid in the one eighty direction by 1 if needed. */
 void Occupancy_Grid::resizeOneEighty() {
     if (robotY == 0) {
-        cout << "Robot Y before resize: " << robotY << endl;
-        yLength++;
+        yLength++;        for (int xCounter = 0; xCounter < xLength; xCounter++) initialiseCell(&grid[xCounter][0]);
         grid.resize(xLength); //Resizes grid xs.
         for (int xCounter = 0; xCounter < xLength; xCounter++) grid[xCounter].resize(yLength); //Resize grid ys
-        cout << "Resized Y by 1." << endl;
         shiftValuesUp();
-        cout << "Shifted Values up 1." << endl;
-        for (int xCounter = 0; xCounter < xLength; xCounter++) initialiseCell(&grid[xCounter][0]);
     }   
 }
 
@@ -108,7 +103,6 @@ void Occupancy_Grid::resizeNighty() {
         grid.resize(xLength); //Resizes grid xs.
         for (int xCounter = 0; xCounter < xLength; xCounter++) grid[xCounter].resize(yLength); //Resize grid ys.
         shiftValuesRight();
-        for (int yCounter = 0; yCounter < yLength; yCounter++) initialiseCell(&grid[0][yCounter]);
     }
 }
 
