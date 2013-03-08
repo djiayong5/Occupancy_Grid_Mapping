@@ -23,10 +23,10 @@
 #define MINUS_NIGHTY -90
 #endif
 
-#define MOVE_PGAIN 0.2
+#define MOVE_PGAIN 0.3
 #define TURN_PGAIN 0.5
 #define MOVE_ERROR_BOUND 0.05
-#define TURN_ERROR_BOUND 1.00
+#define TURN_ERROR_BOUND 0.05
 
 using namespace PlayerCc;
 

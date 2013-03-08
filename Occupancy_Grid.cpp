@@ -64,7 +64,6 @@ void Occupancy_Grid::shiftValuesUp() {
             initialiseCell(&grid[xCounter][yCounter - 1]);
         }
     }
-    cout << "Grid values shifted up." << endl;
 }
 
 /* Member function to shift all the values in the occupancy grid right 1 cell. */
@@ -78,51 +77,51 @@ void Occupancy_Grid::shiftValuesRight() {
             initialiseCell(&grid[xCounter - 1][yCounter]);
         }
     }
-    cout << "Grid values shifted right." << endl;
 }
 
 /* Member function that expands the grid in the zero direction by 1 if needed. */
 void Occupancy_Grid::resizeZero() {
-    if (robotY == yLength - 2) {
+    robotY++;
+    if (robotY >= yLength - 2) {
         yLength++;
         grid.resize(xLength); //Resizes grid xs.
         for (int xCounter = 0; xCounter < xLength; xCounter++) grid[xCounter].resize(yLength); //Resize grid ys.
-        robotY++;
         for (int xCounter = 0; xCounter < xLength; xCounter++) initialiseCell(&grid[xCounter][yLength - 1]);
     }
 }
 
 /* Member function that expands the grid in the one eighty direction by 1 if needed. */
 void Occupancy_Grid::resizeOneEighty() {
-    if (robotY == 1) {
+    robotY--;
+    cout << "Robot Y before resize: " << robotY << endl;
+    if (robotY <= 1) {
         yLength++;
         grid.resize(xLength); //Resizes grid xs.
         for (int xCounter = 0; xCounter < xLength; xCounter++) grid[xCounter].resize(yLength); //Resize grid ys.
         shiftValuesUp();
-        robotY--;
         for (int xCounter = 0; xCounter < xLength; xCounter++) initialiseCell(&grid[xCounter][0]);
-    }
+    }   
 }
 
 /* Member function that expands the grid in the nighty direction by 1 if needed. */
 void Occupancy_Grid::resizeNighty() {
-    if (robotX == 1) {
+    robotX--;
+    if (robotX <= 1) {
         xLength++;
         grid.resize(xLength); //Resizes grid xs.
         for (int xCounter = 0; xCounter < xLength; xCounter++) grid[xCounter].resize(yLength); //Resize grid ys.
         shiftValuesRight();
-        robotX--;
         for (int yCounter = 0; yCounter < yLength; yCounter++) initialiseCell(&grid[0][yCounter]);
     }
 }
 
 /* Member function that expands the grid in the minus nighty direction by 1 if needed. */
 void Occupancy_Grid::resizeMinusNighty() {
-    if (robotX == xLength - 2) {
+    robotX++;
+    if (robotX >= xLength - 2) {
         xLength++;
         grid.resize(xLength); //Resizes grid xs.
-        for (int xCounter = 0; xCounter < xLength; xCounter++) grid[xCounter].resize(yLength); //Resize grid ys.
-        robotX++;
+        for (int xCounter = 0; xCounter < xLength; xCounter++) grid[xCounter].resize(yLength); //Resize grid ys.   
         for (int yCounter = 0; yCounter < yLength; yCounter++) initialiseCell(&grid[xLength - 1][yCounter]);
     }
 }
@@ -260,11 +259,6 @@ int Occupancy_Grid::chooseNextCell() {
     int gridX;
     int gridY;
 
-    cout << "Cell at Zero Status: " << grid[robotX][robotY + 1].isExplored << endl;
-    cout << "Cell at One_Eighty Status: " << grid[robotX][robotY - 1].isExplored << endl;
-    cout << "Cell at Minus_Nighty Status: " << grid[robotX + 1][robotY].isExplored << endl;
-    cout << "Cell at Nighty Status: " << grid[robotX - 1][robotY].isExplored << endl;
-
     do {
         srand(time(NULL));
         randomDirection = (rand() % 4);
@@ -286,11 +280,8 @@ int Occupancy_Grid::chooseNextCell() {
             gridX = robotX - 1;
             gridY = robotY;
         }
-
-        cout << "Cell in Direction: " << randomDirection << ", Explored State: " << grid[gridX][gridY].isExplored << endl;
     } while (grid[gridX][gridY].isExplored == true);
 
-    cout << "Direction: " << randomDirection << " Selected, Explored State: " << grid[gridX][gridY].isExplored << endl;
     return randomDirection;
 }
 

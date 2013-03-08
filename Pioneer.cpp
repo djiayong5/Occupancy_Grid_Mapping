@@ -121,7 +121,6 @@ void Pioneer::reconfigureSensors(int currentDirection) {
 
 void Pioneer::surveyCycle(double frontReading, double rearReading, double leftReading, double rightReading, int currentDirection) {
     oG->resizeGrid(currentDirection); //Expands grid in the direction the robot is currently facing by 1.
-    cout << "Grid resized." << endl;
     oG->evaluateSonarReading(frontReading, frontSensorFacing);
     oG->evaluateSonarReading(rearReading, rearSensorFacing);
     oG->evaluateSonarReading(leftReading, leftSensorFacing);
@@ -170,9 +169,7 @@ void Pioneer::runPioneer() {
         if (oG->getIsExplored() == false) {
             cout << "Current cell not explored, adding cell to path stack." << endl;
             oG->addCellToPath(); //Adds current cell to the top of the path stack.
-            cout << "Picking next cell to travel to..." << endl;
             targetDirection = oG->chooseNextCell(); //Chooses the next unexplored neighbour cell to travel to.
-            //targetDirection = currentDirection;
             oG->setLeavingDirection(targetDirection); //Sets the direction in which the robot will leave the current cell.
         } else if (oG->getNeighboursUnexplored() != 0) {
             cout << "Picking a neighbour to explore..." << endl;
