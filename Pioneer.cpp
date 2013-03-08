@@ -176,14 +176,12 @@ void Pioneer::runPioneer() {
             if (oG->getNeighboursUnexplored() == 0) {
                 if (oG->getPathStack().empty() == false) {
                     cout << "All neighbours of current cell explored." << endl;
-                    oG->removeCellFromPath();
                     targetDirection = oG->getDirectionOfLastCell(); //Gets direction of cell on top of the path stack.
                 }
-            } else {
+            } else {      
                 targetDirection = oG->chooseNextCell(); //Chooses the next unexplored neighbour cell to travel to.
+                oG->addCellToPath(targetDirection); //Adds direction the robot is leaving in to the top of the path stack.
             }
-
-            oG->addCellToPath(targetDirection); //Adds direction the robot is leaving in to the top of the path stack.
         } else if (oG->getNeighboursUnexplored() != 0) {
             cout << "Picking a neighbour to explore..." << endl;
             targetDirection = oG->chooseNextCell(); //Chooses the next unexplored neighbour cell to travel to.
