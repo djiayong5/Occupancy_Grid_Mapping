@@ -3,3 +3,7 @@
 \contentsline {subsection}{\numberline {2.1}Possible Robot Related Causes}{3}
 \contentsline {subsubsection}{\numberline {2.1.1}Wheels and Movement}{3}
 \contentsline {subsubsection}{\numberline {2.1.2}Sensors}{4}
+\contentsline {subsection}{\numberline {2.2}Possible Real World Causes}{4}
+\contentsline {subsubsection}{\numberline {2.2.1}Landscape}{5}
+\contentsline {subsubsection}{\numberline {2.2.2}Weather Conditions}{5}
+\contentsline {subsection}{\numberline {2.3}Summary}{5}

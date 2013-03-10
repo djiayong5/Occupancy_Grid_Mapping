@@ -119,16 +119,16 @@ void Pioneer::reconfigureSensors(int currentDirection) {
     setRightSensorDirection(currentDirection);
 }
 
-void Pioneer::surveyCycle(double s3, double s4, double s12, double s11, double s0, double s15, double s7, double s8, int currentDirection) {
+void Pioneer::surveyCycle(double s3, double s4, double s2, double s5, double s12, double s11, double s13, double s10, double s0, double s15, double s7, double s8, int currentDirection) {
     oG->resizeGrid(currentDirection); //Expands grid in the direction the robot is currently facing by 1.
     
-    if (s3 <= FRONT_REAR_SONAR_RANGE || s4 <= FRONT_REAR_SONAR_RANGE) oG->calculateCellToChange(frontSensorFacing, true);
+    if (s3 <= SONAR_3_4_12_11_RANGE || s4 <= SONAR_3_4_12_11_RANGE || s2 <= SONAR_2_13_5_10_RANGE || s5 <= SONAR_2_13_5_10_RANGE) oG->calculateCellToChange(frontSensorFacing, true);
     else oG->calculateCellToChange(frontSensorFacing, false);
-    if (s12 <= FRONT_REAR_SONAR_RANGE || s11 <= FRONT_REAR_SONAR_RANGE) oG->calculateCellToChange(rearSensorFacing, true);
+    if (s12 <= SONAR_3_4_12_11_RANGE || s11 <= SONAR_3_4_12_11_RANGE || s13 <= SONAR_2_13_5_10_RANGE|| s10 <= SONAR_2_13_5_10_RANGE) oG->calculateCellToChange(rearSensorFacing, true);
     else oG->calculateCellToChange(rearSensorFacing, false);
-    if (s0 <= LEFT_RIGHT_SONAR_RANGE || s15 <= LEFT_RIGHT_SONAR_RANGE) oG->calculateCellToChange(leftSensorFacing, true);
+    if (s0 <= SONAR_0_15_7_8_RANGE || s15 <= SONAR_0_15_7_8_RANGE) oG->calculateCellToChange(leftSensorFacing, true);
     else oG->calculateCellToChange(leftSensorFacing, false);
-    if (s7 <= LEFT_RIGHT_SONAR_RANGE || s8 <= LEFT_RIGHT_SONAR_RANGE) oG->calculateCellToChange(rightSensorFacing, true);
+    if (s7 <= SONAR_0_15_7_8_RANGE || s8 <= SONAR_0_15_7_8_RANGE) oG->calculateCellToChange(rightSensorFacing, true);
     else oG->calculateCellToChange(rightSensorFacing, false);
     
     oG->checkNeighbours();
@@ -172,7 +172,7 @@ void Pioneer::runPioneer() {
     do {
         configureCycle(&robot, &pp, &currentYaw, &currentDirection);
         oG->moveRobotOnGrid(currentDirection);
-        surveyCycle(sp[3], sp[4], sp[12], sp[11], sp[0], sp[15], sp[7], sp[8], currentDirection); //Takes the sonar readings and marks cells as appropriate.
+        surveyCycle(sp[3], sp[4], sp[2], sp[5], sp[12], sp[11], sp[13], sp[10], sp[0], sp[15], sp[7], sp[8], currentDirection); //Takes the sonar readings and marks cells as appropriate.
         oG->printGrid(); //Prints the occupancy grid.
         cout << "Neighbours unexplored: " << oG->getNeighboursUnexplored() << endl;
         oG->setIsExploredTrue();
@@ -196,7 +196,7 @@ void Pioneer::runPioneer() {
         }
 
         configureCycle(&robot, &pp, &currentYaw, &currentDirection);
-        surveyCycle(sp[3], sp[4], sp[12], sp[11], sp[0], sp[15], sp[7], sp[8], currentDirection); //Takes the sonar readings and marks cells as appropriate.
+        surveyCycle(sp[3], sp[4], sp[2], sp[5], sp[12], sp[11], sp[13], sp[10], sp[0], sp[15], sp[7], sp[8], currentDirection); //Takes the sonar readings and marks cells as appropriate.
         oG->printGrid(); //Prints the occupancy grid.
         moveToNextCell(&pp); //Moves robot roughly 0.6m/60cm in the current direction it is facing.
 
