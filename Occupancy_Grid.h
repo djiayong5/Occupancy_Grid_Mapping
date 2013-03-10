@@ -47,8 +47,6 @@ private:
     void resizeNighty();
     void resizeMinusNighty();
     void checkOccupancy(int gridX, int gridY);
-    void incrementCell(int gridX, int gridY);
-    void decrementCell(int gridX, int gridY);
 
 public:
     /* Member Function Prototypes: */
@@ -62,7 +60,9 @@ public:
     void shiftValuesRight();
     void moveRobotOnGrid(int direction);
     void printGrid();
-    void evaluateSonarReading(double sonarReading, int sonarFacing, double sonarRange);
+    void incrementCell(int gridX, int gridY);
+    void decrementCell(int gridX, int gridY);
+    void calculateCellToChange(int sonarFacing, bool obstaclePresent);
     void addCellToPath(int direction);
     int getDirectionOfLastCell();
     void setIsExploredTrue();

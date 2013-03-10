@@ -41,6 +41,17 @@ Firstly the wheels may not be at even pressures causing the robot to always turn
 \vspace{5mm}
 \noindent Another thing to take into account is that on a 2D simulation the sonar sensors do not take into account the height of an obstacle or the height at which the so sonar sensor sit. This can cause quite a lot of problem and different results as on a real robot, the sonar sensors map be sitting at a height at which they cannot detect an obstacle that is too low this leading the robot to crash into the obstacle that could not be detected. With the Pioneer robots, the sonar sensors are not able to detect most chair legs on swivel wheeled office chairs but can detect the stem of the chairs, also if a person put their foot in front of a sonar sensor, the foot probably won't get detected but the person's leg probably would.
 
+\subsection{Possible Real World Causes}
+
+\noindent The real world is full of uncertainties and the only way to ensure that that the robot in question is actually being tested properly and fully is to make sure that the simulated world is as complex and as uncertain as the real world is.
+
+\subsubsection{Landscape}
+
+\noindent A simulated 2D world would not perceive heights of objects or inclines that a robot may encounter. This can be a problem when you have an algorithm that tells a robot to move a set distance but hits an incline or is already on one. Your robot may have moved the set distance but not fully in the direction expected as the robot may of travelled uphill or downhill rather than along a flat surface. Also the terrain/surface the robot may be travelling along could cause the robot's wheels to slip thus either causing a turn or the robot thinking it has a moved a set distance when the reality is that it didn't. A simple simulated world would not consider terrain surfaces and wheel material and thus the traction between the two, but the real world would.
+
+\subsubsection{Weather Conditions}
+
+
 \vspace{5mm}
 \noindent 
 \end{document}

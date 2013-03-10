@@ -23,12 +23,12 @@
 #define MINUS_NIGHTY -90
 #endif
 
-#define MOVE_PGAIN 0.4
-#define TURN_PGAIN 0.4
+#define MOVE_PGAIN 0.5
+#define TURN_PGAIN 0.5
 #define MOVE_ERROR_BOUND 0.025
-#define TURN_ERROR_BOUND 0.025
+#define TURN_ERROR_BOUND 0.05
 #define FRONT_REAR_SONAR_RANGE 0.635
-#define LEFT_RIGHT_SONAR_RANGE 0.625
+#define LEFT_RIGHT_SONAR_RANGE 0.645
 
 using namespace PlayerCc;
 
@@ -48,7 +48,7 @@ private:
     void setLeftSensorDirection(int currentDirection);
     void setRightSensorDirection(int currentDirection);
     void reconfigureSensors(int currentDirection);
-    void surveyCycle(double frontReading, double rearReading, double leftReading, double rightReading, int currentDirection);
+    void surveyCycle(double s3, double s4, double s12, double s11, double s0, double s15, double s7, double s8, int currentDirection);
     void configureCycle(PlayerClient *robot, Position2dProxy *pp, double *currentYaw, int *currentDirection);
 
 public:
