@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.4-1.40.13 (TeX Live 2012/Debian) (format=pdflatex 2013.2.18)  10 MAR 2013 14:58
+This is pdfTeX, Version 3.1415926-2.4-1.40.13 (TeX Live 2012/Debian) (format=pdflatex 2013.2.18)  10 MAR 2013 15:29
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -173,14 +173,14 @@ Here is how much of TeX's memory you used:
  4756 multiletter control sequences out of 15000+200000
  9324 words of font info for 33 fonts, out of 3000000 for 9000
  14 hyphenation exceptions out of 8191
- 37i,6n,23p,877b,236s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 37i,6n,23p,1323b,236s stack positions out of 5000i,500n,10000p,200000b,50000s
 </usr/share/texlive/texmf-dist/font
 s/type1/public/amsfonts/cm/cmbx12.pfb></usr/share/texlive/texmf-dist/fonts/type
 1/public/amsfonts/cm/cmr12.pfb></usr/share/texlive/texmf-dist/fonts/type1/publi
 c/amsfonts/cm/cmr17.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfo
 nts/cm/cmti12.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm
 /cmtt12.pfb>
-Output written on chs17_Simulation_vs_Reality_Report.pdf (4 pages, 60452 bytes)
+Output written on chs17_Simulation_vs_Reality_Report.pdf (4 pages, 62603 bytes)
 .
 PDF statistics:
  37 PDF objects out of 1000 (max. 8388607)

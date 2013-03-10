@@ -166,7 +166,7 @@ void Pioneer::runPioneer() {
     do {
         configureCycle(&robot, &pp, &currentYaw, &currentDirection);
         oG->moveRobotOnGrid(currentDirection);
-        surveyCycle(((sp[3] + sp[4]) / 2), ((sp[12] + sp[11]) / 2), sp[0], sp[7], currentDirection); //Takes the sonar readings and marks cells as appropriate.
+        surveyCycle(((sp[3] + sp[4]) / 2), ((sp[12] + sp[11]) / 2), ((sp[0] + sp[15]) / 2), ((sp[7] + sp[8]) / 2), currentDirection); //Takes the sonar readings and marks cells as appropriate.
         oG->printGrid(); //Prints the occupancy grid.
         cout << "Neighbours unexplored: " << oG->getNeighboursUnexplored() << endl;
         oG->setIsExploredTrue();
@@ -190,7 +190,7 @@ void Pioneer::runPioneer() {
         }
 
         configureCycle(&robot, &pp, &currentYaw, &currentDirection);
-        surveyCycle(((sp[3] + sp[4]) / 2), ((sp[12] + sp[11]) / 2), sp[0], sp[7], currentDirection); //Takes the sonar readings and marks cells as appropriate.
+        surveyCycle(((sp[3] + sp[4]) / 2), ((sp[12] + sp[11]) / 2), ((sp[0] + sp[15]) / 2), ((sp[7] + sp[8]) / 2), currentDirection); //Takes the sonar readings and marks cells as appropriate.
         oG->printGrid(); //Prints the occupancy grid.
         moveToNextCell(&pp); //Moves robot roughly 0.6m/60cm in the current direction it is facing.
 
