@@ -10,7 +10,31 @@ Simulation vs Reality}
 \newpage
 
 \section{Difference Between Simulation and Real Robots}
+The simulation of a robot in a virtual environment and the reality of a real robot in a real world environment can yield very different results. The main cause for this is that the real world is a very complex environment with many uncertainties. Not all of these uncertainties can be dealt with or even simulated properly.
 
+\vspace{5mm}
+\noindent In the case of the a Pioneer robot being simulated in a simple 2D world in Stage, the default \textit{simple.world} file provides an extremely simple environment with just a 'T' shaped corridor with an odd extra cell. Also not only is the world simulated simple, but the robot simulated will work almost perfectly so the PGAIN values chosen will work well. In a sense the simulation is of an ideal scenario. This is not te case however in the real world.
+
+\vspace{5mm}
+\noindent The real world in which the real Pioneer robot will be tested has a floor which has areas which are not level and may cause the robot to turn slightly. Also there will be many different kinds of surfaces that the sonar sensors may or may not scan/interpret properly. Another key thing to remember is that the robot may not be in ideal shape, the robot may not be able to turn as accurately as it does in the simulations (highly likely) and the robot may not move as far or maybe too far compared to the simulations (also highly likely). This means that when it comes to moving the moving the robot from simulation testing to real world testing the PGAIN values may need adjusting to get more accurate results in the real world.
+
+\vspace{5mm}
+\noindent 
 \section{Possible Causes of Differences}
 
+\noindent There are many possible causes for differences in the results between simulated tests and real world tests. The causes can exist in both the robot and the environment it is tested in. Firstly the main thing to take into account is that the simulated world environment may not be and probably is not an accurate representation of the real world environment. To get a proper perspective of the differences in the results you must first make sure that you have the testing environments as similar as possible.
+
+\subsection{Possible Robot Related Causes}
+
+\noindent In terms of the robot in real world there are many ways in which the robot may not portray the same simulated version of itself and produce different results.
+
+\subsubsection{Wheels and Movement}
+Firstly the wheels may not be at even pressures causing the robot to always turn slightly due to uneven pressures between the sides. Also in terms of power, different results may be yielded in how long a robot can last on battery due to different tyre pressures. Relating to the wheels there is something that may yield different moving results. The surface that the wheel travels on as well as the surface of the wheel may give or not give enough traction to allow the robot to actually move. In the case where an algorithm to calculate distance moved just uses time and the speed the robot should of been travelling at, the algorithm relies on the fact that the robot actually moves at the speed stated within the time so if the robot in slipping on ice for example then robot may not actually move at all but the robot thinks it has.
+
+\vspace{5mm}
+\noindent The robot may also count the number of revolutions a wheel goes round and the instrument that measures that may not provide accurate or reliable results thus resulting in different results. The wheel motors may give unequal power to both wheels as well producing the robot to turn when it is not meant to. As you can see there are many things just related to a robot's wheels (if it has any) that can cause unexpected results that differ from those on a simulation.
+
+\subsubsection{Sensors}
+
+\noindent Depending on what kinds of sensors your robot uses (if any) there are different ways in which results can be distorted or even produce anomalies.
 \end{document}
