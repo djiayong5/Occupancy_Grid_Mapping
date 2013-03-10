@@ -121,10 +121,10 @@ void Pioneer::reconfigureSensors(int currentDirection) {
 
 void Pioneer::surveyCycle(double frontReading, double rearReading, double leftReading, double rightReading, int currentDirection) {
     oG->resizeGrid(currentDirection); //Expands grid in the direction the robot is currently facing by 1.
-    oG->evaluateSonarReading(frontReading, frontSensorFacing);
-    oG->evaluateSonarReading(rearReading, rearSensorFacing);
-    oG->evaluateSonarReading(leftReading, leftSensorFacing);
-    oG->evaluateSonarReading(rightReading, rightSensorFacing);
+    oG->evaluateSonarReading(frontReading, frontSensorFacing, FRONT_REAR_SONAR_RANGE);
+    oG->evaluateSonarReading(rearReading, rearSensorFacing, FRONT_REAR_SONAR_RANGE);
+    oG->evaluateSonarReading(leftReading, leftSensorFacing, LEFT_RIGHT_SONAR_RANGE);
+    oG->evaluateSonarReading(rightReading, rightSensorFacing, LEFT_RIGHT_SONAR_RANGE);
     oG->checkNeighbours();
     cout << endl; //Used for formatting output.
 }

@@ -23,10 +23,12 @@
 #define MINUS_NIGHTY -90
 #endif
 
-#define MOVE_PGAIN 0.5
-#define TURN_PGAIN 0.5
+#define MOVE_PGAIN 0.4
+#define TURN_PGAIN 0.4
 #define MOVE_ERROR_BOUND 0.025
 #define TURN_ERROR_BOUND 0.025
+#define FRONT_REAR_SONAR_RANGE 0.635
+#define LEFT_RIGHT_SONAR_RANGE 0.625
 
 using namespace PlayerCc;
 

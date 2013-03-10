@@ -227,10 +227,10 @@ int Occupancy_Grid::getNeighboursUnexplored() {
  * @param sonarReading The sonar's reading.
  * @param sonarFacing The direction the sonar is facing.
  */
-void Occupancy_Grid::evaluateSonarReading(double sonarReading, int sonarFacing) {
+void Occupancy_Grid::evaluateSonarReading(double sonarReading, int sonarFacing, double sonarRange) {
     cout << "Sonar Facing " << sonarFacing << ", Reading: " << sonarReading << endl;
 
-    if (sonarReading <= SONAR_OBSTACLE_RANGE) {
+    if (sonarReading <= sonarRange) {
         if (sonarFacing == ZERO) incrementCell(robotX, robotY + 1);
         if (sonarFacing == ONE_EIGHTY) incrementCell(robotX, robotY - 1);
         if (sonarFacing == NIGHTY) incrementCell(robotX - 1, robotY);
