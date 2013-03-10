@@ -197,9 +197,9 @@ void Occupancy_Grid::decrementCell(int gridX, int gridY) {
     }
 }
 
-/* Member function to return the isExplored field value of the cell the robot currently occupies.*/
-bool Occupancy_Grid::getIsExplored() {
-    return grid[robotX][robotY].isExplored;
+/* Member function to set the current cell's isExplored field value to true. */
+void Occupancy_Grid::setIsExploredTrue() {
+    grid[robotX][robotY].isExplored = true;
 }
 
 /* Member function to check the neighbours of the cell the robot currently occupies for their exploration state.*/
@@ -209,6 +209,11 @@ void Occupancy_Grid::checkNeighbours() {
     if (grid[robotX - 1][robotY].isExplored == false) neighboursUnexplored++;
     if (grid[robotX][robotY + 1].isExplored == false) neighboursUnexplored++;
     if (grid[robotX][robotY - 1].isExplored == false) neighboursUnexplored++;
+    cout << "Cell 0 explored = " << grid[robotX][robotY + 1].isExplored << endl;
+    cout << "Cell 180 explored = " << grid[robotX][robotY - 1].isExplored << endl;
+    cout << "Cell 90 explored = " << grid[robotX - 1][robotY].isExplored << endl;
+    cout << "Cell -90 explored = " << grid[robotX + 1][robotY].isExplored << endl << endl;
+    
 
     grid[robotX][robotY].neighboursUnexplored = neighboursUnexplored;
 }
@@ -225,7 +230,7 @@ int Occupancy_Grid::getNeighboursUnexplored() {
 void Occupancy_Grid::evaluateSonarReading(double sonarReading, int sonarFacing) {
     cout << "Sonar Facing " << sonarFacing << ", Reading: " << sonarReading << endl;
 
-    if (sonarReading <= 0.65) {
+    if (sonarReading <= SONAR_OBSTACLE_RANGE) {
         if (sonarFacing == ZERO) incrementCell(robotX, robotY + 1);
         if (sonarFacing == ONE_EIGHTY) incrementCell(robotX, robotY - 1);
         if (sonarFacing == NIGHTY) incrementCell(robotX - 1, robotY);
@@ -241,15 +246,22 @@ void Occupancy_Grid::evaluateSonarReading(double sonarReading, int sonarFacing) 
 /* Member function to add the cell the robot currently occupies to the pathStack. */
 void Occupancy_Grid::addCellToPath(int direction) {
     pathStack.push_back(direction); //Add pointer of current cell to path stack.
-    grid[robotX][robotY].isExplored = true;
 }
 
-/* Member function to remove the cell that the robot currently occupies from the pathStack. */
-void Occupancy_Grid::removeCellFromPath() {
+/* Member function to set the direction that*/
+int Occupancy_Grid::getDirectionOfLastCell() {
+    int direction;
+    
+    if (pathStack.back() == ZERO) direction = ONE_EIGHTY;
+    else if (pathStack.back() == ONE_EIGHTY) direction = ZERO;
+    else if (pathStack.back() == NIGHTY) direction = MINUS_NIGHTY;
+    else if (pathStack.back() == MINUS_NIGHTY) direction = NIGHTY;
+    
     pathStack.pop_back();
+    return direction;
 }
 
-/* Member function to random choose the next direction to travel in while making sure that the cell in the
+/* Member function to randomly choose the next direction to travel in while making sure that the cell in the
  * direction randomised has not already been explored.
  */
 int Occupancy_Grid::chooseNextCell() {
@@ -281,12 +293,4 @@ int Occupancy_Grid::chooseNextCell() {
     } while (grid[gridX][gridY].isExplored == true);
 
     return randomDirection;
-}
-
-/* Member function to set the direction that*/
-int Occupancy_Grid::getDirectionOfLastCell() {
-    if (pathStack.back() == ZERO) return ONE_EIGHTY;
-    else if (pathStack.back() == ONE_EIGHTY) return ZERO;
-    else if (pathStack.back() == NIGHTY) return MINUS_NIGHTY;
-    else if (pathStack.back() == MINUS_NIGHTY) return NIGHTY;
 }

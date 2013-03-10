@@ -14,7 +14,7 @@
 #include <cstdlib>
 #include <math.h>
 #include <ctime>
-#include <unistd.h>
+#include <signal.h>
 
 using namespace PlayerCc;
 using namespace std;
@@ -169,31 +169,17 @@ void Pioneer::runPioneer() {
         surveyCycle(((sp[3] + sp[4]) / 2), ((sp[12] + sp[11]) / 2), sp[0], sp[7], currentDirection); //Takes the sonar readings and marks cells as appropriate.
         oG->printGrid(); //Prints the occupancy grid.
         cout << "Neighbours unexplored: " << oG->getNeighboursUnexplored() << endl;
-
-        if (oG->getIsExplored() == false) {
-            cout << "Current cell not explored." << endl;
-
-            if (oG->getNeighboursUnexplored() == 0) {
-                if (oG->getPathStack().empty() == false) {
-                    cout << "All neighbours of current cell explored." << endl;
-                    targetDirection = oG->getDirectionOfLastCell(); //Gets direction of cell on top of the path stack.
-                    oG->removeCellFromPath(); //Pops the current cell off the path stack.
-                }
-            } else {
-                cout << "Picking a neighbour to explore..." << endl;
-                targetDirection = oG->chooseNextCell(); //Chooses the next unexplored neighbour cell to travel to.
-                oG->addCellToPath(targetDirection); //Adds direction the robot is leaving in to the top of the path stack.
-            }
-        } else if (oG->getNeighboursUnexplored() != 0) {
+        oG->setIsExploredTrue();
+        
+        if (oG->getNeighboursUnexplored() != 0) {
             cout << "Picking a neighbour to explore..." << endl;
             targetDirection = oG->chooseNextCell(); //Chooses the next unexplored neighbour cell to travel to.
             oG->addCellToPath(targetDirection); //Adds direction the robot is leaving in to the top of the path stack.
         } else if (oG->getNeighboursUnexplored() == 0) {
             cout << "All neighbours of current cell explored." << endl;
 
-            if (oG->getPathStack().empty() == false) {
+            if (!oG->getPathStack().empty()) {
                 targetDirection = oG->getDirectionOfLastCell(); //Gets direction of cell on top of the path stack.
-                oG->removeCellFromPath(); //Pops the current cell off the path stack.
             }
         }
 
@@ -213,12 +199,17 @@ void Pioneer::runPioneer() {
     cout << "Path stack empty, mapping finished." << endl << endl;
 }
 
+void signalHandler(int signum) {
+        
+}
+
 Pioneer::~Pioneer() {
     delete(oG); //Ensures the deletion of the occupancy grid.
 }
 
 int main(int argc, char *argv[]) {
     Pioneer *pioneer = new Pioneer(); //Creates new pioneer on heap.
+    signal(SIGINT, signalHandler);
     pioneer->runPioneer();
     delete(pioneer); //Ensures the deletion of pioneer.
     return 0;

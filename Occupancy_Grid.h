@@ -24,6 +24,7 @@
 #define CELL_WIDTH 0.6
 #define START_X_LENGTH 3
 #define START_Y_LENGTH 3
+#define SONAR_OBSTACLE_RANGE 0.625
 
 using namespace std;
 
@@ -64,11 +65,10 @@ public:
     void printGrid();
     void evaluateSonarReading(double sonarReading, int sonarFacing);
     void addCellToPath(int direction);
-    void removeCellFromPath();
-    bool getIsExplored();
+    int getDirectionOfLastCell();
+    void setIsExploredTrue();
     void checkNeighbours();
     int getNeighboursUnexplored();
     int chooseNextCell();
-    int getDirectionOfLastCell();
 };
 #endif
