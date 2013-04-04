@@ -69,6 +69,6 @@ public:
     void setIsExploredTrue();
     void checkNeighbours();
     int getNeighboursUnexplored();
-    int chooseNextCell();
+    int chooseNextCell(int currentDirection);
 };
 #endif

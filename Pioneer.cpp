@@ -56,30 +56,33 @@ void Pioneer::moveForward(PlayerClient *robot, Position2dProxy *pp, int directio
     double current;
     double target;
     double speed;
+    double distanceLeft;
     robot->Read();
 
     if (direction == ZERO || direction == ONE_EIGHTY) {
-        target = pp->GetXPos() + posDifference;
-        current = pp->GetXPos();
+        target = pp->GetXPos() + posDifference; //Simulated world rotated 90 degrees do axis are switched.
+        current = pp->GetXPos(); //Simulated world rotated 90 degrees do axis are switched.
     } else if (direction == NIGHTY || direction == MINUS_NIGHTY) {
-        target = pp->GetYPos() + posDifference;
-        current = pp->GetYPos();
+        target = pp->GetYPos() + posDifference; //Simulated world rotated 90 degrees do axis are switched.
+        current = pp->GetYPos(); //Simulated world rotated 90 degrees do axis are switched.
     }
 
     while (travelledDistance == false) {
         robot->Read();
         
         if (direction == ZERO || direction == ONE_EIGHTY) {
-            current = pp->GetXPos();
+            current = pp->GetXPos(); //Simulated world rotated 90 degrees do axis are switched.
         } else if (direction == NIGHTY || direction == MINUS_NIGHTY) {
-            current = pp->GetYPos();
+            current = pp->GetYPos(); //Simulated world rotated 90 degrees do axis are switched.
         }
         
-        if (current <= (target + MOVE_ERROR_BOUND) && current >= (target - MOVE_ERROR_BOUND)) {
+        distanceLeft = target - current;
+        
+        if (distanceLeft <= MOVE_ERROR_BOUND && distanceLeft >= -MOVE_ERROR_BOUND) {
             travelledDistance = true;
             speed = 0.000;
         } else {
-            speed = (sqrt(target * target) - sqrt(current * current)) * MOVE_PGAIN;
+            speed = (sqrt(distanceLeft * distanceLeft)) * MOVE_PGAIN;
             speed = sqrt(speed * speed);
         }
 
@@ -204,7 +207,7 @@ void Pioneer::runPioneer() {
 
         if (oG->getNeighboursUnexplored() != 0) {
             cout << "Picking a neighbour to explore..." << endl;
-            targetDirection = oG->chooseNextCell(); //Chooses the next unexplored neighbour cell to travel to.
+            targetDirection = oG->chooseNextCell(currentDirection); //Chooses the next unexplored neighbour cell to travel to.
             oG->addCellToPath(targetDirection); //Adds direction the robot is leaving in to the top of the path stack.
         } else if (oG->getNeighboursUnexplored() == 0) {
             cout << "All neighbours of current cell explored." << endl;

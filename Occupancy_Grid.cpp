@@ -246,11 +246,16 @@ int Occupancy_Grid::getDirectionOfLastCell() {
 /** Member function to randomly choose the next direction to travel in while making sure that the cell in the
  * direction randomised has not already been explored.
  */
-int Occupancy_Grid::chooseNextCell() {
+int Occupancy_Grid::chooseNextCell(int currentDirection) {
     int randomDirection;
     int gridX;
     int gridY;
 
+    if (currentDirection == ZERO && grid[robotX][robotY + 1].isExplored == false) return ZERO;
+    else if (currentDirection == ONE_EIGHTY && grid[robotX][robotY - 1].isExplored == false) return ONE_EIGHTY;
+    else if (currentDirection == NIGHTY && grid[robotX - 1][robotY].isExplored == false) return NIGHTY;
+    else if (currentDirection == MINUS_NIGHTY && grid[robotX + 1][robotY].isExplored == false) return MINUS_NIGHTY;
+    
     do {
         srand(time(NULL));
         randomDirection = (rand() % 4);
