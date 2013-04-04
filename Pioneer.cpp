@@ -125,36 +125,80 @@ void Pioneer::setRightSensorDirection(int currentDirection) {
     else if (currentDirection == NIGHTY) rightSensorFacing = ZERO;
 }
 
+void Pioneer::setFrontLeftSensorDirection(int currentDirection) {
+    if (currentDirection == ZERO) frontLeftSensorFacing = FOURTY_FIVE;
+    else if (currentDirection == MINUS_NIGHTY) frontLeftSensorFacing = MINUS_FOURTY_FIVE;
+    else if (currentDirection == ONE_EIGHTY) frontLeftSensorFacing = MINUS_ONE_THIRTY_FIVE;
+    else if (currentDirection == NIGHTY) frontLeftSensorFacing = ONE_THIRTY_FIVE;
+}
+
+void Pioneer::setFrontRightSensorDirection(int currentDirection) {
+    if (currentDirection == ZERO) frontRightSensorFacing = MINUS_FOURTY_FIVE;
+    else if (currentDirection == MINUS_NIGHTY) frontRightSensorFacing = MINUS_ONE_THIRTY_FIVE;
+    else if (currentDirection == ONE_EIGHTY) frontRightSensorFacing = ONE_THIRTY_FIVE;
+    else if (currentDirection == NIGHTY) frontRightSensorFacing = FOURTY_FIVE;
+}
+
+void Pioneer::setRearLeftSensorDirection(int currentDirection) {
+    if (currentDirection == ZERO) rearLeftSensorFacing = ONE_THIRTY_FIVE;
+    else if (currentDirection == MINUS_NIGHTY) rearLeftSensorFacing = FOURTY_FIVE;
+    else if (currentDirection == ONE_EIGHTY) rearLeftSensorFacing = MINUS_FOURTY_FIVE;
+    else if (currentDirection == NIGHTY) rearLeftSensorFacing = MINUS_ONE_THIRTY_FIVE;
+}
+
+void Pioneer::setRearRightSensorDirection(int currentDirection) {
+    if (currentDirection == ZERO) rearRightSensorFacing = MINUS_ONE_THIRTY_FIVE;
+    else if (currentDirection == MINUS_NIGHTY) rearRightSensorFacing = ONE_THIRTY_FIVE;
+    else if (currentDirection == ONE_EIGHTY) rearRightSensorFacing = FOURTY_FIVE;
+    else if (currentDirection == NIGHTY) rearRightSensorFacing = MINUS_FOURTY_FIVE;
+}
+
 void Pioneer::reconfigureSensors(int currentDirection) {
     setFrontSensorDirection(currentDirection);
     setRearSensorDirection(currentDirection);
     setLeftSensorDirection(currentDirection);
     setRightSensorDirection(currentDirection);
+    setFrontLeftSensorDirection(currentDirection);
+    setFrontRightSensorDirection(currentDirection);
+    setRearLeftSensorDirection(currentDirection);
+    setRearRightSensorDirection(currentDirection);
 }
 
 void Pioneer::surveyCycle(double readings[], int currentDirection, bool inNextCell) {
     if (inNextCell == true) {
         cout << "In next cell." << endl;
 
-        if (readings[3] <= SONAR_3_4_12_11_RANGE || readings[4] <= SONAR_3_4_12_11_RANGE) oG->calculateCellToChange(frontSensorFacing, true);
+        if (readings[3] <= FRONT_REAR_RANGE || readings[4] <= FRONT_REAR_RANGE) oG->calculateCellToChange(frontSensorFacing, true);
         else oG->calculateCellToChange(frontSensorFacing, false);
 
-        if (readings[12] <= SONAR_3_4_12_11_RANGE || readings[11] <= SONAR_3_4_12_11_RANGE) oG->calculateCellToChange(rearSensorFacing, true);
+        if (readings[12] <= FRONT_REAR_RANGE || readings[11] <= FRONT_REAR_RANGE) oG->calculateCellToChange(rearSensorFacing, true);
         else oG->calculateCellToChange(rearSensorFacing, false);
 
-        if (readings[0] <= SONAR_0_15_7_8_RANGE || readings[15] <= SONAR_0_15_7_8_RANGE || readings[1] <= SONAR_1_6_9_14_RANGE || readings[14] <= SONAR_1_6_9_14_RANGE) oG->calculateCellToChange(leftSensorFacing, true);
+        if (readings[0] <= LEFT_RIGHT_RANGE || readings[15] <= LEFT_RIGHT_RANGE) oG->calculateCellToChange(leftSensorFacing, true);
         else oG->calculateCellToChange(leftSensorFacing, false);
 
-        if (readings[7] <= SONAR_0_15_7_8_RANGE || readings[8] <= SONAR_0_15_7_8_RANGE || readings[6] <= SONAR_1_6_9_14_RANGE || readings[9] <= SONAR_1_6_9_14_RANGE) oG->calculateCellToChange(rightSensorFacing, true);
+        if (readings[7] <= LEFT_RIGHT_RANGE || readings[8] <= LEFT_RIGHT_RANGE) oG->calculateCellToChange(rightSensorFacing, true);
         else oG->calculateCellToChange(rightSensorFacing, false);
+        
+        if (readings[1] <= CORNER_RANGE || readings[2] <= CORNER_RANGE) oG->calculateCellToChange(frontLeftSensorFacing, true);
+        else oG->calculateCellToChange(frontLeftSensorFacing, false);
+        
+        if (readings[5] <= CORNER_RANGE || readings[6] <= CORNER_RANGE) oG->calculateCellToChange(frontRightSensorFacing, true);
+        else oG->calculateCellToChange(frontRightSensorFacing, false);
+        
+        if (readings[13] <= CORNER_RANGE || readings[14] <= CORNER_RANGE) oG->calculateCellToChange(rearLeftSensorFacing, true);
+        else oG->calculateCellToChange(rearLeftSensorFacing, false);
+        
+        if (readings[9] <= CORNER_RANGE || readings[10] <= CORNER_RANGE) oG->calculateCellToChange(rearRightSensorFacing, true);
+        else oG->calculateCellToChange(rearRightSensorFacing, false);
     } else {
         cout << "Half way to next cell." << endl;
         oG->checkResizeNeeded(currentDirection); //Checks if the grid needs expanding.
 
-        if (readings[0] <= SONAR_0_15_7_8_RANGE || readings[1] <= SONAR_1_6_9_14_RANGE) oG->calculateCellToChange(leftSensorFacing, true);
+        if (readings[0] <= LEFT_RIGHT_RANGE || readings[1] <= MOVING_SIDE_RANGE) oG->calculateCellToChange(leftSensorFacing, true);
         else oG->calculateCellToChange(leftSensorFacing, false);
 
-        if (readings[7] <= SONAR_0_15_7_8_RANGE || readings[6] <= SONAR_1_6_9_14_RANGE) oG->calculateCellToChange(rightSensorFacing, true);
+        if (readings[7] <= LEFT_RIGHT_RANGE || readings[6] <= MOVING_SIDE_RANGE) oG->calculateCellToChange(rightSensorFacing, true);
         else oG->calculateCellToChange(rightSensorFacing, false);
     }
 

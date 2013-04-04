@@ -26,21 +26,25 @@
 #define MOVE_PGAIN 0.8
 #define TURN_PGAIN 0.8
 #define MOVE_ERROR_BOUND 0.025
-#define TURN_ERROR_BOUND 0.05
-#define SONAR_3_4_12_11_RANGE 0.710
-#define SONAR_0_15_7_8_RANGE 0.700
-#define SONAR_2_13_5_10_RANGE 0.600
-#define SONAR_1_6_9_14_RANGE 0.200
+#define TURN_ERROR_BOUND 0.050
+#define FRONT_REAR_RANGE 0.710
+#define LEFT_RIGHT_RANGE 0.700
+#define CORNER_RANGE 0.800
+#define MOVING_SIDE_RANGE 0.300
 
 using namespace PlayerCc;
 
 class Pioneer {
 private:
     Occupancy_Grid *oG;
-    int frontSensorFacing; /* Field that describes the direction the front sensor currently faces relative to its original direction 'UP' */
-    int rearSensorFacing; /* Field that describes the direction the rear sensor currently faces relative to its original direction 'DOWN' */
-    int leftSensorFacing; /* Field that describes the direction the right sensor currently faces relative to its original direction 'LEFT' */
-    int rightSensorFacing; /* Field that describes the direction the left sensor currently faces relative to its original direction 'RIGHT' */
+    int frontSensorFacing; /* Field that describes the direction the front sensor currently faces. */
+    int rearSensorFacing; /* Field that describes the direction the rear sensor currently faces. */
+    int leftSensorFacing; /* Field that describes the direction the right sensor currently faces. */
+    int rightSensorFacing; /* Field that describes the direction the left sensor currently faces. */
+    int frontLeftSensorFacing; /* Field that describes the direction the front left sensor currently faces. */
+    int frontRightSensorFacing; /* Field that describes the direction the front right sensor currently faces. */
+    int rearLeftSensorFacing; /* Field that describes the direction the rear left sensor currently faces. */
+    int rearRightSensorFacing; /* Field that describes the direction the rear right sensor currently faces. */
     double calculateTurnRate(double currentYaw, double targetYaw);
     void turnToNewDirection(double targetYaw, Position2dProxy *pp, PlayerClient *robot);
     void calculateMoveDistance(PlayerClient *robot, Position2dProxy *pp, int direction, double distanceToMove);
@@ -50,6 +54,10 @@ private:
     void setRearSensorDirection(int currentDirection);
     void setLeftSensorDirection(int currentDirection);
     void setRightSensorDirection(int currentDirection);
+    void setFrontLeftSensorDirection(int currentDirection);
+    void setFrontRightSensorDirection(int currentDirection);
+    void setRearLeftSensorDirection(int currentDirection);
+    void setRearRightSensorDirection(int currentDirection);
     void reconfigureSensors(int currentDirection);
     void surveyCycle(double readings[], int currentDirection, bool inNextCell);
     void configureCycle(PlayerClient *robot, Position2dProxy *pp, double *currentYaw, int *currentDirection);

@@ -16,9 +16,13 @@
 #ifndef DIRECTIONS
 #define DIRECTIONS
 #define ZERO 0
-#define ONE_EIGHTY 180
+#define FOURTY_FIVE 45
 #define NIGHTY 90
+#define ONE_THIRTY_FIVE 135
+#define ONE_EIGHTY 180
+#define MINUS_ONE_THIRTY_FIVE -135
 #define MINUS_NIGHTY -90
+#define MINUS_FOURTY_FIVE -45
 #endif
 
 #define CELL_WIDTH 0.6

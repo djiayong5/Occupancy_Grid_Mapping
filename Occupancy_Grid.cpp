@@ -217,11 +217,19 @@ void Occupancy_Grid::calculateCellToChange(int sonarFacing, bool obstaclePresent
         if (sonarFacing == ONE_EIGHTY) incrementCell(robotX, robotY - 1);
         if (sonarFacing == NIGHTY) incrementCell(robotX - 1, robotY);
         if (sonarFacing == MINUS_NIGHTY) incrementCell(robotX + 1, robotY);
+        if (sonarFacing == FOURTY_FIVE) incrementCell(robotX - 1, robotY + 1);
+        if (sonarFacing == ONE_THIRTY_FIVE) incrementCell(robotX - 1, robotY - 1);
+        if (sonarFacing == MINUS_FOURTY_FIVE) incrementCell(robotX + 1, robotY + 1);
+        if (sonarFacing == MINUS_ONE_THIRTY_FIVE) incrementCell(robotX + 1, robotY - 1);
     } else {
         if (sonarFacing == ZERO) decrementCell(robotX, robotY + 1);
         if (sonarFacing == ONE_EIGHTY) decrementCell(robotX, robotY - 1);
         if (sonarFacing == NIGHTY) decrementCell(robotX - 1, robotY);
         if (sonarFacing == MINUS_NIGHTY) decrementCell(robotX + 1, robotY);
+        if (sonarFacing == FOURTY_FIVE) decrementCell(robotX - 1, robotY + 1);
+        if (sonarFacing == ONE_THIRTY_FIVE) decrementCell(robotX - 1, robotY - 1);
+        if (sonarFacing == MINUS_FOURTY_FIVE) decrementCell(robotX + 1, robotY + 1);
+        if (sonarFacing == MINUS_ONE_THIRTY_FIVE) decrementCell(robotX + 1, robotY - 1);
     }
 }
 
