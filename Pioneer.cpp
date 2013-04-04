@@ -44,36 +44,46 @@ void Pioneer::turnToNewDirection(double targetYaw, Position2dProxy *pp, PlayerCl
     cout << "Turn Complete, Now Facing: " << currentYaw << endl;
 }
 
-void Pioneer::moveForward(Position2dProxy *pp, int direction) {
+void Pioneer::calculateMoveDistance(PlayerClient *robot, Position2dProxy *pp, int direction, double distanceToMove) {
+    if (direction == ZERO) moveForward(robot, pp, direction, distanceToMove);
+    else if (direction == ONE_EIGHTY) moveForward(robot, pp, direction, -distanceToMove);
+    else if (direction == NIGHTY) moveForward(robot, pp, direction, distanceToMove);
+    else if (direction == MINUS_NIGHTY) moveForward(robot, pp, direction, -distanceToMove);
+}
+
+void Pioneer::moveForward(PlayerClient *robot, Position2dProxy *pp, int direction, double posDifference) {
     bool travelledDistance = false; //Boolean condition to break out of while loop.
     double current;
-    
-    if (direction == ZERO) double targetY = pp->GetYPos() + 0.300;
-    else if (direction == ONE_EIGHTY) double targetY = pp->GetYPos() - 0.300;
-    else if (direction == NIGHTY) double targetX = pp->GetXPos() + 0.300;
-    else if (direction == MINUS_NIGHTY) double targetX = pp->GetXPos() - 0.300;
+    double target;
+    double speed;
+    robot->Read();
+
+    if (direction == ZERO || direction == ONE_EIGHTY) {
+        target = pp->GetXPos() + posDifference;
+        current = pp->GetXPos();
+    } else if (direction == NIGHTY || direction == MINUS_NIGHTY) {
+        target = pp->GetYPos() + posDifference;
+        current = pp->GetYPos();
+    }
 
     while (travelledDistance == false) {
+        robot->Read();
+        
         if (direction == ZERO || direction == ONE_EIGHTY) {
-            current = pp->GetYPos();
-            
-            if (current <= (targetY) + MOVE_ERROR_BOUND && current >= (targetY) - MOVE_ERROR_BOUND) {
-                travelledDistance = true;
-                speed = 0.000;
-            } else {
-                speed = (targetY - current) * PGAIN;
-            }
-        } else if (direction == NIGHTY || direction == MINUS_NIGHTY) {
             current = pp->GetXPos();
-            
-            if (current <= (targetX) + MOVE_ERROR_BOUND && current >= (targetX) - MOVE_ERROR_BOUND) travelledDistance = true;
+        } else if (direction == NIGHTY || direction == MINUS_NIGHTY) {
+            current = pp->GetYPos();
+        }
+        
+        if (current <= (target + MOVE_ERROR_BOUND) && current >= (target - MOVE_ERROR_BOUND)) {
+            travelledDistance = true;
             speed = 0.000;
         } else {
-            speed = (targetX - current) * PGAIN;
+            speed = (sqrt(target * target) - sqrt(current * current)) * MOVE_PGAIN;
+            speed = sqrt(speed * speed);
         }
 
         pp->SetSpeed(speed, 0.000);
-        sleep(1);
     }
 }
 
@@ -122,25 +132,25 @@ void Pioneer::reconfigureSensors(int currentDirection) {
 void Pioneer::surveyCycle(double readings[], int currentDirection, bool inNextCell) {
     if (inNextCell == true) {
         cout << "In next cell." << endl;
-        
+
         if (readings[3] <= SONAR_3_4_12_11_RANGE || readings[4] <= SONAR_3_4_12_11_RANGE) oG->calculateCellToChange(frontSensorFacing, true);
         else oG->calculateCellToChange(frontSensorFacing, false);
-        
+
         if (readings[12] <= SONAR_3_4_12_11_RANGE || readings[11] <= SONAR_3_4_12_11_RANGE) oG->calculateCellToChange(rearSensorFacing, true);
         else oG->calculateCellToChange(rearSensorFacing, false);
-        
+
         if (readings[0] <= SONAR_0_15_7_8_RANGE || readings[15] <= SONAR_0_15_7_8_RANGE || readings[1] <= SONAR_1_6_9_14_RANGE || readings[14] <= SONAR_1_6_9_14_RANGE) oG->calculateCellToChange(leftSensorFacing, true);
         else oG->calculateCellToChange(leftSensorFacing, false);
-        
+
         if (readings[7] <= SONAR_0_15_7_8_RANGE || readings[8] <= SONAR_0_15_7_8_RANGE || readings[6] <= SONAR_1_6_9_14_RANGE || readings[9] <= SONAR_1_6_9_14_RANGE) oG->calculateCellToChange(rightSensorFacing, true);
         else oG->calculateCellToChange(rightSensorFacing, false);
     } else {
         cout << "Half way to next cell." << endl;
         oG->checkResizeNeeded(currentDirection); //Checks if the grid needs expanding.
-        
+
         if (readings[0] <= SONAR_0_15_7_8_RANGE || readings[1] <= SONAR_1_6_9_14_RANGE) oG->calculateCellToChange(leftSensorFacing, true);
         else oG->calculateCellToChange(leftSensorFacing, false);
-        
+
         if (readings[7] <= SONAR_0_15_7_8_RANGE || readings[6] <= SONAR_1_6_9_14_RANGE) oG->calculateCellToChange(rightSensorFacing, true);
         else oG->calculateCellToChange(rightSensorFacing, false);
     }
@@ -182,7 +192,7 @@ void Pioneer::runPioneer() {
     cout << "Start Yaw Corrected to: " << currentYaw << endl;
     currentDirection = evaluateDirection(currentYaw);
     configureCycle(&robot, &pp, &currentYaw, &currentDirection);
-   
+
     do {
         configureCycle(&robot, &pp, &currentYaw, &currentDirection);
         for (int counter = 0; counter <= 15; counter++) sonarReadings[counter] = sp[counter];
@@ -190,7 +200,7 @@ void Pioneer::runPioneer() {
         surveyCycle(sonarReadings, currentDirection, true); //Takes the sonar readings and marks cells as appropriate.
         oG->printGrid(); //Prints the occupancy grid.
         cout << "Neighbours unexplored: " << oG->getNeighboursUnexplored() << endl;
-        
+
 
         if (oG->getNeighboursUnexplored() != 0) {
             cout << "Picking a neighbour to explore..." << endl;
@@ -214,14 +224,14 @@ void Pioneer::runPioneer() {
         for (int counter = 0; counter <= 15; counter++) sonarReadings[counter] = sp[counter];
         surveyCycle(sonarReadings, currentDirection, true); //Takes the sonar readings and marks cells as appropriate.
         oG->printGrid(); //Prints the occupancy grid.
-        
+
         oG->moveRobotOnGrid(currentDirection);
-        moveForward(&pp); //Moves robot roughly 0.6cm/60cm in the current direction it is facing.
+        calculateMoveDistance(&robot, &pp, currentDirection, 0.300);
 
         robot.Read();
         for (int counter = 0; counter <= 15; counter++) sonarReadings[counter] = sp[counter];
         surveyCycle(sonarReadings, currentDirection, false); //Takes the sonar readings and marks cells as appropriate.
-        moveForward(&pp); //Moves robot roughly 0.6cm/60cm in the current direction it is facing.
+        calculateMoveDistance(&robot, &pp, currentDirection, 0.300);
     } while (!oG->getPathStack().empty()); //Keeps the loop going while the path stack is not empty.
 
     cout << "Path stack empty, mapping finished." << endl << endl;

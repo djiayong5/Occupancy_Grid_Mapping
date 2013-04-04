@@ -43,7 +43,8 @@ private:
     int rightSensorFacing; /* Field that describes the direction the left sensor currently faces relative to its original direction 'RIGHT' */
     double calculateTurnRate(double currentYaw, double targetYaw);
     void turnToNewDirection(double targetYaw, Position2dProxy *pp, PlayerClient *robot);
-    void moveForward(Position2dProxy *pp);
+    void calculateMoveDistance(PlayerClient *robot, Position2dProxy *pp, int direction, double distanceToMove);
+    void moveForward(PlayerClient *robot, Position2dProxy *pp, int direction, double posDifference);
     int evaluateDirection(double currentYaw);
     void setFrontSensorDirection(int currentDirection);
     void setRearSensorDirection(int currentDirection);

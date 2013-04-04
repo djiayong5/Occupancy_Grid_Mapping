@@ -3,7 +3,7 @@
 #Compile the recently edited c++ file
 echo "Compiling..."
 
-g++ -o simulator `pkg-config --cflags playerc++` "Occupancy_Grid.cpp" "simpleLISA.cpp" `pkg-config --libs playerc++`
+g++ -o simulator `pkg-config --cflags playerc++` "Occupancy_Grid.cpp" "simple.cpp" `pkg-config --libs playerc++`
 
 #Open the application
 echo "Opening the application using a new terminal..."
