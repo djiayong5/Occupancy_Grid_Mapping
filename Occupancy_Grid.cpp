@@ -148,9 +148,11 @@ void Occupancy_Grid::printGrid() {
             if (xCounter == robotX && yCounter == robotY) {
                 cout << "R";
             } else if (grid[xCounter][yCounter].isExplored == true && grid[xCounter][yCounter].obstacleValue == 0) {
-                cout << "-";
+                cout << " ";
+            } else if (grid[xCounter][yCounter].isExplored == false && grid[xCounter][yCounter].obstacleValue == 0) {
+                cout << "~";
             } else {
-                cout << grid[xCounter][yCounter].obstacleValue;
+                cout << "#";
             }
         }
         cout << endl;
