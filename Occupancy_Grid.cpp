@@ -291,3 +291,15 @@ int Occupancy_Grid::chooseNextCell(int currentDirection) {
 
     return randomDirection;
 }
+
+/** Member function to evaluate if the robot has finished mapping an area. */
+bool Occupancy_Grid::checkFinished() {
+    for (int xCounter = 0; xCounter <= xLength - 1; xCounter++) {
+        for (int yCounter = 0; yCounter <= yLength - 1; yCounter) {
+            if (grid[xCounter][yCounter].isExplored == true && grid[xCounter][yCounter].neighboursUnexplored == 0
+                    && grid[xCounter][yCounter].obstacleValue != 0) return false;
+        }
+    }
+    
+    return true;
+}

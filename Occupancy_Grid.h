@@ -74,5 +74,6 @@ public:
     void checkNeighbours();
     int getNeighboursUnexplored();
     int chooseNextCell(int currentDirection);
+    bool checkFinished();
 };
 #endif

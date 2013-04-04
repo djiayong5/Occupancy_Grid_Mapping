@@ -256,7 +256,9 @@ void Pioneer::runPioneer() {
         } else if (oG->getNeighboursUnexplored() == 0) {
             cout << "All neighbours of current cell explored." << endl;
 
-            if (!oG->getPathStack().empty()) {
+            if (oG->checkFinished()) {
+                oG->getPathStack().clear();
+            } else if (!oG->getPathStack().empty()) {
                 targetDirection = oG->getDirectionOfLastCell(); //Gets direction of cell on top of the path stack.
             }
         }
