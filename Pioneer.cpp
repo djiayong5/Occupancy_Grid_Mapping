@@ -13,9 +13,6 @@
 #include <cstdio>
 #include <cstdlib>
 #include <math.h>
-#include <ctime>
-#include <signal.h>
-#include <vector>
 
 using namespace PlayerCc;
 using namespace std;
@@ -47,29 +44,32 @@ void Pioneer::turnToNewDirection(double targetYaw, Position2dProxy *pp, PlayerCl
     cout << "Turn Complete, Now Facing: " << currentYaw << endl;
 }
 
-void Pioneer::moveForward(Position2dProxy *pp) {
-    time_t currentTime = time(NULL); //Stores the current time.
-    time_t lastTime = time(NULL); //Stores the previous current time.
-    double timeDifference = 0.000; //Stores the time difference between lastTime and currentTime in seconds.
-    double speed = 0.000; //Stores the current speed the robot is travelling at.
-    double lastSpeed = 0.000; //Stores the speed the robot was last travelling at.
-    double distance = 0.000; //Stores the distance the robot has travelled. 
+void Pioneer::moveForward(Position2dProxy *pp, int direction) {
     bool travelledDistance = false; //Boolean condition to break out of while loop.
+    double current;
+    
+    if (direction == ZERO) double targetY = pp->GetYPos() + 0.300;
+    else if (direction == ONE_EIGHTY) double targetY = pp->GetYPos() - 0.300;
+    else if (direction == NIGHTY) double targetX = pp->GetXPos() + 0.300;
+    else if (direction == MINUS_NIGHTY) double targetX = pp->GetXPos() - 0.300;
 
     while (travelledDistance == false) {
-        lastTime = currentTime; //Sets time to the time stored in currentTime before it updates ready for time difference calculation.
-        currentTime = time(NULL); //Sets time to the current time ready for time difference calculation, 
-        timeDifference = difftime(currentTime, lastTime); //Calculates time difference in seconds.
-
-        if ((distance <= ((CELL_WIDTH / 2) + MOVE_ERROR_BOUND)) && (distance >= ((CELL_WIDTH / 2) - MOVE_ERROR_BOUND))) {
+        if (direction == ZERO || direction == ONE_EIGHTY) {
+            current = pp->GetYPos();
+            
+            if (current <= (targetY) + MOVE_ERROR_BOUND && current >= (targetY) - MOVE_ERROR_BOUND) {
+                travelledDistance = true;
+                speed = 0.000;
+            } else {
+                speed = (targetY - current) * PGAIN;
+            }
+        } else if (direction == NIGHTY || direction == MINUS_NIGHTY) {
+            current = pp->GetXPos();
+            
+            if (current <= (targetX) + MOVE_ERROR_BOUND && current >= (targetX) - MOVE_ERROR_BOUND) travelledDistance = true;
             speed = 0.000;
-            lastSpeed = 0.000;
-            distance = 0.000;
-            travelledDistance = true;
         } else {
-            lastSpeed = speed;
-            distance += (lastSpeed * timeDifference); //Speed in m/sec, time in sec.
-            speed = (((CELL_WIDTH / 2) - distance) * MOVE_PGAIN);
+            speed = (targetX - current) * PGAIN;
         }
 
         pp->SetSpeed(speed, 0.000);

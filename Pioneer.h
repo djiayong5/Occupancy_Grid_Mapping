@@ -13,7 +13,6 @@
 #include <libplayerc++/playerc++.h>
 #include <cstdio>
 #include <cstdlib>
-#include <vector>
 #include "Occupancy_Grid.h"
 
 #ifndef DIRECTIONS
@@ -28,7 +27,7 @@
 #define TURN_PGAIN 0.8
 #define MOVE_ERROR_BOUND 0.025
 #define TURN_ERROR_BOUND 0.05
-#define SONAR_3_4_12_11_RANGE 0.710
+#define SONAR_3_4_12_11_RANGE 0.750
 #define SONAR_0_15_7_8_RANGE 0.750
 #define SONAR_2_13_5_10_RANGE 0.600
 #define SONAR_1_6_9_14_RANGE 0.200
