@@ -15,6 +15,7 @@
 #include <math.h>
 #include <ctime>
 #include <signal.h>
+#include <vector>
 
 using namespace PlayerCc;
 using namespace std;
@@ -46,7 +47,7 @@ void Pioneer::turnToNewDirection(double targetYaw, Position2dProxy *pp, PlayerCl
     cout << "Turn Complete, Now Facing: " << currentYaw << endl;
 }
 
-void Pioneer::moveToNextCell(Position2dProxy *pp) {
+void Pioneer::moveForward(Position2dProxy *pp) {
     time_t currentTime = time(NULL); //Stores the current time.
     time_t lastTime = time(NULL); //Stores the previous current time.
     double timeDifference = 0.000; //Stores the time difference between lastTime and currentTime in seconds.
@@ -60,16 +61,15 @@ void Pioneer::moveToNextCell(Position2dProxy *pp) {
         currentTime = time(NULL); //Sets time to the current time ready for time difference calculation, 
         timeDifference = difftime(currentTime, lastTime); //Calculates time difference in seconds.
 
-        if ((distance <= (CELL_WIDTH + MOVE_ERROR_BOUND)) && (distance >= (CELL_WIDTH - MOVE_ERROR_BOUND))) {
+        if ((distance <= ((CELL_WIDTH / 2) + MOVE_ERROR_BOUND)) && (distance >= ((CELL_WIDTH / 2) - MOVE_ERROR_BOUND))) {
             speed = 0.000;
             lastSpeed = 0.000;
             distance = 0.000;
             travelledDistance = true;
-            cout << "Arrived at next cell." << endl;
         } else {
             lastSpeed = speed;
             distance += (lastSpeed * timeDifference); //Speed in m/sec, time in sec.
-            speed = ((CELL_WIDTH - distance) * MOVE_PGAIN);
+            speed = (((CELL_WIDTH / 2) - distance) * MOVE_PGAIN);
         }
 
         pp->SetSpeed(speed, 0.000);
@@ -119,18 +119,32 @@ void Pioneer::reconfigureSensors(int currentDirection) {
     setRightSensorDirection(currentDirection);
 }
 
-void Pioneer::surveyCycle(double s3, double s4, double s2, double s5, double s12, double s11, double s13, double s10, double s0, double s15, double s7, double s8, int currentDirection) {
-    oG->resizeGrid(currentDirection); //Expands grid in the direction the robot is currently facing by 1.
-    
-    if (s3 <= SONAR_3_4_12_11_RANGE || s4 <= SONAR_3_4_12_11_RANGE || s2 <= SONAR_2_13_5_10_RANGE || s5 <= SONAR_2_13_5_10_RANGE) oG->calculateCellToChange(frontSensorFacing, true);
-    else oG->calculateCellToChange(frontSensorFacing, false);
-    if (s12 <= SONAR_3_4_12_11_RANGE || s11 <= SONAR_3_4_12_11_RANGE || s13 <= SONAR_2_13_5_10_RANGE|| s10 <= SONAR_2_13_5_10_RANGE) oG->calculateCellToChange(rearSensorFacing, true);
-    else oG->calculateCellToChange(rearSensorFacing, false);
-    if (s0 <= SONAR_0_15_7_8_RANGE || s15 <= SONAR_0_15_7_8_RANGE) oG->calculateCellToChange(leftSensorFacing, true);
-    else oG->calculateCellToChange(leftSensorFacing, false);
-    if (s7 <= SONAR_0_15_7_8_RANGE || s8 <= SONAR_0_15_7_8_RANGE) oG->calculateCellToChange(rightSensorFacing, true);
-    else oG->calculateCellToChange(rightSensorFacing, false);
-    
+void Pioneer::surveyCycle(double readings[], int currentDirection, bool inNextCell) {
+    if (inNextCell == true) {
+        cout << "In next cell." << endl;
+        
+        if (readings[3] <= SONAR_3_4_12_11_RANGE || readings[4] <= SONAR_3_4_12_11_RANGE) oG->calculateCellToChange(frontSensorFacing, true);
+        else oG->calculateCellToChange(frontSensorFacing, false);
+        
+        if (readings[12] <= SONAR_3_4_12_11_RANGE || readings[11] <= SONAR_3_4_12_11_RANGE) oG->calculateCellToChange(rearSensorFacing, true);
+        else oG->calculateCellToChange(rearSensorFacing, false);
+        
+        if (readings[0] <= SONAR_0_15_7_8_RANGE || readings[15] <= SONAR_0_15_7_8_RANGE || readings[1] <= SONAR_1_6_9_14_RANGE || readings[14] <= SONAR_1_6_9_14_RANGE) oG->calculateCellToChange(leftSensorFacing, true);
+        else oG->calculateCellToChange(leftSensorFacing, false);
+        
+        if (readings[7] <= SONAR_0_15_7_8_RANGE || readings[8] <= SONAR_0_15_7_8_RANGE || readings[6] <= SONAR_1_6_9_14_RANGE || readings[9] <= SONAR_1_6_9_14_RANGE) oG->calculateCellToChange(rightSensorFacing, true);
+        else oG->calculateCellToChange(rightSensorFacing, false);
+    } else {
+        cout << "Half way to next cell." << endl;
+        oG->checkResizeNeeded(currentDirection); //Checks if the grid needs expanding.
+        
+        if (readings[0] <= SONAR_0_15_7_8_RANGE || readings[1] <= SONAR_1_6_9_14_RANGE) oG->calculateCellToChange(leftSensorFacing, true);
+        else oG->calculateCellToChange(leftSensorFacing, false);
+        
+        if (readings[7] <= SONAR_0_15_7_8_RANGE || readings[6] <= SONAR_1_6_9_14_RANGE) oG->calculateCellToChange(rightSensorFacing, true);
+        else oG->calculateCellToChange(rightSensorFacing, false);
+    }
+
     oG->checkNeighbours();
     cout << endl; //Used for formatting output.
 }
@@ -145,7 +159,7 @@ void Pioneer::configureCycle(PlayerClient *robot, Position2dProxy *pp, double *c
 
 void Pioneer::runPioneer() {
     PlayerClient robot("localhost");
-    //PlayerClient robot("lisa.islnet");
+    //PlayerClient robot("bart.islnet");
     RangerProxy sp(&robot, 0);
     //SonarProxy sp(&robot, 0);
     Position2dProxy pp(&robot, 0);
@@ -153,6 +167,7 @@ void Pioneer::runPioneer() {
     oG = new Occupancy_Grid(); //Creates new occupancy grid on the heap;
     double currentYaw = 0.000;
     double targetYaw = 0.000;
+    double sonarReadings[16];
     int currentDirection;
     int targetDirection;
 
@@ -167,16 +182,16 @@ void Pioneer::runPioneer() {
     cout << "Start Yaw Corrected to: " << currentYaw << endl;
     currentDirection = evaluateDirection(currentYaw);
     configureCycle(&robot, &pp, &currentYaw, &currentDirection);
-    oG->shrinkGrid(currentDirection); //Shrinks grid in the direction the robot faces as the grid will expand in that same direction once it enters the loop ahead.
-
+   
     do {
         configureCycle(&robot, &pp, &currentYaw, &currentDirection);
-        oG->moveRobotOnGrid(currentDirection);
-        surveyCycle(sp[3], sp[4], sp[2], sp[5], sp[12], sp[11], sp[13], sp[10], sp[0], sp[15], sp[7], sp[8], currentDirection); //Takes the sonar readings and marks cells as appropriate.
+        for (int counter = 0; counter <= 15; counter++) sonarReadings[counter] = sp[counter];
+        oG->setIsExploredTrue();
+        surveyCycle(sonarReadings, currentDirection, true); //Takes the sonar readings and marks cells as appropriate.
         oG->printGrid(); //Prints the occupancy grid.
         cout << "Neighbours unexplored: " << oG->getNeighboursUnexplored() << endl;
-        oG->setIsExploredTrue();
         
+
         if (oG->getNeighboursUnexplored() != 0) {
             cout << "Picking a neighbour to explore..." << endl;
             targetDirection = oG->chooseNextCell(); //Chooses the next unexplored neighbour cell to travel to.
@@ -196,10 +211,17 @@ void Pioneer::runPioneer() {
         }
 
         configureCycle(&robot, &pp, &currentYaw, &currentDirection);
-        surveyCycle(sp[3], sp[4], sp[2], sp[5], sp[12], sp[11], sp[13], sp[10], sp[0], sp[15], sp[7], sp[8], currentDirection); //Takes the sonar readings and marks cells as appropriate.
+        for (int counter = 0; counter <= 15; counter++) sonarReadings[counter] = sp[counter];
+        surveyCycle(sonarReadings, currentDirection, true); //Takes the sonar readings and marks cells as appropriate.
         oG->printGrid(); //Prints the occupancy grid.
-        moveToNextCell(&pp); //Moves robot roughly 0.6m/60cm in the current direction it is facing.
+        
+        oG->moveRobotOnGrid(currentDirection);
+        moveForward(&pp); //Moves robot roughly 0.6cm/60cm in the current direction it is facing.
 
+        robot.Read();
+        for (int counter = 0; counter <= 15; counter++) sonarReadings[counter] = sp[counter];
+        surveyCycle(sonarReadings, currentDirection, false); //Takes the sonar readings and marks cells as appropriate.
+        moveForward(&pp); //Moves robot roughly 0.6cm/60cm in the current direction it is facing.
     } while (!oG->getPathStack().empty()); //Keeps the loop going while the path stack is not empty.
 
     cout << "Path stack empty, mapping finished." << endl << endl;

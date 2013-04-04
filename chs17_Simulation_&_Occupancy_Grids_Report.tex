@@ -43,10 +43,7 @@ Simulation and Occupancy Grids}
 \end{itemize}
  
 \subsection{Solution}
-\noindent My initial approach to solving the problem involved tackling each of the issues mentioned in the subsection above one at a time. However, as I eventually noticed that all of the issues are interlinked in one way or another so I had to accept that my designs may change as I try to get everything to integrate well together.
-
-\vspace{5mm}
-\noindent I first decided on how to construct an actual occupancy grid to map with. The specification stated that a 2D array of integers would be a good starting point. I though about how the occupancy grid would be used and if simple integer cells within the 2D array would suffice. This led me to think about how I would control the robot's exploration of an area.
+\noindent The construction of the occupancy grid was first considered, but to construct the grid the data needed to be stored had to be decided first so the exploration algorithm was tackled beforehand.
 
 \vspace{5mm}
 \noindent After thinking of ways to tackle the exploration issue, I decided that obstacles would cause a problem with a random and fixed search and that a method of manoeuvring around the obstacles (if possible) would be required. When looked from a different perspective, the exploration problem looked like a search problem with the problem space being the exploration area in question. An artificial intelligence inspired search technique called Depth-First Search (DFS) was then chosen to control the robot's exploration.
@@ -61,7 +58,7 @@ Simulation and Occupancy Grids}
 \end{itemize}
 
 \begin{figure}[H]
-\includegraphics[scale=0.53]{robotics3DFS.png}
+\includegraphics[scale=0.53]{roboticsDFSCode.png}
 \caption{Screen shot of the DFS exploration algorithm implemented in C++.}
 \end{figure}
 
@@ -69,26 +66,46 @@ Simulation and Occupancy Grids}
 \noindent As the path is stored as a stack the search acts like a Depth-First Search always going further and further until it hits a dead-end and then back tracks one cell, and tries again, and so fourth etc. This allows the robot to explore an entire area and even get around obstacles as it doesn't need to think about how it is going to get around it, the robot just eventually check every cell it can as that is how the search algorithm works.
 
 \vspace{5mm}
-\noindent Once I knew how the exploration would be controlled I knew what would be needed to keep track of the search and this led to 2D array of \textbf{Cell} structs which store not only the obstacle value, but other fields required for search purposes as well. Concerning the issue of which sonar sensors to use, it seemed sensible to only use the front, rear, left and right sonar sensors as they would be more accurate and easier to work with. This did meant that the robot would only be able to scan in directions at 90 degrees (approximately). Also for simplicity and to reduce error probabilities and effects, it made sense to only move one cell, that is 60cm approximately at a time in any 90 degree direction and only scan for obstacles 60cm approximately in either direction to map onto the grid, this occurred when deciding to use a DFS approach to exploration.
+\noindent A simple algorithm to consisting of \textbf{if statements} would move the robot on the grid with every move it made. And as the DFS approach allows for the robot to explore an area of undefined size, it occurred that the 2D grid would have to be dynamically resizeable so algorithms were implemented to resize the grid by 1 in the direction it just travelled. Algorithms to shift the values within the grid right and up were implemented as well for when the grid expands left and down to avoid using negative index values which would not work with arrays.
 
 \vspace{5mm}
-\noindent Also with those simplicities decided, it made to it easier to see how the 2D grid would lay over the robot's environment. A simple algorithm to consisting of \textbf{if statements} would move the robot on the grid with every move it made. And as the DFS approach allows for the robot to explore an area of undefined size, it occurred that the 2D grid would have to be dynamically resizeable so algorithms were implemented to resize the grid by 1 in the direction it just travelled. Algorithms to shift the values within the grid right and up were implemented as well for when the grid expands left and down to avoid using negative index values which would not work with arrays.
+\noindent Once the exploration issue was decided, a 2D array of \textbf{Cell} structs which store the obstacle value and other fields required for search purposes were implemented. In terms of the issue of which sensors to use, it was decided that all sensors would be utilised to provide more information about the area being explored.
 
 \subsection{Example Execution of Solution}
 
 \begin{figure}[H]
-\includegraphics[scale=0.8]{robotics1Terminal.png}
+\includegraphics[scale=0.8]{robotics7Terminal.png}
 \caption{Screen shot of the terminal window during an execution of the solution described above.}
 \end{figure}
 
 \begin{figure}[H]
-\includegraphics[scale=0.9]{robotics2Stage.png}
+\includegraphics[scale=0.9]{robotics7Stage.png}
 \caption{Screen shot of the Stage window during an execution of the solution described above.}
 \end{figure}
 
-\noindent The two screen shots above show an example execution of the solution implemented. Both the screen shots are of the same execution and time (cut from a full-screen screen shot), that is to say they are synchronised. The terminal window shows the state of the occupancy grid at the time the robot last scanned (scans every time it arrives at a cell and before it leaves). The Stage window shows the robots path. Take notice that the green painting is not at all a true representation of the robot's scans but the furthest any of it's sensors had managed to extend to.
+\noindent The two screen shots above show an example execution of the solution implemented. Both the screen shots are of the same execution and time (cut from a full-screen screen shot), that is to say they are synchronised. The terminal window shows the state of the occupancy grid at the time the robot last scanned. The Stage window shows the robots position in the environment.
 
 \vspace{5mm}
 \noindent The Stage window screen shot shows how the DFS algorithm can work, you can see back tracking in the robot's path and this also relates to the higher obstacle values on the terminal window screen shot. In terms of a threshold value needed to give a final view of the occupancy grid, taking a mean from all the cells that have an obstacle value > 0 would be appropriate although this value can change a lot if the robot does a lot of backtracking.
+
+\subsection{Problems with Solution}
+\noindent After more testing it became apparent that the algorithm implemented doesn't actually scan for a cell 60cm by 60cm but just the length meaning the robot will move into a cell that it can move into, but no long turn within it (if there is an obstacle to the side of it). It was also learned that the restricting the robot to moving at 90 degree angles gave it great mapping accuracy but also reduced the moving flexibility too much. he lessons learned are invaluable but due to time constraints a new solution could be devised or implemented.
+
+\section{References}
+\noindent The wikipedia page and PDF below were used to provide knowledge about Player and Stage.
+
+
+\vspace{5mm}
+\noindent Wikipedia reference:
+\\URL: \textbf{http://en.wikipedia.org/wiki/Player\_(software)}
+\\Page Title: \textbf{Player Project}
+\\Page Last Modified: \textbf{15 December 2012}
+
+\vspace{5mm}
+\noindent PDF reference:
+\\Title: \textbf{How to use Player/Stage}
+\\Version: \textbf{2nd edition}
+\\Author: \textbf{Jennifer Owen}
+\\Date: \textbf{16th April 2010}
 
 \end{document}

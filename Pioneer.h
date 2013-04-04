@@ -13,6 +13,7 @@
 #include <libplayerc++/playerc++.h>
 #include <cstdio>
 #include <cstdlib>
+#include <vector>
 #include "Occupancy_Grid.h"
 
 #ifndef DIRECTIONS
@@ -23,13 +24,14 @@
 #define MINUS_NIGHTY -90
 #endif
 
-#define MOVE_PGAIN 0.5
-#define TURN_PGAIN 0.5
+#define MOVE_PGAIN 0.8
+#define TURN_PGAIN 0.8
 #define MOVE_ERROR_BOUND 0.025
 #define TURN_ERROR_BOUND 0.05
-#define SONAR_3_4_12_11_RANGE 0.635
-#define SONAR_0_15_7_8_RANGE 0.645
-#define SONAR_2_13_5_10_RANGE 0.150
+#define SONAR_3_4_12_11_RANGE 0.710
+#define SONAR_0_15_7_8_RANGE 0.750
+#define SONAR_2_13_5_10_RANGE 0.600
+#define SONAR_1_6_9_14_RANGE 0.200
 
 using namespace PlayerCc;
 
@@ -42,14 +44,14 @@ private:
     int rightSensorFacing; /* Field that describes the direction the left sensor currently faces relative to its original direction 'RIGHT' */
     double calculateTurnRate(double currentYaw, double targetYaw);
     void turnToNewDirection(double targetYaw, Position2dProxy *pp, PlayerClient *robot);
-    void moveToNextCell(Position2dProxy *pp);
+    void moveForward(Position2dProxy *pp);
     int evaluateDirection(double currentYaw);
     void setFrontSensorDirection(int currentDirection);
     void setRearSensorDirection(int currentDirection);
     void setLeftSensorDirection(int currentDirection);
     void setRightSensorDirection(int currentDirection);
     void reconfigureSensors(int currentDirection);
-    void surveyCycle(double s3, double s4, double s2, double s5, double s12, double s11, double s13, double s10, double s0, double s15, double s7, double s8, int currentDirection);
+    void surveyCycle(double readings[], int currentDirection, bool inNextCell);
     void configureCycle(PlayerClient *robot, Position2dProxy *pp, double *currentYaw, int *currentDirection);
 
 public:

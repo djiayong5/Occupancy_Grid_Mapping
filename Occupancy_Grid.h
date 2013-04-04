@@ -42,6 +42,7 @@ private:
     int xLength;
     int robotY;
     int robotX;
+    void resizeGrid(int directionToExpand);
     void resizeZero();
     void resizeOneEighty();
     void resizeNighty();
@@ -54,7 +55,7 @@ public:
     void initialiseCell(Cell *cell);
     vector<int> getPathStack();
     vector<vector<Cell> > getGrid();
-    void resizeGrid(int directionToExpand);
+    void checkResizeNeeded(int currentDirection);
     void shrinkGrid(int directionToShrink);
     void shiftValuesUp();
     void shiftValuesRight();
