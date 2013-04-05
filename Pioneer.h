@@ -27,10 +27,10 @@
 #define TURN_PGAIN 0.8
 #define MOVE_ERROR_BOUND 0.025
 #define TURN_ERROR_BOUND 0.050
-#define FRONT_REAR_RANGE 0.710
-#define LEFT_RIGHT_RANGE 0.650
-#define CORNER_RANGE 0.750
-#define CLOSE_RANGE 0.200
+#define FRONT_REAR_RANGE 0.830
+#define LEFT_RIGHT_RANGE 0.950
+#define CORNER_RANGE 1.20
+#define CLOSE_RANGE 0.300
 
 using namespace PlayerCc;
 
@@ -61,7 +61,7 @@ private:
     void reconfigureSensors(int currentDirection);
     void surveyCycle(double readings[], int currentDirection, bool inNextCell);
     void evaluateReadings(double reading1, double reading2, double range, int sensorFacing);
-    void evaluateCornerReadings(double reading1, double reading2, double range1, double range2, int sensorFacing1, int sensorFacing2);
+    void evaluateCornerReadings(double reading, double lowerBound, double upperBound, int sensorFacing);
     void evaluateMovingReadings(double reading1, double reading2, double range1, double range2, int sensorFacing);
     void configureCycle(PlayerClient *robot, Position2dProxy *pp, double *currentYaw, int *currentDirection);
 

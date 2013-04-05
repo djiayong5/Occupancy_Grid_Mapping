@@ -69,6 +69,7 @@ public:
     void decrementCell(int gridX, int gridY);
     void calculateCellToChange(int sonarFacing, bool obstaclePresent);
     void addCellToPath(int direction);
+    void printPath();
     int getDirectionOfLastCell();
     void setIsExploredTrue();
     void checkNeighbours();

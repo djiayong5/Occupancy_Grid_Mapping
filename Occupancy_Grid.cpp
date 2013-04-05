@@ -241,6 +241,15 @@ void Occupancy_Grid::addCellToPath(int direction) {
     pathStack.push_back(direction); //Add pointer of current cell to path stack.
 }
 
+void Occupancy_Grid::printPath() {
+    cout << "Path Stack:";
+
+    for (int counter = pathStack.size() - 1; counter >= 0; counter--) {
+        cout << " " << pathStack.at(counter);
+    }
+    cout << endl;
+}
+
 /** Member function to set the direction that*/
 int Occupancy_Grid::getDirectionOfLastCell() {
     int direction;
@@ -266,7 +275,7 @@ int Occupancy_Grid::chooseNextCell(int currentDirection) {
     else if (currentDirection == ONE_EIGHTY && grid[robotX][robotY - 1].isExplored == false) return ONE_EIGHTY;
     else if (currentDirection == NIGHTY && grid[robotX - 1][robotY].isExplored == false) return NIGHTY;
     else if (currentDirection == MINUS_NIGHTY && grid[robotX + 1][robotY].isExplored == false) return MINUS_NIGHTY;
-    
+
     do {
         srand(time(NULL));
         randomDirection = (rand() % 4);
@@ -295,12 +304,13 @@ int Occupancy_Grid::chooseNextCell(int currentDirection) {
 
 /** Member function to evaluate if the robot has finished mapping an area. */
 bool Occupancy_Grid::checkFinished() {
+    cout << "Checking if finished..." << endl;
     for (int xCounter = 0; xCounter <= xLength - 1; xCounter++) {
-        for (int yCounter = 0; yCounter <= yLength - 1; yCounter) {
-            if (grid[xCounter][yCounter].isExplored == true && grid[xCounter][yCounter].neighboursUnexplored == 0
-                    && grid[xCounter][yCounter].obstacleValue != 0) return false;
+        for (int yCounter = 0; yCounter <= yLength - 1; yCounter++) {
+            if (grid[xCounter][yCounter].isExplored == true && grid[xCounter][yCounter].neighboursUnexplored != 0
+                    && grid[xCounter][yCounter].obstacleValue == 0) return false;
         }
     }
-    
+
     return true;
 }

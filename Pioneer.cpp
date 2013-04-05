@@ -173,10 +173,10 @@ void Pioneer::surveyCycle(double readings[], int currentDirection, bool inNextCe
         evaluateReadings(readings[0], readings[15], LEFT_RIGHT_RANGE, leftSensorFacing);
         evaluateReadings(readings[7], readings[8], LEFT_RIGHT_RANGE, rightSensorFacing);
 
-        evaluateCornerReadings(readings[1], readings[2], CLOSE_RANGE, CORNER_RANGE, leftSensorFacing, frontLeftSensorFacing);
-        evaluateCornerReadings(readings[5], readings[6], CLOSE_RANGE, CORNER_RANGE, rightSensorFacing, frontRightSensorFacing);
-        evaluateCornerReadings(readings[13], readings[14], CLOSE_RANGE, CORNER_RANGE, leftSensorFacing, rearLeftSensorFacing);
-        evaluateCornerReadings(readings[9], readings[10], CLOSE_RANGE, CORNER_RANGE, rightSensorFacing, rearRightSensorFacing);
+        evaluateCornerReadings(readings[1], CLOSE_RANGE, CORNER_RANGE, frontLeftSensorFacing);
+        evaluateCornerReadings(readings[6], CLOSE_RANGE, CORNER_RANGE, frontRightSensorFacing);
+        evaluateCornerReadings(readings[9], CLOSE_RANGE, CORNER_RANGE, rearRightSensorFacing);
+        evaluateCornerReadings(readings[14], CLOSE_RANGE, CORNER_RANGE, rearLeftSensorFacing);
     } else {
         cout << "Half way to next cell." << endl;
         oG->checkResizeNeeded(currentDirection); //Checks if the grid needs expanding.
@@ -191,19 +191,19 @@ void Pioneer::surveyCycle(double readings[], int currentDirection, bool inNextCe
 
 void Pioneer::evaluateReadings(double reading1, double reading2, double range, int sensorFacing) {
     if (reading1 <= range || reading2 <= range) {
-        oG->calculateCellToChange(sensorFacing, true); 
-    }
-    else {
-        oG->calculateCellToChange(sensorFacing, false); 
+        oG->calculateCellToChange(sensorFacing, true);
+    } else {
+        oG->calculateCellToChange(sensorFacing, false);
     }
 }
 
-void Pioneer::evaluateCornerReadings(double reading1, double reading2, double range1, double range2, int sensorFacing1, int sensorFacing2) {
-    if (reading1 <= range1 || reading2 <= range1) oG->calculateCellToChange(sensorFacing1, true);
-    else if (reading1 <= range2 || reading2 <= range2) oG->calculateCellToChange(sensorFacing2, true);
-    else {
-        oG->calculateCellToChange(sensorFacing1, false);
-        oG->calculateCellToChange(sensorFacing2, false);
+void Pioneer::evaluateCornerReadings(double reading, double lowerBound, double upperBound, int sensorFacing) {
+    cout << reading << endl;
+
+    if (reading >= lowerBound && reading <= upperBound) {
+        oG->calculateCellToChange(sensorFacing, true);
+    } else {
+        oG->calculateCellToChange(sensorFacing, false);
     }
 }
 
@@ -263,33 +263,41 @@ void Pioneer::runPioneer() {
             cout << "All neighbours of current cell explored." << endl;
 
             if (oG->checkFinished()) {
+                cout << "Finished Mapping.";
                 oG->getPathStack().clear();
             } else if (!oG->getPathStack().empty()) {
+                cout << "Path not empty." << endl;
                 targetDirection = oG->getDirectionOfLastCell(); //Gets direction of cell on top of the path stack.
+                cout << "New Direction: " << targetDirection << endl;
             }
         }
 
-        targetYaw = targetDirection;
+        if (!oG->getPathStack().empty()) {
+            oG->printPath();
+            targetYaw = targetDirection;
 
-        if (targetDirection != currentDirection) {
-            turnToNewDirection(targetYaw, &pp, &robot); //Turns robot to face direction of next cell to travel to.    
+            if (targetDirection != currentDirection) {
+                turnToNewDirection(targetYaw, &pp, &robot); //Turns robot to face direction of next cell to travel to.    
+            }
+
+            configureCycle(&robot, &pp, &currentYaw, &currentDirection);
+            for (int counter = 0; counter <= 15; counter++) sonarReadings[counter] = sp[counter];
+            surveyCycle(sonarReadings, currentDirection, true); //Takes the sonar readings and marks cells as appropriate.
+            oG->printGrid(); //Prints the occupancy grid.
+
+            oG->moveRobotOnGrid(currentDirection);
+            calculateMoveDistance(&robot, &pp, currentDirection, 0.350);
+
+            robot.Read();
+            for (int counter = 0; counter <= 15; counter++) sonarReadings[counter] = sp[counter];
+            surveyCycle(sonarReadings, currentDirection, false); //Takes the sonar readings and marks cells as appropriate.
+            calculateMoveDistance(&robot, &pp, currentDirection, 0.350);
+        } else {
+            cout << "Path stack empty, mapping finished." << endl << endl;
         }
-
-        configureCycle(&robot, &pp, &currentYaw, &currentDirection);
-        for (int counter = 0; counter <= 15; counter++) sonarReadings[counter] = sp[counter];
-        surveyCycle(sonarReadings, currentDirection, true); //Takes the sonar readings and marks cells as appropriate.
-        oG->printGrid(); //Prints the occupancy grid.
-
-        oG->moveRobotOnGrid(currentDirection);
-        calculateMoveDistance(&robot, &pp, currentDirection, 0.300);
-
-        robot.Read();
-        for (int counter = 0; counter <= 15; counter++) sonarReadings[counter] = sp[counter];
-        surveyCycle(sonarReadings, currentDirection, false); //Takes the sonar readings and marks cells as appropriate.
-        calculateMoveDistance(&robot, &pp, currentDirection, 0.300);
     } while (!oG->getPathStack().empty()); //Keeps the loop going while the path stack is not empty.
 
-    cout << "Path stack empty, mapping finished." << endl << endl;
+
 }
 
 Pioneer::~Pioneer() {
