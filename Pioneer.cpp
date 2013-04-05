@@ -69,15 +69,15 @@ void Pioneer::moveForward(PlayerClient *robot, Position2dProxy *pp, int directio
 
     while (travelledDistance == false) {
         robot->Read();
-        
+
         if (direction == ZERO || direction == ONE_EIGHTY) {
             current = pp->GetXPos(); //Simulated world rotated 90 degrees do axis are switched.
         } else if (direction == NIGHTY || direction == MINUS_NIGHTY) {
             current = pp->GetYPos(); //Simulated world rotated 90 degrees do axis are switched.
         }
-        
+
         distanceLeft = target - current;
-        
+
         if (distanceLeft <= MOVE_ERROR_BOUND && distanceLeft >= -MOVE_ERROR_BOUND) {
             travelledDistance = true;
             speed = 0.000;
@@ -168,42 +168,44 @@ void Pioneer::surveyCycle(double readings[], int currentDirection, bool inNextCe
     if (inNextCell == true) {
         cout << "In next cell." << endl;
 
-        if (readings[3] <= FRONT_REAR_RANGE || readings[4] <= FRONT_REAR_RANGE) oG->calculateCellToChange(frontSensorFacing, true);
-        else oG->calculateCellToChange(frontSensorFacing, false);
+        evaluateReadings(reading[3], readings[4], FRONT_REAR_RANGE, frontSensorFacing);
+        evaluateReadings(reading[12], readings[11], FRONT_REAR_RANGE, rearSensorFacing);
+        evaluateReadings(reading[0], readings[15], LEFT_RIGHT_RANGE, frontSensorFacing);
+        evaluateReadings(reading[7], readings[8], LEFT_RIGHT_RANGE, frontSensorFacing);
 
-        if (readings[12] <= FRONT_REAR_RANGE || readings[11] <= FRONT_REAR_RANGE) oG->calculateCellToChange(rearSensorFacing, true);
-        else oG->calculateCellToChange(rearSensorFacing, false);
-
-        if (readings[0] <= LEFT_RIGHT_RANGE || readings[15] <= LEFT_RIGHT_RANGE) oG->calculateCellToChange(leftSensorFacing, true);
-        else oG->calculateCellToChange(leftSensorFacing, false);
-
-        if (readings[7] <= LEFT_RIGHT_RANGE || readings[8] <= LEFT_RIGHT_RANGE) oG->calculateCellToChange(rightSensorFacing, true);
-        else oG->calculateCellToChange(rightSensorFacing, false);
-        
-        if (readings[1] <= CORNER_RANGE || readings[2] <= CORNER_RANGE) oG->calculateCellToChange(frontLeftSensorFacing, true);
-        else oG->calculateCellToChange(frontLeftSensorFacing, false);
-        
-        if (readings[5] <= CORNER_RANGE || readings[6] <= CORNER_RANGE) oG->calculateCellToChange(frontRightSensorFacing, true);
-        else oG->calculateCellToChange(frontRightSensorFacing, false);
-        
-        if (readings[13] <= CORNER_RANGE || readings[14] <= CORNER_RANGE) oG->calculateCellToChange(rearLeftSensorFacing, true);
-        else oG->calculateCellToChange(rearLeftSensorFacing, false);
-        
-        if (readings[9] <= CORNER_RANGE || readings[10] <= CORNER_RANGE) oG->calculateCellToChange(rearRightSensorFacing, true);
-        else oG->calculateCellToChange(rearRightSensorFacing, false);
+        evaluateCornerReadings(readings[1], readings[2], CLOSE_RANGE, CORNER_RANGE, leftSensorFacing, frontLeftSensorFacing);
+        evaluateCornerReadings(readings[5], readings[6], CLOSE_RANGE, CORNER_RANGE, rightSensorFacing, frontRightSensorFacing);
+        evaluateCornerReadings(readings[13], readings[14], CLOSE_RANGE, CORNER_RANGE, leftSensorFacing, rearLeftSensorFacing);
+        evaluateCornerReadings(readings[9], readings[10], CLOSE_RANGE, CORNER_RANGE, rightSensorFacing, rearRightSensorFacing);
     } else {
         cout << "Half way to next cell." << endl;
         oG->checkResizeNeeded(currentDirection); //Checks if the grid needs expanding.
 
-        if (readings[0] <= LEFT_RIGHT_RANGE || readings[1] <= MOVING_SIDE_RANGE) oG->calculateCellToChange(leftSensorFacing, true);
-        else oG->calculateCellToChange(leftSensorFacing, false);
-
-        if (readings[7] <= LEFT_RIGHT_RANGE || readings[6] <= MOVING_SIDE_RANGE) oG->calculateCellToChange(rightSensorFacing, true);
-        else oG->calculateCellToChange(rightSensorFacing, false);
+        evaluateMovingReadings(readings[0], readings[1], LEFT_RIGHT_RANGE, CLOSE_RANGE, leftSensorFacing);
+        evaluateMovingReadings(readings[7], readings[6], LEFT_RIGHT_RANGE, CLOSE_RANGE, rightSensorFacing);
     }
 
     oG->checkNeighbours();
     cout << endl; //Used for formatting output.
+}
+
+void Pioneer::evaluateReadings(double reading1, double reading2, int range, int sensorFacing) {
+    if (reading1 <= range || reading2 <= range) oG->calculateCellToChange(sensorFacing, true);
+    else oG->calculateCellToChange(sensorFacing, false);
+}
+
+void Pioneer::evaluateCornerReadings(double reading1, double reading2, int range1, int range2, int sensorFacing1, int sensorFacing2) {
+    if (reading1 <= range1 || reading2 <= range1) oG->calculateCellToChange(sensorFacing1, true);
+    else if (reading1 <= range2 || reading2 <= range2) oG->calculateCellToChange(sensorFacing2, true);
+    else {
+        oG->calculateCellToChange(sensorFacing1, false);
+        oG->calculateCellToChange(sensorFacing2, false);
+    }
+}
+
+void Pioneer::evaluateMovingReaings(double reading1, double reading2, int range1, int range2, int sensorFacing) {
+    if (reading1 <= range1 || reading2 <= range2) oG->calculateCellToChange(sensorFacing, true);
+    else oG->calculateCellToChange(sensorFacing, false);
 }
 
 void Pioneer::configureCycle(PlayerClient *robot, Position2dProxy *pp, double *currentYaw, int *currentDirection) {

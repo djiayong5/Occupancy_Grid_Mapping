@@ -30,7 +30,7 @@
 #define FRONT_REAR_RANGE 0.710
 #define LEFT_RIGHT_RANGE 0.650
 #define CORNER_RANGE 0.750
-#define MOVING_SIDE_RANGE 0.200
+#define CLOSE_RANGE 0.200
 
 using namespace PlayerCc;
 
@@ -60,6 +60,9 @@ private:
     void setRearRightSensorDirection(int currentDirection);
     void reconfigureSensors(int currentDirection);
     void surveyCycle(double readings[], int currentDirection, bool inNextCell);
+    void evaluateReadings(double reading1, double reading2, int range, int sensorFacing);
+    void evaluateCornerReadings(double reading1, double reading2, int range1, int range2, int sensorFacing1, int sensorFacing2);
+    void evaluateMovingReaings(double reading1, double reading2, int range1, int range2, int sensorFacing);
     void configureCycle(PlayerClient *robot, Position2dProxy *pp, double *currentYaw, int *currentDirection);
 
 public:
