@@ -39,10 +39,11 @@ void Occupancy_Grid::initialiseCell(Cell *cell) {
     cell->isExplored = false;
     cell->neighboursUnexplored = 4;
     cell->obstacleValue = 0;
+    cell->directionLeftFrom = 360;
 }
 
 /** Member function to return the pathStack. */
-vector<int> Occupancy_Grid::getPathStack() {
+vector<Cell*> Occupancy_Grid::getPathStack() {
     return pathStack;
 }
 
@@ -58,6 +59,7 @@ void Occupancy_Grid::shiftValuesUp() {
             grid[xCounter][yCounter].isExplored = grid[xCounter][yCounter - 1].isExplored; //Copies value to the cell above.
             grid[xCounter][yCounter].neighboursUnexplored = grid[xCounter][yCounter - 1].neighboursUnexplored;
             grid[xCounter][yCounter].obstacleValue = grid[xCounter][yCounter - 1].obstacleValue;
+            grid[xCounter][yCounter].directionLeftFrom = grid[xCounter][yCounter - 1].directionLeftFrom;
             initialiseCell(&grid[xCounter][yCounter - 1]);
         }
     }
@@ -71,6 +73,7 @@ void Occupancy_Grid::shiftValuesRight() {
             grid[xCounter][yCounter].isExplored = grid[xCounter - 1][yCounter].isExplored; //Copies value to the cell to the right.
             grid[xCounter][yCounter].neighboursUnexplored = grid[xCounter - 1][yCounter].neighboursUnexplored;
             grid[xCounter][yCounter].obstacleValue = grid[xCounter - 1][yCounter].obstacleValue;
+            grid[xCounter][yCounter].directionLeftFrom = grid[xCounter - 1][yCounter].directionLeftFrom;
             initialiseCell(&grid[xCounter - 1][yCounter]);
         }
     }
@@ -238,14 +241,16 @@ void Occupancy_Grid::calculateCellToChange(int sonarFacing, bool obstaclePresent
 
 /** Member function to add the cell the robot currently occupies to the pathStack. */
 void Occupancy_Grid::addCellToPath(int direction) {
-    pathStack.push_back(direction); //Add pointer of current cell to path stack.
+    grid[robotX][robotY].directionLeftFrom = direction;
+    pathStack.push_back(&grid[robotX][robotY]); //Add pointer of current cell to path stack.   
 }
 
 void Occupancy_Grid::printPath() {
+    cout << "Path Stack Size:" << pathStack.size() << endl;
     cout << "Path Stack:";
 
     for (int counter = pathStack.size() - 1; counter >= 0; counter--) {
-        cout << " " << pathStack.at(counter);
+        cout << " " << pathStack.at(counter)->directionLeftFrom;
     }
     cout << endl;
 }
@@ -254,10 +259,10 @@ void Occupancy_Grid::printPath() {
 int Occupancy_Grid::getDirectionOfLastCell() {
     int direction;
 
-    if (pathStack.back() == ZERO) direction = ONE_EIGHTY;
-    else if (pathStack.back() == ONE_EIGHTY) direction = ZERO;
-    else if (pathStack.back() == NIGHTY) direction = MINUS_NIGHTY;
-    else if (pathStack.back() == MINUS_NIGHTY) direction = NIGHTY;
+    if (pathStack.back()->directionLeftFrom == ZERO) direction = ONE_EIGHTY;
+    else if (pathStack.back()->directionLeftFrom == ONE_EIGHTY) direction = ZERO;
+    else if (pathStack.back()->directionLeftFrom == NIGHTY) direction = MINUS_NIGHTY;
+    else if (pathStack.back()->directionLeftFrom == MINUS_NIGHTY) direction = NIGHTY;
 
     pathStack.pop_back();
     return direction;
@@ -305,12 +310,14 @@ int Occupancy_Grid::chooseNextCell(int currentDirection) {
 /** Member function to evaluate if the robot has finished mapping an area. */
 bool Occupancy_Grid::checkFinished() {
     cout << "Checking if finished..." << endl;
-    for (int xCounter = 0; xCounter <= xLength - 1; xCounter++) {
-        for (int yCounter = 0; yCounter <= yLength - 1; yCounter++) {
-            if (grid[xCounter][yCounter].isExplored == true && grid[xCounter][yCounter].neighboursUnexplored != 0
-                    && grid[xCounter][yCounter].obstacleValue == 0) return false;
-        }
+    for (int counter = 0; counter <= pathStack.size(); counter++) {
+            if (pathStack.at(counter)->isExplored == true && pathStack.at(counter)->obstacleValue == 0
+                    && pathStack.at(counter)->neighboursUnexplored != 0) return false;
     }
 
     return true;
 }
+
+/*void Occupancy_Grid::plotPath(int targetXPos, int targetYPos) {
+    
+}*/

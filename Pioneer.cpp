@@ -169,7 +169,9 @@ void Pioneer::surveyCycle(double readings[], int currentDirection, bool inNextCe
         cout << "In next cell." << endl;
 
         evaluateReadings(readings[3], readings[4], FRONT_REAR_RANGE, frontSensorFacing);
+        evaluateBlindSpots(readings[2], readings[5], CLOSE_RANGE, frontSensorFacing);
         evaluateReadings(readings[12], readings[11], FRONT_REAR_RANGE, rearSensorFacing);
+        evaluateBlindSpots(readings[10], readings[13], CLOSE_RANGE, rearSensorFacing);     
         evaluateReadings(readings[0], readings[15], LEFT_RIGHT_RANGE, leftSensorFacing);
         evaluateReadings(readings[7], readings[8], LEFT_RIGHT_RANGE, rightSensorFacing);
 
@@ -198,8 +200,6 @@ void Pioneer::evaluateReadings(double reading1, double reading2, double range, i
 }
 
 void Pioneer::evaluateCornerReadings(double reading, double lowerBound, double upperBound, int sensorFacing) {
-    cout << reading << endl;
-
     if (reading >= lowerBound && reading <= upperBound) {
         oG->calculateCellToChange(sensorFacing, true);
     } else {
@@ -208,8 +208,11 @@ void Pioneer::evaluateCornerReadings(double reading, double lowerBound, double u
 }
 
 void Pioneer::evaluateMovingReadings(double reading1, double reading2, double range1, double range2, int sensorFacing) {
-    if (reading1 <= range1 || reading2 <= range2) oG->calculateCellToChange(sensorFacing, true);
-    else oG->calculateCellToChange(sensorFacing, false);
+    if (reading1 <= range1 || reading2 <= range2) oG->calculateCellToChange(sensorFacing, true);        
+}
+
+void Pioneer::evaluateBlindSpots(double reading1, double reading2, double range, int sensorFacing) {
+    if (reading1 <= range || reading2 <= range) oG->calculateCellToChange(sensorFacing, true);
 }
 
 void Pioneer::configureCycle(PlayerClient *robot, Position2dProxy *pp, double *currentYaw, int *currentDirection) {
@@ -253,7 +256,6 @@ void Pioneer::runPioneer() {
         surveyCycle(sonarReadings, currentDirection, true); //Takes the sonar readings and marks cells as appropriate.
         oG->printGrid(); //Prints the occupancy grid.
         cout << "Neighbours unexplored: " << oG->getNeighboursUnexplored() << endl;
-
 
         if (oG->getNeighboursUnexplored() != 0) {
             cout << "Picking a neighbour to explore..." << endl;

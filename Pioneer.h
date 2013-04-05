@@ -27,7 +27,7 @@
 #define TURN_PGAIN 0.8
 #define MOVE_ERROR_BOUND 0.025
 #define TURN_ERROR_BOUND 0.050
-#define FRONT_REAR_RANGE 0.830
+#define FRONT_REAR_RANGE 0.850
 #define LEFT_RIGHT_RANGE 0.950
 #define CORNER_RANGE 1.20
 #define CLOSE_RANGE 0.300
@@ -63,6 +63,7 @@ private:
     void evaluateReadings(double reading1, double reading2, double range, int sensorFacing);
     void evaluateCornerReadings(double reading, double lowerBound, double upperBound, int sensorFacing);
     void evaluateMovingReadings(double reading1, double reading2, double range1, double range2, int sensorFacing);
+    void evaluateBlindSpots(double reading1, double reading2, double range, int sensorFacing);
     void configureCycle(PlayerClient *robot, Position2dProxy *pp, double *currentYaw, int *currentDirection);
 
 public:

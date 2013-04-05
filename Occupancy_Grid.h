@@ -35,12 +35,13 @@ struct Cell {
     bool isExplored; //The cell's state of exploration.
     int neighboursUnexplored; //The number of neighbours around the cell unexplored.
     int obstacleValue; //The current obstacle value of the cell.
+    int directionLeftFrom;
 };
 
 /* Occupancy_Grid class definition */
 class Occupancy_Grid {
 private:
-    vector<int> pathStack;
+    vector<Cell*> pathStack;
     vector<vector<Cell> > grid;
     int yLength;
     int xLength;
@@ -57,7 +58,7 @@ public:
     /* Member Function Prototypes: */
     Occupancy_Grid();
     void initialiseCell(Cell *cell);
-    vector<int> getPathStack();
+    vector<Cell*> getPathStack();
     vector<vector<Cell> > getGrid();
     void checkResizeNeeded(int currentDirection);
     void shrinkGrid(int directionToShrink);
@@ -68,7 +69,7 @@ public:
     void incrementCell(int gridX, int gridY);
     void decrementCell(int gridX, int gridY);
     void calculateCellToChange(int sonarFacing, bool obstaclePresent);
-    void addCellToPath(int direction);
+    void addCellToPath(int directionLeftFrom);
     void printPath();
     int getDirectionOfLastCell();
     void setIsExploredTrue();
@@ -76,5 +77,6 @@ public:
     int getNeighboursUnexplored();
     int chooseNextCell(int currentDirection);
     bool checkFinished();
+    //void Occupancy_Grid::plotPath(int targetXPos, int targetYPos);
 };
 #endif
