@@ -152,6 +152,7 @@ void Occupancy_Grid::printGrid() {
             } else if (grid[xCounter][yCounter].isExplored == false && grid[xCounter][yCounter].obstacleValue == 0) {
                 cout << "~";
             } else {
+                //cout << grid[xCounter][yCounter].obstacleValue;
                 cout << "#";
             }
         }

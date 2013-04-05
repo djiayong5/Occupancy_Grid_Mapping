@@ -168,10 +168,10 @@ void Pioneer::surveyCycle(double readings[], int currentDirection, bool inNextCe
     if (inNextCell == true) {
         cout << "In next cell." << endl;
 
-        evaluateReadings(reading[3], readings[4], FRONT_REAR_RANGE, frontSensorFacing);
-        evaluateReadings(reading[12], readings[11], FRONT_REAR_RANGE, rearSensorFacing);
-        evaluateReadings(reading[0], readings[15], LEFT_RIGHT_RANGE, frontSensorFacing);
-        evaluateReadings(reading[7], readings[8], LEFT_RIGHT_RANGE, frontSensorFacing);
+        evaluateReadings(readings[3], readings[4], FRONT_REAR_RANGE, frontSensorFacing);
+        evaluateReadings(readings[12], readings[11], FRONT_REAR_RANGE, rearSensorFacing);
+        evaluateReadings(readings[0], readings[15], LEFT_RIGHT_RANGE, leftSensorFacing);
+        evaluateReadings(readings[7], readings[8], LEFT_RIGHT_RANGE, rightSensorFacing);
 
         evaluateCornerReadings(readings[1], readings[2], CLOSE_RANGE, CORNER_RANGE, leftSensorFacing, frontLeftSensorFacing);
         evaluateCornerReadings(readings[5], readings[6], CLOSE_RANGE, CORNER_RANGE, rightSensorFacing, frontRightSensorFacing);
@@ -189,12 +189,16 @@ void Pioneer::surveyCycle(double readings[], int currentDirection, bool inNextCe
     cout << endl; //Used for formatting output.
 }
 
-void Pioneer::evaluateReadings(double reading1, double reading2, int range, int sensorFacing) {
-    if (reading1 <= range || reading2 <= range) oG->calculateCellToChange(sensorFacing, true);
-    else oG->calculateCellToChange(sensorFacing, false);
+void Pioneer::evaluateReadings(double reading1, double reading2, double range, int sensorFacing) {
+    if (reading1 <= range || reading2 <= range) {
+        oG->calculateCellToChange(sensorFacing, true); 
+    }
+    else {
+        oG->calculateCellToChange(sensorFacing, false); 
+    }
 }
 
-void Pioneer::evaluateCornerReadings(double reading1, double reading2, int range1, int range2, int sensorFacing1, int sensorFacing2) {
+void Pioneer::evaluateCornerReadings(double reading1, double reading2, double range1, double range2, int sensorFacing1, int sensorFacing2) {
     if (reading1 <= range1 || reading2 <= range1) oG->calculateCellToChange(sensorFacing1, true);
     else if (reading1 <= range2 || reading2 <= range2) oG->calculateCellToChange(sensorFacing2, true);
     else {
@@ -203,7 +207,7 @@ void Pioneer::evaluateCornerReadings(double reading1, double reading2, int range
     }
 }
 
-void Pioneer::evaluateMovingReaings(double reading1, double reading2, int range1, int range2, int sensorFacing) {
+void Pioneer::evaluateMovingReadings(double reading1, double reading2, double range1, double range2, int sensorFacing) {
     if (reading1 <= range1 || reading2 <= range2) oG->calculateCellToChange(sensorFacing, true);
     else oG->calculateCellToChange(sensorFacing, false);
 }

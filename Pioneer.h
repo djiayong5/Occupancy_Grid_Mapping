@@ -60,9 +60,9 @@ private:
     void setRearRightSensorDirection(int currentDirection);
     void reconfigureSensors(int currentDirection);
     void surveyCycle(double readings[], int currentDirection, bool inNextCell);
-    void evaluateReadings(double reading1, double reading2, int range, int sensorFacing);
-    void evaluateCornerReadings(double reading1, double reading2, int range1, int range2, int sensorFacing1, int sensorFacing2);
-    void evaluateMovingReaings(double reading1, double reading2, int range1, int range2, int sensorFacing);
+    void evaluateReadings(double reading1, double reading2, double range, int sensorFacing);
+    void evaluateCornerReadings(double reading1, double reading2, double range1, double range2, int sensorFacing1, int sensorFacing2);
+    void evaluateMovingReadings(double reading1, double reading2, double range1, double range2, int sensorFacing);
     void configureCycle(PlayerClient *robot, Position2dProxy *pp, double *currentYaw, int *currentDirection);
 
 public:
