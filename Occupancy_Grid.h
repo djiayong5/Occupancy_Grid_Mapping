@@ -36,45 +36,46 @@ struct Cell {
     int neighboursUnexplored; //The number of neighbours around the cell unexplored.
     int obstacleValue; //The current obstacle value of the cell.
     int directionLeftFrom;
+    int xPos;
+    int yPos;
 };
 
 /* Occupancy_Grid class definition */
 class Occupancy_Grid {
 private:
-    vector<Cell*> pathStack;
+    vector<Cell *> pathStack;
     vector<vector<Cell> > grid;
     int yLength;
     int xLength;
     int robotY;
     int robotX;
+    void initialiseCell(Cell *cell, int xValue, int yValue);
+    void shiftPathPointers(int xShift, int yShift);
     void resizeGrid(int directionToExpand);
     void resizeZero();
     void resizeOneEighty();
     void resizeNighty();
     void resizeMinusNighty();
     void checkOccupancy(int gridX, int gridY);
+    void incrementCell(int gridX, int gridY);
+    void decrementCell(int gridX, int gridY);
 
 public:
     /* Member Function Prototypes: */
     Occupancy_Grid();
-    void initialiseCell(Cell *cell);
-    vector<Cell*> getPathStack();
+    vector<Cell *> getPathStack();
     vector<vector<Cell> > getGrid();
     void checkResizeNeeded(int currentDirection);
-    void shrinkGrid(int directionToShrink);
     void shiftValuesUp();
     void shiftValuesRight();
     void moveRobotOnGrid(int direction);
     void printGrid();
-    void incrementCell(int gridX, int gridY);
-    void decrementCell(int gridX, int gridY);
     void calculateCellToChange(int sonarFacing, bool obstaclePresent);
     void addCellToPath(int directionLeftFrom);
-    void printPath();
     int getDirectionOfLastCell();
     void setIsExploredTrue();
-    void checkNeighbours();
     int getNeighboursUnexplored();
+    void checkNeighbours();
     int chooseNextCell(int currentDirection);
     bool checkFinished();
     //void Occupancy_Grid::plotPath(int targetXPos, int targetYPos);

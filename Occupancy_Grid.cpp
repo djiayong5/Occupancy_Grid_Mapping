@@ -10,7 +10,6 @@
 #include <cstdlib>
 #include <iostream>
 #include <vector>
-#include <ctime>
 #include "Occupancy_Grid.h"
 
 using namespace std;
@@ -27,7 +26,7 @@ Occupancy_Grid::Occupancy_Grid() {
 
     for (int xCounter = 0; xCounter < START_X_LENGTH; xCounter++) {
         for (int yCounter = 0; yCounter < START_Y_LENGTH; yCounter++) {
-            initialiseCell(&grid[xCounter][yCounter]);
+            initialiseCell(&grid[xCounter][yCounter], xCounter, yCounter);
         }
     }
 
@@ -35,21 +34,33 @@ Occupancy_Grid::Occupancy_Grid() {
 }
 
 /** Member function to initialise the cell passed in.*/
-void Occupancy_Grid::initialiseCell(Cell *cell) {
+void Occupancy_Grid::initialiseCell(Cell *cell, int xValue, int yValue) {
     cell->isExplored = false;
     cell->neighboursUnexplored = 4;
     cell->obstacleValue = 0;
     cell->directionLeftFrom = 360;
+    cell->xPos = xValue;
+    cell->yPos = yValue;
 }
 
 /** Member function to return the pathStack. */
-vector<Cell*> Occupancy_Grid::getPathStack() {
+vector<Cell *> Occupancy_Grid::getPathStack() {
     return pathStack;
 }
 
 /** Member function to return the grid. */
 vector<vector<Cell> > Occupancy_Grid::getGrid() {
     return grid;
+}
+
+void Occupancy_Grid::shiftPathPointers(int xShift, int yShift) {
+    if (!pathStack.empty()) {
+        for (vector<Cell*>::iterator it = pathStack.begin(); it != pathStack.end(); ++it) {
+            cout << (*it)->xPos << "          " << (*it)->yPos << endl;
+            cout << (*it)->xPos + xShift << "          " << (*it)->yPos + yShift << endl;
+            *it = &grid[((*it)->xPos + xShift)][((*it)->yPos + yShift)];
+        }
+    }
 }
 
 /** Member function to shift all the values in the occupancy grid 1 cell up.*/
@@ -60,7 +71,8 @@ void Occupancy_Grid::shiftValuesUp() {
             grid[xCounter][yCounter].neighboursUnexplored = grid[xCounter][yCounter - 1].neighboursUnexplored;
             grid[xCounter][yCounter].obstacleValue = grid[xCounter][yCounter - 1].obstacleValue;
             grid[xCounter][yCounter].directionLeftFrom = grid[xCounter][yCounter - 1].directionLeftFrom;
-            initialiseCell(&grid[xCounter][yCounter - 1]);
+            grid[xCounter][yCounter].yPos = grid[xCounter][yCounter - 1].yPos + 1;
+            initialiseCell(&grid[xCounter][yCounter - 1], xCounter, yCounter - 1);
         }
     }
     robotY++; //Corrects robot's position on grid.
@@ -74,7 +86,8 @@ void Occupancy_Grid::shiftValuesRight() {
             grid[xCounter][yCounter].neighboursUnexplored = grid[xCounter - 1][yCounter].neighboursUnexplored;
             grid[xCounter][yCounter].obstacleValue = grid[xCounter - 1][yCounter].obstacleValue;
             grid[xCounter][yCounter].directionLeftFrom = grid[xCounter - 1][yCounter].directionLeftFrom;
-            initialiseCell(&grid[xCounter - 1][yCounter]);
+            grid[xCounter][yCounter].xPos = grid[xCounter - 1][yCounter].xPos + 1;
+            initialiseCell(&grid[xCounter - 1][yCounter], xCounter - 1, yCounter);
         }
     }
     robotX++; //Corrects robot's position on grid.
@@ -83,34 +96,33 @@ void Occupancy_Grid::shiftValuesRight() {
 /** Member function that expands the grid in the zero direction by 1 if needed. */
 void Occupancy_Grid::resizeZero() {
     yLength++;
-    grid.resize(xLength); //Resizes grid xs.
-    for (int xCounter = 0; xCounter < xLength; xCounter++) grid[xCounter].resize(yLength); //Resize grid ys.
-    for (int xCounter = 0; xCounter < xLength; xCounter++) initialiseCell(&grid[xCounter][yLength - 1]);
+    for (int counter = 0; counter < xLength; counter++) grid[counter].resize(yLength); //Resize grid ys.
+    for (int counter = 0; counter < xLength; counter++) initialiseCell(&grid[counter][yLength - 1], counter, yLength - 1);
 }
 
 /** Member function that expands the grid in the one eighty direction by 1 if needed. */
 void Occupancy_Grid::resizeOneEighty() {
     yLength++;
-    for (int xCounter = 0; xCounter < xLength; xCounter++) initialiseCell(&grid[xCounter][0]);
-    grid.resize(xLength); //Resizes grid xs.
-    for (int xCounter = 0; xCounter < xLength; xCounter++) grid[xCounter].resize(yLength); //Resize grid ys
+    for (int counter = 0; counter < xLength; counter++) grid[counter].resize(yLength); //Resize grid ys
     shiftValuesUp();
+    shiftPathPointers(0, 1);
 }
 
 /** Member function that expands the grid in the nighty direction by 1 if needed. */
 void Occupancy_Grid::resizeNighty() {
     xLength++;
     grid.resize(xLength); //Resizes grid xs.
-    for (int xCounter = 0; xCounter < xLength; xCounter++) grid[xCounter].resize(yLength); //Resize grid ys.
+    for (int counter = 0; counter < xLength; counter++) grid[counter].resize(yLength); //Resize grid ys.
     shiftValuesRight();
+    shiftPathPointers(1, 0);
 }
 
 /** Member function that expands the grid in the minus nighty direction by 1 if needed. */
 void Occupancy_Grid::resizeMinusNighty() {
     xLength++;
     grid.resize(xLength); //Resizes grid xs.
-    for (int xCounter = 0; xCounter < xLength; xCounter++) grid[xCounter].resize(yLength); //Resize grid ys.   
-    for (int yCounter = 0; yCounter < yLength; yCounter++) initialiseCell(&grid[xLength - 1][yCounter]);
+    for (int counter = 0; counter < xLength; counter++) grid[counter].resize(yLength); //Resize grid ys.   
+    for (int counter = 0; counter < yLength; counter++) initialiseCell(&grid[xLength - 1][counter], xLength - 1, counter);
 }
 
 /** Member function to evaluate if the grid needs expanding.
@@ -242,17 +254,9 @@ void Occupancy_Grid::calculateCellToChange(int sonarFacing, bool obstaclePresent
 /** Member function to add the cell the robot currently occupies to the pathStack. */
 void Occupancy_Grid::addCellToPath(int direction) {
     grid[robotX][robotY].directionLeftFrom = direction;
-    pathStack.push_back(&grid[robotX][robotY]); //Add pointer of current cell to path stack.   
-}
-
-void Occupancy_Grid::printPath() {
-    cout << "Path Stack Size:" << pathStack.size() << endl;
-    cout << "Path Stack:";
-
-    for (int counter = pathStack.size() - 1; counter >= 0; counter--) {
-        cout << " " << pathStack.at(counter)->directionLeftFrom;
-    }
-    cout << endl;
+    pathStack.push_back(&grid[robotX][robotY]); //Add pointer of current cell to path stack.
+    cout << pathStack.back()->xPos << "     " << pathStack.back()->yPos << endl;
+    cout << pathStack.front()->xPos << "     " << pathStack.front()->yPos << endl;
 }
 
 /** Member function to set the direction that*/
@@ -311,8 +315,8 @@ int Occupancy_Grid::chooseNextCell(int currentDirection) {
 bool Occupancy_Grid::checkFinished() {
     cout << "Checking if finished..." << endl;
     for (int counter = 0; counter <= pathStack.size(); counter++) {
-            if (pathStack.at(counter)->isExplored == true && pathStack.at(counter)->obstacleValue == 0
-                    && pathStack.at(counter)->neighboursUnexplored != 0) return false;
+        if (pathStack.at(counter)->isExplored == true && pathStack.at(counter)->obstacleValue == 0
+                && pathStack.at(counter)->neighboursUnexplored != 0) return false;
     }
 
     return true;

@@ -275,7 +275,6 @@ void Pioneer::runPioneer() {
         }
 
         if (!oG->getPathStack().empty()) {
-            oG->printPath();
             targetYaw = targetDirection;
 
             if (targetDirection != currentDirection) {
