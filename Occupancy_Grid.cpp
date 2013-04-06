@@ -200,16 +200,27 @@ void Occupancy_Grid::decrementCell(int gridX, int gridY) {
 /** Member function to set the current cell's isExplored field value to true. */
 void Occupancy_Grid::setIsExploredTrue() {
     grid[robotX][robotY].isExplored = true;
+    checkPathExploration();
 }
 
 /** Member function to check the neighbours of the cell the robot currently occupies for their exploration state.*/
-void Occupancy_Grid::checkNeighbours() {
+void Occupancy_Grid::checkNeighbours(int xPos, int yPos) {
     int neighboursUnexplored = 0;
-    if (grid[robotX + 1][robotY].isExplored == false) neighboursUnexplored++;
-    if (grid[robotX - 1][robotY].isExplored == false) neighboursUnexplored++;
-    if (grid[robotX][robotY + 1].isExplored == false) neighboursUnexplored++;
-    if (grid[robotX][robotY - 1].isExplored == false) neighboursUnexplored++;
-    grid[robotX][robotY].neighboursUnexplored = neighboursUnexplored;
+    if (grid[xPos + 1][yPos].isExplored == false) neighboursUnexplored++;
+    if (grid[xPos - 1][yPos].isExplored == false) neighboursUnexplored++;
+    if (grid[xPos][yPos + 1].isExplored == false) neighboursUnexplored++;
+    if (grid[xPos][yPos - 1].isExplored == false) neighboursUnexplored++;
+    grid[xPos][yPos].neighboursUnexplored = neighboursUnexplored;
+}
+
+void Occupancy_Grid::checkCellNeighbours() {
+    checkNeighbours(robotX, robotY);
+}
+
+void Occupancy_Grid::checkPathExploration() {
+    for (int counter = 0; counter < pathLength; counter++) {
+        checkNeighbours(pathStack.at(counter).xPos, pathStack.at(counter).yPos);
+    }
 }
 
 /** Member function to return the neighboursUnexplored field value of the cell the robot currently occupies.*/
@@ -309,12 +320,15 @@ int Occupancy_Grid::chooseNextCell(int currentDirection) {
 /** Member function to evaluate if the robot has finished mapping an area. */
 bool Occupancy_Grid::checkFinished() {
     cout << "Checking if finished..." << endl;
+    
     for (int counter = 0; counter < pathLength; counter++) {
         if (grid[pathStack.at(counter).xPos][pathStack.at(counter).yPos].isExplored == true &&
                 grid[pathStack.at(counter).xPos][pathStack.at(counter).yPos].obstacleValue == 0
                 && grid[pathStack.at(counter).xPos][pathStack.at(counter).yPos].neighboursUnexplored != 0) return false;
-    }
+    }        
 
+    pathLength = 0;
+    pathStack.erase(pathStack.begin(), pathStack.end());
     return true;
 }
 

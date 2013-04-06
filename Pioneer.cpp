@@ -165,7 +165,7 @@ void Pioneer::reconfigureSensors(int currentDirection) {
 }
 
 void Pioneer::surveyCycle(double readings[], int currentDirection, bool inNextCell) {
-    if (inNextCell == true) {
+    if (inNextCell == true) {        
         cout << "In next cell." << endl;
 
         evaluateReadings(readings[3], readings[4], FRONT_REAR_RANGE, frontSensorFacing);
@@ -187,7 +187,7 @@ void Pioneer::surveyCycle(double readings[], int currentDirection, bool inNextCe
         evaluateMovingReadings(readings[7], readings[6], LEFT_RIGHT_RANGE, CLOSE_RANGE, rightSensorFacing);
     }
 
-    oG->checkNeighbours();
+    oG->checkCellNeighbours();
     cout << endl; //Used for formatting output.
 }
 
@@ -266,7 +266,6 @@ void Pioneer::runPioneer() {
 
             if (oG->checkFinished()) {
                 cout << "Finished Mapping.";
-                oG->getPathStack().clear();
             } else if (!oG->getPathStack().empty()) {
                 cout << "Path not empty." << endl;
                 targetDirection = oG->getDirectionOfLastCell(); //Gets direction of cell on top of the path stack.

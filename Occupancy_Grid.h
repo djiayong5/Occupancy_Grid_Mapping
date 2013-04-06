@@ -65,6 +65,8 @@ private:
     void checkOccupancy(int gridX, int gridY);
     void incrementCell(int gridX, int gridY);
     void decrementCell(int gridX, int gridY);
+    void checkNeighbours(int xPos, int yPos);
+    void checkPathExploration();
 
 public:
     /* Member Function Prototypes: */
@@ -79,7 +81,7 @@ public:
     int getDirectionOfLastCell();
     void setIsExploredTrue();
     int getNeighboursUnexplored();
-    void checkNeighbours();
+    void checkCellNeighbours();
     int chooseNextCell(int currentDirection);
     bool checkFinished();
     //void Occupancy_Grid::plotPath(int targetXPos, int targetYPos);
