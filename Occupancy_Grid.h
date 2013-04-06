@@ -35,6 +35,9 @@ struct Cell {
     bool isExplored; //The cell's state of exploration.
     int neighboursUnexplored; //The number of neighbours around the cell unexplored.
     int obstacleValue; //The current obstacle value of the cell.
+};
+
+struct Tracker {
     int directionLeftFrom;
     int xPos;
     int yPos;
@@ -43,14 +46,17 @@ struct Cell {
 /* Occupancy_Grid class definition */
 class Occupancy_Grid {
 private:
-    vector<Cell *> pathStack;
+    vector<Tracker> pathStack;
     vector<vector<Cell> > grid;
     int yLength;
     int xLength;
     int robotY;
     int robotX;
-    void initialiseCell(Cell *cell, int xValue, int yValue);
-    void shiftPathPointers(int xShift, int yShift);
+    int pathLength;
+    void initialiseCell(Cell *cell);
+    void shiftTrackers(int xShift, int yShift);
+    void shiftValuesUp();
+    void shiftValuesRight();
     void resizeGrid(int directionToExpand);
     void resizeZero();
     void resizeOneEighty();
@@ -63,11 +69,9 @@ private:
 public:
     /* Member Function Prototypes: */
     Occupancy_Grid();
-    vector<Cell *> getPathStack();
+    vector<Tracker> getPathStack();
     vector<vector<Cell> > getGrid();
     void checkResizeNeeded(int currentDirection);
-    void shiftValuesUp();
-    void shiftValuesRight();
     void moveRobotOnGrid(int direction);
     void printGrid();
     void calculateCellToChange(int sonarFacing, bool obstaclePresent);
