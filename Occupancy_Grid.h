@@ -3,7 +3,7 @@
  * File Name: Occupancy_Grid.h
  * Description: Stores member function prototypes and class definition for Occupancy_Grid class.
  * First Created: 25/02/2013
- * Last Modified: 04/04/2013
+ * Last Modified: 07/04/2013
  */
 
 #ifndef OCCUPANCY_GRID_H
@@ -43,16 +43,27 @@ struct Tracker {
     int yPos;
 };
 
+struct Node {
+    int xPos;
+    int yPos;
+    int pathValue;
+    int directionLeftFrom;
+};
+
 /* Occupancy_Grid class definition */
 class Occupancy_Grid {
 private:
     vector<Tracker> pathStack;
     vector<vector<Cell> > grid;
+    vector<Node> frontier;
+    vector<Node> neighbours;
     int yLength;
     int xLength;
     int robotY;
     int robotX;
     int pathLength;
+    int frontierLength;
+    int neighboursLength;
     void initialiseCell(Cell *cell);
     void shiftTrackers(int xShift, int yShift);
     void shiftValuesUp();
@@ -66,7 +77,12 @@ private:
     void incrementCell(int gridX, int gridY);
     void decrementCell(int gridX, int gridY);
     void checkNeighbours(int xPos, int yPos);
+    void addCellToPath(int direction, int xPos, int yPos);
     void checkPathExploration();
+    int calculateCost(int currentX, int currentY, int newX, int newY, int cost);
+    void getExplorableNeighbours(int xPos, int yPos, int cost, int distanceRemaining);
+    void addExplorableNeighbour(int xPos, int yPos, int cost, int distanceRemaining, int direction);
+    void addNodesToFrontier();
 
 public:
     /* Member Function Prototypes: */
@@ -77,13 +93,13 @@ public:
     void moveRobotOnGrid(int direction);
     void printGrid();
     void calculateCellToChange(int sonarFacing, bool obstaclePresent);
-    void addCellToPath(int directionLeftFrom);
+    void mapPath(int direction);
     int getDirectionOfLastCell();
     void setIsExploredTrue();
     int getNeighboursUnexplored();
     void checkCellNeighbours();
     int chooseNextCell(int currentDirection);
     bool checkFinished();
-    //void Occupancy_Grid::plotPath(int targetXPos, int targetYPos);
+    bool plotPath(int currentX, int currentY, int targetX, int targetY, int cost);
 };
 #endif

@@ -3,7 +3,7 @@
  * File Name: Occupancy_Grid.cpp
  * Description: Stores member function declarations for Occupancy_Grid class.
  * First Created: 25/02/2013
- * Last Modified: 04/04/2013
+ * Last Modified: 07/04/2013
  */
 
 #include <cstdio>
@@ -255,12 +255,15 @@ void Occupancy_Grid::calculateCellToChange(int sonarFacing, bool obstaclePresent
     }
 }
 
+void Occupancy_Grid::mapPath(int direction) {
+    addCellToPath(direction robotX, robotY);
+}
+
 /** Member function to add the cell the robot currently occupies to the pathStack. */
-void Occupancy_Grid::addCellToPath(int direction) {
-    pathLength++;
-    pathStack.resize(pathLength); //Add pointer of current cell to path stack.
-    pathStack.back().xPos = robotX;
-    pathStack.back().yPos = robotY;
+void Occupancy_Grid::addCellToPath(int direction, int xPos, int yPos) {
+    pathStack.resize(++pathLength); //Add pointer of current cell to path stack.
+    pathStack.back().xPos = xPos;
+    pathStack.back().yPos = yPos;
     pathStack.back().directionLeftFrom = direction;
 }
 
@@ -320,18 +323,71 @@ int Occupancy_Grid::chooseNextCell(int currentDirection) {
 /** Member function to evaluate if the robot has finished mapping an area. */
 bool Occupancy_Grid::checkFinished() {
     cout << "Checking if finished..." << endl;
-    
+
     for (int counter = 0; counter < pathLength; counter++) {
         if (grid[pathStack.at(counter).xPos][pathStack.at(counter).yPos].isExplored == true &&
                 grid[pathStack.at(counter).xPos][pathStack.at(counter).yPos].obstacleValue == 0
                 && grid[pathStack.at(counter).xPos][pathStack.at(counter).yPos].neighboursUnexplored != 0) return false;
-    }        
+    }
 
     pathLength = 0;
     pathStack.erase(pathStack.begin(), pathStack.end());
     return true;
 }
 
-/*void Occupancy_Grid::plotPath(int targetXPos, int targetYPos) {
-    
-}*/
+bool Occupancy_Grid::plotPath(int currentX, int currentY, int targetX, int targetY, int cost) {
+    int distanceRemaining = (targetX - currentX) + (targetY - currentY);
+    addCellToPath(frontier.back().directionLeftFrom, frontier.back().xPos, frontier.back().yPos);
+
+    if (currentX == targetX && currentY == targetY) {
+        neighbours.erase(neighbours.begin(), neighbours.end());
+        frontier.erase(frontier.begin(), frontier.end());
+        return true;
+    } else {
+        frontier.pop_back();
+        getExplorableNeighbours(currentX, currentY, cost, distanceRemaining);
+
+        for (int counter = neighboursLength - 1; counter >= 0; counter--) {
+            addNodesToFrontier();
+            if (plotPath(frontier.back().xPos, frontier.back().yPos, targetX, targetY, cost + 1) == true) {
+                return true;
+            } else {
+                pathStack.pop_back();
+                pathLength--;
+            }
+        }
+    }
+
+    pathStack.pop_back();
+    pathLength--;
+    return false;
+}
+
+void Occupancy_Grid::getExplorableNeighbours(int xPos, int yPos, int cost, int distanceRemaining) {
+    if (grid[xPos + 1][yPos].obstacleValue == 0) addExplorableNeighbour(xPos + 1, yPos, cost, distanceRemaining, MINUS_NIGHTY);
+    if (grid[xPos - 1][yPos].obstacleValue == 0) addExplorableNeighbour(xPos - 1, yPos, cost, distanceRemaining, NIGHTY);
+    if (grid[xPos][yPos + 1].obstacleValue == 0) addExplorableNeighbour(xPos, yPos + 1, cost, distanceRemaining, ZERO);
+    if (grid[xPos][yPos - 1].obstacleValue == 0) addExplorableNeighbour(xPos, yPos - 1, cost, distanceRemaining, ONE_EIGHTY);
+}
+
+void Occupancy_Grid::addExplorableNeighbour(int xPos, int yPos, int cost, int distanceRemaining, int direction) {
+    neighbours.resize(++neighboursLength);
+    pathValue = (++cost) + distanceRemaining;
+
+    if (neighboursLength > 1) {
+        for (int counter = neighboursLength - 1; counter >= 0; counter--) {
+            if (pathValue < neighbours.at(counter).pathValue) neighbours.push_back(xPos, yPos, pathValue, direction);
+            else neighbours.insert(counter, xPos, yPos, pathValue, direction);
+        }
+    }
+}
+
+void Occupancy_Grid::addNodesToFrontier() {
+    for (int counter = neighboursLength - 1; counter >= 0; counter--) {
+        frontier.resize(++frontierLength);
+        frontier.push_back(neighbours.back().xPos, neighbours.back().yPos, neighbours.back().pathValue,
+                    neighbours.back().directionLeftFrom);
+        neighbours.pop_back();
+        neighboursLength--;
+    }
+}

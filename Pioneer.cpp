@@ -3,7 +3,7 @@
  * File Name: Pioneer.cpp
  * Description: Stores function declarations for Pioneer to use.
  * First Created: 25/02/2013
- * Last Modified: 04/04/2013
+ * Last Modified: 06/04/2013
  */
 
 #include <iostream>
@@ -260,7 +260,7 @@ void Pioneer::runPioneer() {
         if (oG->getNeighboursUnexplored() != 0) {
             cout << "Picking a neighbour to explore..." << endl;
             targetDirection = oG->chooseNextCell(currentDirection); //Chooses the next unexplored neighbour cell to travel to.
-            oG->addCellToPath(targetDirection); //Adds direction the robot is leaving in to the top of the path stack.
+            oG->mapPath(targetDirection); //Adds direction the robot is leaving in to the top of the path stack.
         } else if (oG->getNeighboursUnexplored() == 0) {
             cout << "All neighbours of current cell explored." << endl;
 
