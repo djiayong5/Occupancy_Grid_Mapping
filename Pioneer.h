@@ -60,14 +60,14 @@ private:
     void setRearRightSensorDirection(int currentDirection);
     void reconfigureSensors(int currentDirection);
     void surveyCycle(double readings[], int currentDirection, bool inNextCell);
-    void evaluateReadings(double reading1, double reading2, double range, int sensorFacing);
-    void evaluateCornerReadings(double reading, double lowerBound, double upperBound, int sensorFacing);
-    void evaluateMovingReadings(double reading1, double reading2, double range1, double range2, int sensorFacing);
-    void evaluateBlindSpots(double reading1, double reading2, double range, int sensorFacing);
+    void evaluateReadings(double reading1, double reading2, double range, int sensorFacing, Occupancy_Grid grid);
+    void evaluateCornerReadings(double reading, double lowerBound, double upperBound, int sensorFacing, Occupancy_Grid grid);
+    void evaluateMovingReadings(double reading1, double reading2, double range1, double range2, int sensorFacing, Occupancy_Grid grid);
+    void evaluateBlindSpots(double reading1, double reading2, double range, int sensorFacing, Occupancy_Grid grid);
     void configureCycle(PlayerClient *robot, Position2dProxy *pp, double *currentYaw, int *currentDirection);
 
 public:
-    void runPioneer();
+    void map();
     ~Pioneer();
 };
 #endif

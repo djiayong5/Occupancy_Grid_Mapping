@@ -164,14 +164,14 @@ void Pioneer::reconfigureSensors(int currentDirection) {
     setRearRightSensorDirection(currentDirection);
 }
 
-void Pioneer::surveyCycle(double readings[], int currentDirection, bool inNextCell) {
-    if (inNextCell == true) {        
+void Pioneer::surveyCycle(double readings[], int currentDirection, bool inNextCell, Occupancy_Grid grid) {
+    if (inNextCell == true) {
         cout << "In next cell." << endl;
 
         evaluateReadings(readings[3], readings[4], FRONT_REAR_RANGE, frontSensorFacing);
         evaluateBlindSpots(readings[2], readings[5], CLOSE_RANGE, frontSensorFacing);
         evaluateReadings(readings[12], readings[11], FRONT_REAR_RANGE, rearSensorFacing);
-        evaluateBlindSpots(readings[10], readings[13], CLOSE_RANGE, rearSensorFacing);     
+        evaluateBlindSpots(readings[10], readings[13], CLOSE_RANGE, rearSensorFacing);
         evaluateReadings(readings[0], readings[15], LEFT_RIGHT_RANGE, leftSensorFacing);
         evaluateReadings(readings[7], readings[8], LEFT_RIGHT_RANGE, rightSensorFacing);
 
@@ -181,38 +181,38 @@ void Pioneer::surveyCycle(double readings[], int currentDirection, bool inNextCe
         evaluateCornerReadings(readings[14], CLOSE_RANGE, CORNER_RANGE, rearLeftSensorFacing);
     } else {
         cout << "Half way to next cell." << endl;
-        oG->checkResizeNeeded(currentDirection); //Checks if the grid needs expanding.
+        grid->checkResizeNeeded(currentDirection); //Checks if the grid needs expanding.
 
         evaluateMovingReadings(readings[0], readings[1], LEFT_RIGHT_RANGE, CLOSE_RANGE, leftSensorFacing);
         evaluateMovingReadings(readings[7], readings[6], LEFT_RIGHT_RANGE, CLOSE_RANGE, rightSensorFacing);
     }
 
-    oG->checkCellNeighbours();
+    grid->checkCellNeighbours();
     cout << endl; //Used for formatting output.
 }
 
-void Pioneer::evaluateReadings(double reading1, double reading2, double range, int sensorFacing) {
+void Pioneer::evaluateReadings(double reading1, double reading2, double range, int sensorFacing, Occupancy_Grid grid) {
     if (reading1 <= range || reading2 <= range) {
-        oG->calculateCellToChange(sensorFacing, true);
+        grid->calculateCellToChange(sensorFacing, true);
     } else {
-        oG->calculateCellToChange(sensorFacing, false);
+        grid->calculateCellToChange(sensorFacing, false);
     }
 }
 
-void Pioneer::evaluateCornerReadings(double reading, double lowerBound, double upperBound, int sensorFacing) {
+void Pioneer::evaluateCornerReadings(double reading, double lowerBound, double upperBound, int sensorFacing, Occupancy_Grid grid) {
     if (reading >= lowerBound && reading <= upperBound) {
-        oG->calculateCellToChange(sensorFacing, true);
+        grid->calculateCellToChange(sensorFacing, true);
     } else {
-        oG->calculateCellToChange(sensorFacing, false);
+        grid->calculateCellToChange(sensorFacing, false);
     }
 }
 
-void Pioneer::evaluateMovingReadings(double reading1, double reading2, double range1, double range2, int sensorFacing) {
-    if (reading1 <= range1 || reading2 <= range2) oG->calculateCellToChange(sensorFacing, true);        
+void Pioneer::evaluateMovingReadings(double reading1, double reading2, double range1, double range2, int sensorFacing, Occupancy_Grid grid) {
+    if (reading1 <= range1 || reading2 <= range2) grid->calculateCellToChange(sensorFacing, true);
 }
 
-void Pioneer::evaluateBlindSpots(double reading1, double reading2, double range, int sensorFacing) {
-    if (reading1 <= range || reading2 <= range) oG->calculateCellToChange(sensorFacing, true);
+void Pioneer::evaluateBlindSpots(double reading1, double reading2, double range, int sensorFacing, Occupancy_Grid grid) {
+    if (reading1 <= range || reading2 <= range) grid->calculateCellToChange(sensorFacing, true);
 }
 
 void Pioneer::configureCycle(PlayerClient *robot, Position2dProxy *pp, double *currentYaw, int *currentDirection) {
@@ -223,14 +223,14 @@ void Pioneer::configureCycle(PlayerClient *robot, Position2dProxy *pp, double *c
     reconfigureSensors(*currentDirection);
 }
 
-void Pioneer::runPioneer() {
+void Pioneer::map() {
     PlayerClient robot("localhost");
     //PlayerClient robot("bart.islnet");
     RangerProxy sp(&robot, 0);
     //SonarProxy sp(&robot, 0);
     Position2dProxy pp(&robot, 0);
 
-    oG = new Occupancy_Grid(); //Creates new occupancy grid on the heap;
+
     double currentYaw = 0.000;
     double targetYaw = 0.000;
     double sonarReadings[16];
@@ -253,7 +253,7 @@ void Pioneer::runPioneer() {
         configureCycle(&robot, &pp, &currentYaw, &currentDirection);
         for (int counter = 0; counter <= 15; counter++) sonarReadings[counter] = sp[counter];
         oG->setIsExploredTrue();
-        surveyCycle(sonarReadings, currentDirection, true); //Takes the sonar readings and marks cells as appropriate.
+        surveyCycle(sonarReadings, currentDirection, true, oG); //Takes the sonar readings and marks cells as appropriate.
         oG->printGrid(); //Prints the occupancy grid.
         cout << "Neighbours unexplored: " << oG->getNeighboursUnexplored() << endl;
 
@@ -282,7 +282,7 @@ void Pioneer::runPioneer() {
 
             configureCycle(&robot, &pp, &currentYaw, &currentDirection);
             for (int counter = 0; counter <= 15; counter++) sonarReadings[counter] = sp[counter];
-            surveyCycle(sonarReadings, currentDirection, true); //Takes the sonar readings and marks cells as appropriate.
+            surveyCycle(sonarReadings, currentDirection, true, oG); //Takes the sonar readings and marks cells as appropriate.
             oG->printGrid(); //Prints the occupancy grid.
 
             oG->moveRobotOnGrid(currentDirection);
@@ -290,7 +290,7 @@ void Pioneer::runPioneer() {
 
             robot.Read();
             for (int counter = 0; counter <= 15; counter++) sonarReadings[counter] = sp[counter];
-            surveyCycle(sonarReadings, currentDirection, false); //Takes the sonar readings and marks cells as appropriate.
+            surveyCycle(sonarReadings, currentDirection, false, oG); //Takes the sonar readings and marks cells as appropriate.
             calculateMoveDistance(&robot, &pp, currentDirection, 0.350);
         } else {
             cout << "Path stack empty, mapping finished." << endl << endl;
@@ -300,13 +300,149 @@ void Pioneer::runPioneer() {
 
 }
 
+bool Pioneer::localise() {
+    Occupancy_Grid *temp = new Occupancy_Grid();
+    PlayerClient robot("localhost");
+    //PlayerClient robot("bart.islnet");
+    RangerProxy sp(&robot, 0);
+    //SonarProxy sp(&robot, 0);
+    Position2dProxy pp(&robot, 0);
+
+    double currentYaw = 0.000;
+    double targetYaw = 0.000;
+    double sonarReadings[16];
+    int currentDirection;
+    int targetDirection;
+    int attemptsLeft = 3;
+
+    temp->printGrid(); /* Print out initial grid. */
+    pp.SetMotorEnable(true); /* Enable motors. */
+    robot.Read(); /* Read from proxies. */
+    currentYaw = rtod(pp.GetYaw()); /* Retrieve current yaw. */
+    cout << "Start Yaw: " << currentYaw << endl;
+
+    turnToNewDirection(0.000, &pp, &robot); //Gets robot to turn to 0 degrees (with error bounds).
+
+    cout << "Start Yaw Corrected to: " << currentYaw << endl;
+    currentDirection = evaluateDirection(currentYaw);
+    configureCycle(&robot, &pp, &currentYaw, &currentDirection);
+
+    do {
+        configureCycle(&robot, &pp, &currentYaw, &currentDirection);
+        for (int counter = 0; counter <= 15; counter++) sonarReadings[counter] = sp[counter];
+        temp->setIsExploredTrue();
+        surveyCycle(sonarReadings, currentDirection, true, temp); //Takes the sonar readings and marks cells as appropriate.
+        temp->printGrid(); //Prints the occupancy grid.
+
+        if (oG->attemptLocalisation(temp) == 3) {
+            oG->switchGrid();
+            return true;
+        } else if (oG->attemptLocalisation(temp) == 2 && attemptsLeft > 0) {
+            attemptsLeft--;
+            cout << "Neighbours unexplored: " << temp->getNeighboursUnexplored() << endl;
+            
+            if (temp->getNeighboursUnexplored() != 0) {
+                cout << "Picking a neighbour to explore..." << endl;
+                targetDirection = temp->chooseNextCell(currentDirection); //Chooses the next unexplored neighbour cell to travel to.
+                temp->mapPath(targetDirection); //Adds direction the robot is leaving in to the top of the path stack.
+            } else if (oG->getNeighboursUnexplored() == 0) {
+                cout << "All neighbours of current cell explored." << endl;
+
+                if (temp->checkFinished()) {
+                    return false;
+                } else if (!temp->getPathStack().empty()) {
+                    cout << "Path not empty." << endl;
+                    targetDirection = temp->getDirectionOfLastCell(); //Gets direction of cell on top of the path stack.
+                    cout << "New Direction: " << targetDirection << endl;
+                }
+            }
+
+            if (!temp->getPathStack().empty()) {
+                targetYaw = targetDirection;
+
+                if (targetDirection != currentDirection) {
+                    turnToNewDirection(targetYaw, &pp, &robot); //Turns robot to face direction of next cell to travel to.    
+                }
+
+                configureCycle(&robot, &pp, &currentYaw, &currentDirection);
+                for (int counter = 0; counter <= 15; counter++) sonarReadings[counter] = sp[counter];
+                surveyCycle(sonarReadings, currentDirection, true, temp); //Takes the sonar readings and marks cells as appropriate.
+                temp->printGrid(); //Prints the occupancy grid.
+
+                temp->moveRobotOnGrid(currentDirection);
+                calculateMoveDistance(&robot, &pp, currentDirection, 0.350);
+
+                robot.Read();
+                for (int counter = 0; counter <= 15; counter++) sonarReadings[counter] = sp[counter];
+                surveyCycle(sonarReadings, currentDirection, false, temp); //Takes the sonar readings and marks cells as appropriate.
+                calculateMoveDistance(&robot, &pp, currentDirection, 0.350);
+            }
+        } else return false;
+
+    } while (attemptsLeft > 0);
+}
+
+Pioneer::Pioneer() {
+    oG = new Occupancy_Grid(); //Creates new occupancy grid on the heap;
+}
+
 Pioneer::~Pioneer() {
     delete(oG); //Ensures the deletion of the occupancy grid.
 }
 
 int main(int argc, char *argv[]) {
-    Pioneer *pioneer = new Pioneer(); //Creates new pioneer on heap.
-    pioneer->runPioneer();
+    Pioneer *pioneer = new Pioneer(); //Creates new pioneer on heap.    
+    runProgram(); 
     delete(pioneer); //Ensures the deletion of pioneer.
     return 0;
 }
+
+void Pioneer::runProgram() {
+    int option; //Field to store the user's option input.
+    bool mapped = false;
+
+    do {
+        cout << "***********************************" << endl;
+        cout << "*         Pioneer Program         *" << endl;
+        cout << "***********************************" << endl;
+        cout << "*         1. Map Area             *" << endl;
+        cout << "*         2. Seek                 *" << endl;
+        cout << "*         3. Hide                 *" << endl;
+        cout << "*         4. Exit                 *" << endl;
+        cout << "***********************************" << endl << endl;
+
+        cout << "Please enter in an option from the above an press 'Enter': ";
+        cin.clear();
+        cin >> option;
+        cin.ignore();
+
+        switch (option) {
+            case 1:
+                pioneer->map();
+                mapped = true;
+                break;
+            case 2:
+                 if (mapped == true) {
+                    if (pioneer->localise()) {
+                        cout << "Localisation successful, starting to seek..." << endl;
+                        pioneer->seek();
+                    } else cout << "Pioneer failed to localise itself, cannot seek." << endl;
+                } else cout << "Pioneer has not mapped the are yet, cannot localise for seeking." << endl;
+                break;
+            case 3:
+                if (mapped == true) {
+                    if (pioneer->localise()) {
+                        cout << "Localisation successful, starting to hide..." << endl;
+                        pioneer->hide();
+                    } else cout << "Pioneer failed to localise itself, cannot hide." << endl;
+                } else cout << "Pioneer has not mapped the are yet, cannot localise for hiding." << endl;
+                break;
+            case 4:
+                cout << "Exiting program..." << endl;
+                break;
+            default:
+                cout << "Please enter in a valid option." << endl << endl;
+        }
+    } while (option != 4);
+}
+    

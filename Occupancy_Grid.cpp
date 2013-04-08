@@ -34,6 +34,22 @@ Occupancy_Grid::Occupancy_Grid() {
     cout << endl;
 }
 
+int Occupancy_Grid::getXLength() {
+    return xLength;
+}
+
+int Occupancy_Grid::getYLength() {
+    return yLength;
+}
+
+int Occupancy_Grid::getRobotX() {
+    return robotX;
+}
+
+int Occupancy_Grid::getRobotY() {
+    return robotY;
+}
+
 /** Member function to initialise the cell passed in.*/
 void Occupancy_Grid::initialiseCell(Cell *cell) {
     cell->isExplored = false;
@@ -392,29 +408,28 @@ void Occupancy_Grid::addNodesToFrontier() {
     }
 }
 
-int Occuancy_Grid::attemptLocalisation(vector<vector<Cell > > temp, int tempRobotX, int tempRobotY, int tempXLength, int tempYLength) {
+int Occuancy_Grid::attemptLocalisation(Occupancy_Grid temp) {
     int possibleAreas = 0;
 
-    for (int xCounter = 0; xCounter < (xLength - tempXLength); xCounter++) {
-        for (int yCounter = 0; yCounter < (yLength - tempYLength); yCounter++) {
-            if (compareArea(temp, tempXLength, tempYLength, tempRobotX, tempRobotY, xCounter, yCounter)) possibleAreas++;
-            if (possibleAreas > 1) return 2;
+    for (int xCounter = 0; xCounter < (xLength - temp->getXLength()); xCounter++) {
+        for (int yCounter = 0; yCounter < (yLength - temp->getYLength()); yCounter++) {
+            if (compareArea(temp, xCounter, yCounter)) possibleAreas++;
+            if (possibleAreas > 1) return 2; //More than one possible area.
         }
     }
 
-    if (possibleAreas == 1) return 3;
-    else return 1;
+    if (possibleAreas == 1) return 3; //True.
+    else return 1; //False.
 }
 
 bool Occupancy_Grid::compareCells(Cell cell1, Cell cell2) {
-    if (cell1.isExplored == cell2.isExplored) {
-        if (cell1.obstacleValue > 0 && cell2.obstacleValue > 0) return true;
-    }
+    if (cell1.obstacleValue > 0 && cell2.obstacleValue > 0) return true;
+    else if (cell2.obstacleValue == 0) return true;
 
     return false;
 }
 
-bool Occupancy_Grid::compareArea(vector<vector<Cell > > temp, int tempXLength, int tempYLength, int tempRobotX, int tempRobotY, int xCounter, int yCounter) {
+bool Occupancy_Grid::compareArea(Occurpancy_Grid temp, int xCounter, int yCounter) {
     xEnd = xCounter + tempXLength - 1;
     yEnd = yCounter + tempYLength - 1;
     int tempXCounter = 0;

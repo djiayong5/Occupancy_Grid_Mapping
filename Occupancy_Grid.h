@@ -66,6 +66,10 @@ private:
     int neighboursLength;
     int possibleRobotX;
     int possibleRobotY;
+    int getXLength();
+    int getYLength();
+    int getRobotX();
+    int getRobotY();
     void initialiseCell(Cell *cell);
     void shiftTrackers(int xShift, int yShift);
     void shiftValuesUp();
@@ -86,7 +90,7 @@ private:
     void addExplorableNeighbour(int xPos, int yPos, int cost, int distanceRemaining, int direction);
     void addNodesToFrontier();
     bool compareCells(Cell cell1, Cell cell2);
-    bool compareArea(vector<vector<Cell > > temp, int tempXLength, int tempYLength, int tempRobotX, int tempRobotY, int xStart, int yStart);
+    bool compareArea(Occupancy_Grid temp, int xCounter, int yCounter);
     void switchGrid();
     
 public:
@@ -106,6 +110,6 @@ public:
     int chooseNextCell(int currentDirection);
     bool checkFinished();
     bool plotPath(int currentX, int currentY, int targetX, int targetY, int cost);
-    int attemptLocalisation(vector<vector<Cell > > temp, int tempRobotX, int tempRobotY, int tempXLength, int tempYLength);
+    int attemptLocalisation(Occupancy_Grid temp);
 };
 #endif
