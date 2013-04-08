@@ -45,6 +45,9 @@ private:
     int frontRightSensorFacing; /* Field that describes the direction the front right sensor currently faces. */
     int rearLeftSensorFacing; /* Field that describes the direction the rear left sensor currently faces. */
     int rearRightSensorFacing; /* Field that describes the direction the rear right sensor currently faces. */
+    void runProgram();
+    void localise();
+    void hide();
     double calculateTurnRate(double currentYaw, double targetYaw);
     void turnToNewDirection(double targetYaw, Position2dProxy *pp, PlayerClient *robot);
     void calculateMoveDistance(PlayerClient *robot, Position2dProxy *pp, int direction, double distanceToMove);
@@ -65,6 +68,7 @@ private:
     void evaluateMovingReadings(double reading1, double reading2, double range1, double range2, int sensorFacing, Occupancy_Grid grid);
     void evaluateBlindSpots(double reading1, double reading2, double range, int sensorFacing, Occupancy_Grid grid);
     void configureCycle(PlayerClient *robot, Position2dProxy *pp, double *currentYaw, int *currentDirection);
+    
 
 public:
     void map();
