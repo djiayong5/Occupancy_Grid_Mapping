@@ -386,8 +386,65 @@ void Occupancy_Grid::addNodesToFrontier() {
     for (int counter = neighboursLength - 1; counter >= 0; counter--) {
         frontier.resize(++frontierLength);
         frontier.push_back(neighbours.back().xPos, neighbours.back().yPos, neighbours.back().pathValue,
-                    neighbours.back().directionLeftFrom);
+                neighbours.back().directionLeftFrom);
         neighbours.pop_back();
         neighboursLength--;
     }
+}
+
+int Occuancy_Grid::attemptLocalisation(vector<vector<Cell > > temp, int tempRobotX, int tempRobotY, int tempXLength, int tempYLength) {
+    int possibleAreas = 0;
+
+    for (int xCounter = 0; xCounter < (xLength - tempXLength); xCounter++) {
+        for (int yCounter = 0; yCounter < (yLength - tempYLength); yCounter++) {
+            if (compareArea(temp, tempXLength, tempYLength, tempRobotX, tempRobotY, xCounter, yCounter)) possibleAreas++;
+            if (possibleAreas > 1) return 2;
+        }
+    }
+
+    if (possibleAreas == 1) return 3;
+    else return 1;
+}
+
+bool Occupancy_Grid::compareCells(Cell cell1, Cell cell2) {
+    if (cell1.isExplored == cell2.isExplored) {
+        if (cell1.obstacleValue > 0 && cell2.obstacleValue > 0) return true;
+    }
+
+    return false;
+}
+
+bool Occupancy_Grid::compareArea(vector<vector<Cell > > temp, int tempXLength, int tempYLength, int tempRobotX, int tempRobotY, int xCounter, int yCounter) {
+    xEnd = xCounter + tempXLength - 1;
+    yEnd = yCounter + tempYLength - 1;
+    int tempXCounter = 0;
+    int tempYCounter = 0;
+
+    while (xCounter <= xEnd && yCounter <= yEnd) {
+        if (!compareCells(grid[xCounter][yCounter], temp[tempXCounter][tempYCounter])) {
+            possibleRobotX = 0;
+            possibleRobotY = 0;
+            return false;
+        }
+
+        if (tempXCounter == tempRobotX && tempYCounter = tempRobotY) {
+            possibleRobotX = xCounter;
+            possibleRobotY = yCounter;
+        }
+
+        if (xCounter >= tempXLength - 1) {
+            yCounter++;
+            tempYCounter++;
+        } else {
+            xCounter++;
+            tempXCounter++;
+        }
+    }
+
+    return true;
+}
+
+void Occupancy_Grid::switchGrid() {
+    robotX = possibleRobotX;
+    robotY = possibleRobotY;
 }
