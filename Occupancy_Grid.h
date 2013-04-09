@@ -87,8 +87,7 @@ private:
     void addExplorableNeighbour(int xPos, int yPos, int cost, int distanceRemaining, int direction);
     void addNodesToFrontier();
     bool compareCells(Cell cell1, Cell cell2);
-    bool compareArea(Occupancy_Grid temp, int xCounter, int yCounter);
-    void switchGrid();
+    bool compareArea(Occupancy_Grid *temp, int xCounter, int yCounter);
 
 public:
     /* Member Function Prototypes: */
@@ -113,7 +112,8 @@ public:
     int chooseNextCell(int currentDirection);
     bool checkFinished();
     bool plotPath(int currentX, int currentY, int targetX, int targetY, int cost);
-    int attemptLocalisation(Occupancy_Grid temp);
+    int attemptLocalisation(Occupancy_Grid *temp);
+    void switchGrid();
     void seekConfigure();
     bool detectAnomaly(int xPos, int yPos);
 };

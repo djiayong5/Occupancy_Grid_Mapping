@@ -291,7 +291,7 @@ void Occupancy_Grid::calculateCellToChange(int sonarFacing, bool obstaclePresent
 }
 
 void Occupancy_Grid::mapPath(int direction) {
-    addCellToPath(direction robotX, robotY);
+    addCellToPath(direction, robotX, robotY);
 }
 
 /** Member function to add the cell the robot currently occupies to the pathStack. */
@@ -406,13 +406,24 @@ void Occupancy_Grid::getExplorableNeighbours(int xPos, int yPos, int cost, int d
 }
 
 void Occupancy_Grid::addExplorableNeighbour(int xPos, int yPos, int cost, int distanceRemaining, int direction) {
-    neighbours.resize(++neighboursLength);
-    pathValue = (++cost) + distanceRemaining;
+
+    int pathValue = (++cost) + distanceRemaining;
 
     if (neighboursLength > 1) {
         for (int counter = neighboursLength - 1; counter >= 0; counter--) {
-            if (pathValue < neighbours.at(counter).pathValue) neighbours.push_back(xPos, yPos, pathValue, direction);
-            else neighbours.insert(counter, xPos, yPos, pathValue, direction);
+            if (pathValue < neighbours.at(counter).pathValue) {
+                neighbours.resize(++neighboursLength);
+                neighbours.back().xPos = xPos;
+                neighbours.back().yPos = yPos;
+                neighbours.back().pathValue = pathValue;
+                neighbours.back().directionLeftFrom = direction;
+            } else {
+                neighbours.insert(neighbours.begin() + counter, Node());
+                neighbours.at(counter).xPos = xPos;
+                neighbours.at(counter).yPos = yPos;
+                neighbours.at(counter).pathValue = pathValue;
+                neighbours.at(counter).directionLeftFrom = direction;
+            }
         }
     }
 }
@@ -420,14 +431,16 @@ void Occupancy_Grid::addExplorableNeighbour(int xPos, int yPos, int cost, int di
 void Occupancy_Grid::addNodesToFrontier() {
     for (int counter = neighboursLength - 1; counter >= 0; counter--) {
         frontier.resize(++frontierLength);
-        frontier.push_back(neighbours.back().xPos, neighbours.back().yPos, neighbours.back().pathValue,
-                neighbours.back().directionLeftFrom);
+        frontier.back().xPos = neighbours.back().xPos;
+        frontier.back().yPos = neighbours.back().yPos;
+        frontier.back().pathValue = neighbours.back().pathValue;
+        frontier.back().directionLeftFrom = neighbours.back().directionLeftFrom;
         neighbours.pop_back();
         neighboursLength--;
     }
 }
 
-int Occuancy_Grid::attemptLocalisation(Occupancy_Grid temp) {
+int Occupancy_Grid::attemptLocalisation(Occupancy_Grid *temp) {
     int possibleAreas = 0;
 
     for (int xCounter = 0; xCounter < (xLength - temp->getXLength()); xCounter++) {
@@ -448,25 +461,25 @@ bool Occupancy_Grid::compareCells(Cell cell1, Cell cell2) {
     return false;
 }
 
-bool Occupancy_Grid::compareArea(Occurpancy_Grid temp, int xCounter, int yCounter) {
-    xEnd = xCounter + tempXLength - 1;
-    yEnd = yCounter + tempYLength - 1;
+bool Occupancy_Grid::compareArea(Occupancy_Grid *temp, int xCounter, int yCounter) {
+    int xEnd = xCounter + temp->getXLength() - 1;
+    int yEnd = yCounter + temp->getYLength() - 1;
     int tempXCounter = 0;
     int tempYCounter = 0;
 
     while (xCounter <= xEnd && yCounter <= yEnd) {
-        if (!compareCells(grid[xCounter][yCounter], temp[tempXCounter][tempYCounter])) {
+        if (!compareCells(grid[xCounter][yCounter], temp->getGrid()[tempXCounter][tempYCounter])) {
             possibleRobotX = 0;
             possibleRobotY = 0;
             return false;
         }
 
-        if (tempXCounter == tempRobotX && tempYCounter = tempRobotY) {
+        if (tempXCounter == temp->getRobotX() && tempYCounter == temp->getRobotY()) {
             possibleRobotX = xCounter;
             possibleRobotY = yCounter;
         }
 
-        if (xCounter >= tempXLength - 1) {
+        if (xCounter >= temp->getXLength() - 1) {
             yCounter++;
             tempYCounter++;
         } else {
@@ -483,7 +496,7 @@ void Occupancy_Grid::switchGrid() {
     robotY = possibleRobotY;
 }
 
-void Occupany_Grid::seekConfigure() {
+void Occupancy_Grid::seekConfigure() {
     for (int xCounter = 0; xCounter < xLength; xCounter++) {
         for (int yCounter = 0; yCounter < yLength; yCounter++) {
             if (grid[xCounter][yCounter].obstacleValue == 0 && grid[xCounter][yCounter].isExplored == true) {

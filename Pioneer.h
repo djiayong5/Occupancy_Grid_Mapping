@@ -45,8 +45,8 @@ private:
     int frontRightSensorFacing; /* Field that describes the direction the front right sensor currently faces. */
     int rearLeftSensorFacing; /* Field that describes the direction the rear left sensor currently faces. */
     int rearRightSensorFacing; /* Field that describes the direction the rear right sensor currently faces. */
-    void runProgram();
-    void localise();
+    bool localise();
+    void seek();
     void hide();
     double calculateTurnRate(double currentYaw, double targetYaw);
     void turnToNewDirection(double targetYaw, Position2dProxy *pp, PlayerClient *robot);
@@ -62,16 +62,18 @@ private:
     void setRearLeftSensorDirection(int currentDirection);
     void setRearRightSensorDirection(int currentDirection);
     void reconfigureSensors(int currentDirection);
-    void surveyCycle(double readings[], int currentDirection, bool inNextCell, Occupancy_Grid grid, bool seekMode);
-    void evaluateReadings(double reading1, double reading2, double range, int sensorFacing, Occupancy_Grid grid, bool seekMode);
-    void evaluateCornerReadings(double reading, double lowerBound, double upperBound, int sensorFacing, Occupancy_Grid grid, bool seekMode);
-    void evaluateMovingReadings(double reading1, double reading2, double range1, double range2, int sensorFacing, Occupancy_Grid grid, bool seekMode);
-    void evaluateBlindSpots(double reading1, double reading2, double range, int sensorFacing, Occupancy_Grid grid, bool seekMode);
+    void surveyCycle(double readings[], int currentDirection, bool inNextCell, Occupancy_Grid *grid, bool seekMode);
+    void evaluateReadings(double reading1, double reading2, double range, int sensorFacing, Occupancy_Grid *grid, bool seekMode);
+    void evaluateCornerReadings(double reading, double lowerBound, double upperBound, int sensorFacing, Occupancy_Grid *grid, bool seekMode);
+    void evaluateMovingReadings(double reading1, double reading2, double range1, double range2, int sensorFacing, Occupancy_Grid *grid, bool seekMode);
+    void evaluateBlindSpots(double reading1, double reading2, double range, int sensorFacing, Occupancy_Grid *grid, bool seekMode);
     void configureCycle(PlayerClient *robot, Position2dProxy *pp, double *currentYaw, int *currentDirection);
-    
+
 
 public:
     void map();
     ~Pioneer();
+    Pioneer();
+    void runProgram();
 };
 #endif
