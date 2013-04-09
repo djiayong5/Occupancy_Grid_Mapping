@@ -66,10 +66,7 @@ private:
     int neighboursLength;
     int possibleRobotX;
     int possibleRobotY;
-    int getXLength();
-    int getYLength();
-    int getRobotX();
-    int getRobotY();
+    int anomalyFound;
     void initialiseCell(Cell *cell);
     void shiftTrackers(int xShift, int yShift);
     void shiftValuesUp();
@@ -92,16 +89,22 @@ private:
     bool compareCells(Cell cell1, Cell cell2);
     bool compareArea(Occupancy_Grid temp, int xCounter, int yCounter);
     void switchGrid();
-    
+
 public:
     /* Member Function Prototypes: */
     Occupancy_Grid();
+    void mapConfigure();
     vector<Tracker> getPathStack();
     vector<vector<Cell> > getGrid();
+    int getXLength();
+    int getYLength();
+    int getRobotX();
+    int getRobotY();
+    bool getAnomalyFound();
     void checkResizeNeeded(int currentDirection);
     void moveRobotOnGrid(int direction);
     void printGrid();
-    void calculateCellToChange(int sonarFacing, bool obstaclePresent);
+    void calculateCellToChange(int sonarFacing, bool obstaclePresent, bool seekMode);
     void mapPath(int direction);
     int getDirectionOfLastCell();
     void setIsExploredTrue();
@@ -111,5 +114,7 @@ public:
     bool checkFinished();
     bool plotPath(int currentX, int currentY, int targetX, int targetY, int cost);
     int attemptLocalisation(Occupancy_Grid temp);
+    void seekConfigure();
+    bool detectAnomaly(int xPos, int yPos);
 };
 #endif

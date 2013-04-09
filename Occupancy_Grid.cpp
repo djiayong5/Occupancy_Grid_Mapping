@@ -16,11 +16,16 @@ using namespace std;
 
 /** Default constructor. */
 Occupancy_Grid::Occupancy_Grid() {
+    mapConfigure();
+}
+
+void Occupancy_Grid::mapConfigure() {
     robotX = 1;
     robotY = 1;
     xLength = 3;
     yLength = 3;
     pathLength = 0;
+    anomalyFound = false;
 
     grid.resize(START_X_LENGTH);
     for (int counter = 0; counter < START_X_LENGTH; counter++) grid[counter].resize(START_Y_LENGTH);
@@ -48,6 +53,10 @@ int Occupancy_Grid::getRobotX() {
 
 int Occupancy_Grid::getRobotY() {
     return robotY;
+}
+
+bool Occupancy_Grid::getAnomalyFound() {
+    return anomalyFound;
 }
 
 /** Member function to initialise the cell passed in.*/
@@ -248,17 +257,27 @@ int Occupancy_Grid::getNeighboursUnexplored() {
  * @param sonarReading The sonar's reading.
  * @param sonarFacing The direction the sonar is facing.
  */
-void Occupancy_Grid::calculateCellToChange(int sonarFacing, bool obstaclePresent) {
-
+void Occupancy_Grid::calculateCellToChange(int sonarFacing, bool obstaclePresent, bool seekMode) {
     if (obstaclePresent == true) {
-        if (sonarFacing == ZERO) incrementCell(robotX, robotY + 1);
-        if (sonarFacing == ONE_EIGHTY) incrementCell(robotX, robotY - 1);
-        if (sonarFacing == NIGHTY) incrementCell(robotX - 1, robotY);
-        if (sonarFacing == MINUS_NIGHTY) incrementCell(robotX + 1, robotY);
-        if (sonarFacing == FOURTY_FIVE) incrementCell(robotX - 1, robotY + 1);
-        if (sonarFacing == ONE_THIRTY_FIVE) incrementCell(robotX - 1, robotY - 1);
-        if (sonarFacing == MINUS_FOURTY_FIVE) incrementCell(robotX + 1, robotY + 1);
-        if (sonarFacing == MINUS_ONE_THIRTY_FIVE) incrementCell(robotX + 1, robotY - 1);
+        if (seekMode == false) {
+            if (sonarFacing == ZERO) incrementCell(robotX, robotY + 1);
+            if (sonarFacing == ONE_EIGHTY) incrementCell(robotX, robotY - 1);
+            if (sonarFacing == NIGHTY) incrementCell(robotX - 1, robotY);
+            if (sonarFacing == MINUS_NIGHTY) incrementCell(robotX + 1, robotY);
+            if (sonarFacing == FOURTY_FIVE) incrementCell(robotX - 1, robotY + 1);
+            if (sonarFacing == ONE_THIRTY_FIVE) incrementCell(robotX - 1, robotY - 1);
+            if (sonarFacing == MINUS_FOURTY_FIVE) incrementCell(robotX + 1, robotY + 1);
+            if (sonarFacing == MINUS_ONE_THIRTY_FIVE) incrementCell(robotX + 1, robotY - 1);
+        } else {
+            if (sonarFacing == ZERO) detectAnomaly(robotX, robotY + 1);
+            if (sonarFacing == ONE_EIGHTY) detectAnomaly(robotX, robotY - 1);
+            if (sonarFacing == NIGHTY) detectAnomaly(robotX - 1, robotY);
+            if (sonarFacing == MINUS_NIGHTY) detectAnomaly(robotX + 1, robotY);
+            if (sonarFacing == FOURTY_FIVE) detectAnomaly(robotX - 1, robotY + 1);
+            if (sonarFacing == ONE_THIRTY_FIVE) detectAnomaly(robotX - 1, robotY - 1);
+            if (sonarFacing == MINUS_FOURTY_FIVE) detectAnomaly(robotX + 1, robotY + 1);
+            if (sonarFacing == MINUS_ONE_THIRTY_FIVE) detectAnomaly(robotX + 1, robotY - 1);
+        }
     } else {
         if (sonarFacing == ZERO) decrementCell(robotX, robotY + 1);
         if (sonarFacing == ONE_EIGHTY) decrementCell(robotX, robotY - 1);
@@ -462,4 +481,22 @@ bool Occupancy_Grid::compareArea(Occurpancy_Grid temp, int xCounter, int yCounte
 void Occupancy_Grid::switchGrid() {
     robotX = possibleRobotX;
     robotY = possibleRobotY;
+}
+
+void Occupany_Grid::seekConfigure() {
+    for (int xCounter = 0; xCounter < xLength; xCounter++) {
+        for (int yCounter = 0; yCounter < yLength; yCounter++) {
+            if (grid[xCounter][yCounter].obstacleValue == 0 && grid[xCounter][yCounter].isExplored == true) {
+                grid[xCounter][yCounter].isExplored = false;
+            }
+        }
+    }
+}
+
+bool Occupancy_Grid::detectAnomaly(int xPos, int yPos) {
+    if (grid[xPos][yPos].obstacleValue == 0) {
+        cout << "Anomaly found at grid co-ordinates (" << xPos << ", " << yPos << ")" << endl;
+        anomalyFound = true;
+        return true;
+    } else return false;
 }
