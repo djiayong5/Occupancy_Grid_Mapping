@@ -17,12 +17,13 @@
 
 #ifndef DIRECTIONS
 #define DIRECTIONS
-#define ZERO 0
-#define ONE_EIGHTY 180
-#define NIGHTY 90
-#define MINUS_NIGHTY -90
+#define TOP 0
+#define BOTTOM 180
+#define LEFT 90
+#define RIGHT -90
 #endif
 
+#define ANGLE_ERROR 10
 #define MOVE_PGAIN 0.8
 #define TURN_PGAIN 0.8
 #define MOVE_ERROR_BOUND 0.025
@@ -45,22 +46,16 @@ private:
     int frontRightSensorFacing; /* Field that describes the direction the front right sensor currently faces. */
     int rearLeftSensorFacing; /* Field that describes the direction the rear left sensor currently faces. */
     int rearRightSensorFacing; /* Field that describes the direction the rear right sensor currently faces. */
-    bool localise();
-    void seek();
-    void hide();
+    void map(PlayerClient *robot, RangerProxy *sp, Position2dProxy *pp);
+    bool localise(PlayerClient *robot, RangerProxy *sp, Position2dProxy *pp);
+    void seek(PlayerClient *robot, RangerProxy *sp, Position2dProxy *pp);
+    void hide(PlayerClient *robot, RangerProxy *sp, Position2dProxy *pp);
     double calculateTurnRate(double currentYaw, double targetYaw);
     void turnToNewDirection(double targetYaw, Position2dProxy *pp, PlayerClient *robot);
     void calculateMoveDistance(PlayerClient *robot, Position2dProxy *pp, int direction, double distanceToMove);
     void moveForward(PlayerClient *robot, Position2dProxy *pp, int direction, double posDifference);
     int evaluateDirection(double currentYaw);
-    void setFrontSensorDirection(int currentDirection);
-    void setRearSensorDirection(int currentDirection);
-    void setLeftSensorDirection(int currentDirection);
-    void setRightSensorDirection(int currentDirection);
-    void setFrontLeftSensorDirection(int currentDirection);
-    void setFrontRightSensorDirection(int currentDirection);
-    void setRearLeftSensorDirection(int currentDirection);
-    void setRearRightSensorDirection(int currentDirection);
+    int setSensorDirection(int currentDirection, int angleOffset);
     void reconfigureSensors(int currentDirection);
     void surveyCycle(double readings[], int currentDirection, bool inNextCell, Occupancy_Grid *grid, bool seekMode);
     void evaluateReadings(double reading1, double reading2, double range, int sensorFacing, Occupancy_Grid *grid, bool seekMode);
@@ -71,9 +66,8 @@ private:
 
 
 public:
-    void map();
     ~Pioneer();
     Pioneer();
-    void runProgram();
+    void runProgram(PlayerClient *robot, RangerProxy *sp, Position2dProxy *pp);
 };
 #endif

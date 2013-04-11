@@ -15,17 +15,17 @@
 
 #ifndef DIRECTIONS
 #define DIRECTIONS
-#define ZERO 0
-#define FOURTY_FIVE 45
-#define NIGHTY 90
-#define ONE_THIRTY_FIVE 135
-#define ONE_EIGHTY 180
-#define MINUS_ONE_THIRTY_FIVE -135
-#define MINUS_NIGHTY -90
-#define MINUS_FOURTY_FIVE -45
+#define TOP 0
+#define TOP_LEFT 45
+#define LEFT 90
+#define BOTTOM_LEFT 135
+#define BOTTOM 180
+#define BOTTOM_RIGHT -135
+#define RIGHT -90
+#define TOP_RIGHT -45
 #endif
 
-#define CELL_WIDTH 0.6
+#define CELL_WIDTH 0.7
 #define START_X_LENGTH 3
 #define START_Y_LENGTH 3
 
@@ -38,7 +38,7 @@ struct Cell {
 };
 
 struct Tracker {
-    int directionLeftFrom;
+    int directionCameFrom;
     int xPos;
     int yPos;
 };
@@ -57,7 +57,6 @@ private:
     vector<vector<Cell> > grid;
     vector<Node> frontier;
     vector<Node> neighbours;
-    vector<Node> hideStack;
     int yLength;
     int xLength;
     int robotY;
@@ -91,7 +90,6 @@ private:
     int calculateCost(int currentX, int currentY, int newX, int newY, int cost);
     void getExplorableNeighbours(int xPos, int yPos, int cost, int distanceRemaining);
     void addExplorableNeighbour(int xPos, int yPos, int cost, int distanceRemaining, int direction);
-    void addCellToHidePath(int direction, int xPos, int yPos);
 
 public:
     /* Member Function Prototypes: */
@@ -108,7 +106,6 @@ public:
     void moveRobotOnGrid(int direction);
     void printGrid();
     void calculateCellToChange(int sonarFacing, bool obstaclePresent, bool seekMode);
-    void mapPath(int direction);
     int getDirectionOfLastCell();
     void setIsExploredTrue();
     int getNeighboursUnexplored();
@@ -121,7 +118,6 @@ public:
     bool detectAnomaly(int xPos, int yPos);
     void getHideLocation();
     bool plotPath(int currentX, int currentY, int targetX, int targetY, int cost);
-    int getNextCellDriection();
-    vector<Node> getHideStack();   
+    int getNextCellDriection(); 
 };
 #endif

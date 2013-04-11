@@ -45,10 +45,10 @@ void Pioneer::turnToNewDirection(double targetYaw, Position2dProxy *pp, PlayerCl
 }
 
 void Pioneer::calculateMoveDistance(PlayerClient *robot, Position2dProxy *pp, int direction, double distanceToMove) {
-    if (direction == ZERO) moveForward(robot, pp, direction, distanceToMove);
-    else if (direction == ONE_EIGHTY) moveForward(robot, pp, direction, -distanceToMove);
-    else if (direction == NIGHTY) moveForward(robot, pp, direction, distanceToMove);
-    else if (direction == MINUS_NIGHTY) moveForward(robot, pp, direction, -distanceToMove);
+    if (direction == TOP) moveForward(robot, pp, direction, distanceToMove);
+    else if (direction == BOTTOM) moveForward(robot, pp, direction, -distanceToMove);
+    else if (direction == LEFT) moveForward(robot, pp, direction, distanceToMove);
+    else if (direction == RIGHT) moveForward(robot, pp, direction, -distanceToMove);
 }
 
 void Pioneer::moveForward(PlayerClient *robot, Position2dProxy *pp, int direction, double posDifference) {
@@ -59,10 +59,10 @@ void Pioneer::moveForward(PlayerClient *robot, Position2dProxy *pp, int directio
     double distanceLeft;
     robot->Read();
 
-    if (direction == ZERO || direction == ONE_EIGHTY) {
+    if (direction == TOP || direction == BOTTOM) {
         target = pp->GetXPos() + posDifference; //Simulated world rotated 90 degrees do axis are switched.
         current = pp->GetXPos(); //Simulated world rotated 90 degrees do axis are switched.
-    } else if (direction == NIGHTY || direction == MINUS_NIGHTY) {
+    } else if (direction == LEFT || direction == RIGHT) {
         target = pp->GetYPos() + posDifference; //Simulated world rotated 90 degrees do axis are switched.
         current = pp->GetYPos(); //Simulated world rotated 90 degrees do axis are switched.
     }
@@ -70,9 +70,9 @@ void Pioneer::moveForward(PlayerClient *robot, Position2dProxy *pp, int directio
     while (travelledDistance == false) {
         robot->Read();
 
-        if (direction == ZERO || direction == ONE_EIGHTY) {
+        if (direction == TOP || direction == BOTTOM) {
             current = pp->GetXPos(); //Simulated world rotated 90 degrees do axis are switched.
-        } else if (direction == NIGHTY || direction == MINUS_NIGHTY) {
+        } else if (direction == LEFT || direction == RIGHT) {
             current = pp->GetYPos(); //Simulated world rotated 90 degrees do axis are switched.
         }
 
@@ -91,77 +91,37 @@ void Pioneer::moveForward(PlayerClient *robot, Position2dProxy *pp, int directio
 }
 
 int Pioneer::evaluateDirection(double currentYaw) {
-    if (currentYaw <= -80 && currentYaw >= -100.00) return MINUS_NIGHTY;
-    else if (currentYaw <= 100.00 && currentYaw >= 80.00) return NIGHTY;
-    else if ((currentYaw <= -170 && currentYaw >= -179.99) || (currentYaw >= 170.00 && currentYaw <= 180.00)) return ONE_EIGHTY;
-    if ((currentYaw <= 10.00 && currentYaw >= 0.00) || (currentYaw >= -10.00 && currentYaw <= 0.00)) return ZERO;
+    if (currentYaw <= (RIGHT + ANGLE_ERROR) && currentYaw >= (RIGHT - ANGLE_ERROR)) return RIGHT;
+    else if (currentYaw <= (LEFT + ANGLE_ERROR) && currentYaw >= (LEFT - ANGLE_ERROR)) return LEFT;
+    else if ((currentYaw <= -170 && currentYaw >= -179.99) || (currentYaw >= 170.00 && currentYaw <= 180.00)) return BOTTOM;
+    //else if (currentYaw <= (DOWN + ANGLE_ERROR) && currentYaw >= (DOWN + ANGLE_ERROR)) return DOWN;
+    if ((currentYaw <= 10.00 && currentYaw >= 0.00) || (currentYaw >= -10.00 && currentYaw <= 0.00)) return TOP;
+    //else if (currentYaw <= (TOP + ANGLE_ERROR) && currentYaw >= (TOP + ANGLE_ERROR)) return TOP;
 }
 
-void Pioneer::setFrontSensorDirection(int currentDirection) {
-    if (currentDirection == ZERO) frontSensorFacing = ZERO;
-    else if (currentDirection == MINUS_NIGHTY) frontSensorFacing = MINUS_NIGHTY;
-    else if (currentDirection == ONE_EIGHTY) frontSensorFacing = ONE_EIGHTY;
-    else if (currentDirection == NIGHTY) frontSensorFacing = NIGHTY;
-}
+int Pioneer::setSensorDirection(int currentDirection, int angleOffset) {
+    int facing = 0;
 
-void Pioneer::setRearSensorDirection(int currentDirection) {
-    if (currentDirection == ZERO) rearSensorFacing = ONE_EIGHTY;
-    else if (currentDirection == MINUS_NIGHTY) rearSensorFacing = NIGHTY;
-    else if (currentDirection == ONE_EIGHTY) rearSensorFacing = ZERO;
-    else if (currentDirection == NIGHTY) rearSensorFacing = MINUS_NIGHTY;
-}
+    if (currentDirection == TOP) facing = (TOP + angleOffset);
+    else if (currentDirection == RIGHT) facing = (RIGHT + angleOffset);
+    else if (currentDirection == BOTTOM) facing = (BOTTOM + angleOffset);
+    else if (currentDirection == LEFT) facing = (LEFT + angleOffset);
 
-void Pioneer::setLeftSensorDirection(int currentDirection) {
-    if (currentDirection == ZERO) leftSensorFacing = NIGHTY;
-    else if (currentDirection == MINUS_NIGHTY) leftSensorFacing = ZERO;
-    else if (currentDirection == ONE_EIGHTY) leftSensorFacing = MINUS_NIGHTY;
-    else if (currentDirection == NIGHTY) leftSensorFacing = ONE_EIGHTY;
-}
+    if (facing > 180) facing -= 360;
+    if (facing == -180) facing = BOTTOM;
 
-void Pioneer::setRightSensorDirection(int currentDirection) {
-    if (currentDirection == ZERO) rightSensorFacing = MINUS_NIGHTY;
-    else if (currentDirection == MINUS_NIGHTY) rightSensorFacing = ONE_EIGHTY;
-    else if (currentDirection == ONE_EIGHTY) rightSensorFacing = NIGHTY;
-    else if (currentDirection == NIGHTY) rightSensorFacing = ZERO;
-}
-
-void Pioneer::setFrontLeftSensorDirection(int currentDirection) {
-    if (currentDirection == ZERO) frontLeftSensorFacing = FOURTY_FIVE;
-    else if (currentDirection == MINUS_NIGHTY) frontLeftSensorFacing = MINUS_FOURTY_FIVE;
-    else if (currentDirection == ONE_EIGHTY) frontLeftSensorFacing = MINUS_ONE_THIRTY_FIVE;
-    else if (currentDirection == NIGHTY) frontLeftSensorFacing = ONE_THIRTY_FIVE;
-}
-
-void Pioneer::setFrontRightSensorDirection(int currentDirection) {
-    if (currentDirection == ZERO) frontRightSensorFacing = MINUS_FOURTY_FIVE;
-    else if (currentDirection == MINUS_NIGHTY) frontRightSensorFacing = MINUS_ONE_THIRTY_FIVE;
-    else if (currentDirection == ONE_EIGHTY) frontRightSensorFacing = ONE_THIRTY_FIVE;
-    else if (currentDirection == NIGHTY) frontRightSensorFacing = FOURTY_FIVE;
-}
-
-void Pioneer::setRearLeftSensorDirection(int currentDirection) {
-    if (currentDirection == ZERO) rearLeftSensorFacing = ONE_THIRTY_FIVE;
-    else if (currentDirection == MINUS_NIGHTY) rearLeftSensorFacing = FOURTY_FIVE;
-    else if (currentDirection == ONE_EIGHTY) rearLeftSensorFacing = MINUS_FOURTY_FIVE;
-    else if (currentDirection == NIGHTY) rearLeftSensorFacing = MINUS_ONE_THIRTY_FIVE;
-}
-
-void Pioneer::setRearRightSensorDirection(int currentDirection) {
-    if (currentDirection == ZERO) rearRightSensorFacing = MINUS_ONE_THIRTY_FIVE;
-    else if (currentDirection == MINUS_NIGHTY) rearRightSensorFacing = ONE_THIRTY_FIVE;
-    else if (currentDirection == ONE_EIGHTY) rearRightSensorFacing = FOURTY_FIVE;
-    else if (currentDirection == NIGHTY) rearRightSensorFacing = MINUS_FOURTY_FIVE;
+    return facing;
 }
 
 void Pioneer::reconfigureSensors(int currentDirection) {
-    setFrontSensorDirection(currentDirection);
-    setRearSensorDirection(currentDirection);
-    setLeftSensorDirection(currentDirection);
-    setRightSensorDirection(currentDirection);
-    setFrontLeftSensorDirection(currentDirection);
-    setFrontRightSensorDirection(currentDirection);
-    setRearLeftSensorDirection(currentDirection);
-    setRearRightSensorDirection(currentDirection);
+    frontSensorFacing = setSensorDirection(currentDirection, TOP);
+    frontRightSensorFacing = setSensorDirection(currentDirection, TOP_RIGHT);
+    rightSensorFacing = setSensorDirection(currentDirection, RIGHT);
+    rearRightSensorFacing = setSensorDirection(currentDirection, BOTTOM_RIGHT);
+    rearSensorFacing = setSensorDirection(currentDirection, BOTTOM);
+    rearLeftSensorFacing = setSensorDirection(currentDirection, BOTTOM_LEFT);
+    leftSensorFacing = setSensorDirection(currentDirection, LEFT);
+    frontLeftSensorFacing = setSensorDirection(currentDirection, TOP_LEFT);
 }
 
 void Pioneer::surveyCycle(double readings[], int currentDirection, bool inNextCell, Occupancy_Grid *grid, bool seekMode) {
@@ -223,13 +183,7 @@ void Pioneer::configureCycle(PlayerClient *robot, Position2dProxy *pp, double *c
     reconfigureSensors(*currentDirection);
 }
 
-void Pioneer::map() {
-    PlayerClient robot("localhost");
-    //PlayerClient robot("bart.islnet");
-    RangerProxy sp(&robot, 0);
-    //SonarProxy sp(&robot, 0);
-    Position2dProxy pp(&robot, 0);
-
+void Pioneer::map(PlayerClient *robot, RangerProxy *sp, Position2dProxy *pp) {
     oG->mapConfigure();
     double currentYaw = 0.000;
     double targetYaw = 0.000;
@@ -238,20 +192,19 @@ void Pioneer::map() {
     int targetDirection;
 
     oG->printGrid(); /* Print out initial grid. */
-    pp.SetMotorEnable(true); /* Enable motors. */
-    robot.Read(); /* Read from proxies. */
-    currentYaw = rtod(pp.GetYaw()); /* Retrieve current yaw. */
+    pp->SetMotorEnable(true); /* Enable motors. */
+    robot->Read(); /* Read from proxies. */
+    currentYaw = rtod(pp->GetYaw()); /* Retrieve current yaw. */
     cout << "Start Yaw: " << currentYaw << endl;
 
-    turnToNewDirection(0.000, &pp, &robot); //Gets robot to turn to 0 degrees (with error bounds).
-
+    turnToNewDirection(0.000, pp, robot); //Gets robot to turn to 0 degrees (with error bounds).
     cout << "Start Yaw Corrected to: " << currentYaw << endl;
     currentDirection = evaluateDirection(currentYaw);
-    configureCycle(&robot, &pp, &currentYaw, &currentDirection);
+    configureCycle(robot, pp, &currentYaw, &currentDirection);
 
     do {
-        configureCycle(&robot, &pp, &currentYaw, &currentDirection);
-        for (int counter = 0; counter <= 15; counter++) sonarReadings[counter] = sp[counter];
+        configureCycle(robot, pp, &currentYaw, &currentDirection);
+        for (int counter = 0; counter <= 15; counter++) sonarReadings[counter] = (*sp)[counter];
         oG->setIsExploredTrue();
         surveyCycle(sonarReadings, currentDirection, true, oG, false); //Takes the sonar readings and marks cells as appropriate.
         oG->printGrid(); //Prints the occupancy grid.
@@ -260,7 +213,6 @@ void Pioneer::map() {
         if (oG->getNeighboursUnexplored() != 0) {
             cout << "Picking a neighbour to explore..." << endl;
             targetDirection = oG->chooseNextCell(currentDirection); //Chooses the next unexplored neighbour cell to travel to.
-            oG->mapPath(targetDirection); //Adds direction the robot is leaving in to the top of the path stack.
         } else if (oG->getNeighboursUnexplored() == 0) {
             cout << "All neighbours of current cell explored." << endl;
 
@@ -275,39 +227,30 @@ void Pioneer::map() {
 
         if (!oG->getPathStack().empty()) {
             targetYaw = targetDirection;
+            turnToNewDirection(targetYaw, pp, robot); //Turns robot to face direction of next cell to travel to.    
 
-            if (targetDirection != currentDirection) {
-                turnToNewDirection(targetYaw, &pp, &robot); //Turns robot to face direction of next cell to travel to.    
-            }
-
-            configureCycle(&robot, &pp, &currentYaw, &currentDirection);
-            for (int counter = 0; counter <= 15; counter++) sonarReadings[counter] = sp[counter];
+            configureCycle(robot, pp, &currentYaw, &currentDirection);
+            for (int counter = 0; counter <= 15; counter++) sonarReadings[counter] = (*sp)[counter];
             surveyCycle(sonarReadings, currentDirection, true, oG, false); //Takes the sonar readings and marks cells as appropriate.
             oG->printGrid(); //Prints the occupancy grid.
 
             oG->moveRobotOnGrid(currentDirection);
-            calculateMoveDistance(&robot, &pp, currentDirection, 0.350);
+            calculateMoveDistance(robot, pp, currentDirection, 0.350);
 
-            robot.Read();
-            for (int counter = 0; counter <= 15; counter++) sonarReadings[counter] = sp[counter];
+            robot->Read();
+            for (int counter = 0; counter <= 15; counter++) sonarReadings[counter] = (*sp)[counter];
             surveyCycle(sonarReadings, currentDirection, false, oG, false); //Takes the sonar readings and marks cells as appropriate.
-            calculateMoveDistance(&robot, &pp, currentDirection, 0.350);
+            calculateMoveDistance(robot, pp, currentDirection, 0.350);
         } else {
             cout << "Path stack empty, mapping finished." << endl << endl;
         }
     } while (!oG->getPathStack().empty()); //Keeps the loop going while the path stack is not empty.
 
-    pp.SetMotorEnable(false);
+    pp->SetMotorEnable(false);
 }
 
-bool Pioneer::localise() {
+bool Pioneer::localise(PlayerClient *robot, RangerProxy *sp, Position2dProxy *pp) {
     Occupancy_Grid *temp = new Occupancy_Grid();
-    PlayerClient robot("localhost");
-    //PlayerClient robot("bart.islnet");
-    RangerProxy sp(&robot, 0);
-    //SonarProxy sp(&robot, 0);
-    Position2dProxy pp(&robot, 0);
-
     double currentYaw = 0.000;
     double targetYaw = 0.000;
     double sonarReadings[16];
@@ -316,20 +259,20 @@ bool Pioneer::localise() {
     int attemptsLeft = 3;
 
     temp->printGrid(); /* Print out initial grid. */
-    pp.SetMotorEnable(true); /* Enable motors. */
-    robot.Read(); /* Read from proxies. */
-    currentYaw = rtod(pp.GetYaw()); /* Retrieve current yaw. */
+    pp->SetMotorEnable(true); /* Enable motors. */
+    robot->Read(); /* Read from proxies. */
+    currentYaw = rtod(pp->GetYaw()); /* Retrieve current yaw. */
     cout << "Start Yaw: " << currentYaw << endl;
 
-    turnToNewDirection(0.000, &pp, &robot); //Gets robot to turn to 0 degrees (with error bounds).
+    turnToNewDirection(0.000, pp, robot); //Gets robot to turn to 0 degrees (with error bounds).
 
     cout << "Start Yaw Corrected to: " << currentYaw << endl;
     currentDirection = evaluateDirection(currentYaw);
-    configureCycle(&robot, &pp, &currentYaw, &currentDirection);
+    configureCycle(robot, pp, &currentYaw, &currentDirection);
 
     do {
-        configureCycle(&robot, &pp, &currentYaw, &currentDirection);
-        for (int counter = 0; counter <= 15; counter++) sonarReadings[counter] = sp[counter];
+        configureCycle(robot, pp, &currentYaw, &currentDirection);
+        for (int counter = 0; counter <= 15; counter++) sonarReadings[counter] = (*sp)[counter];
         temp->setIsExploredTrue();
         surveyCycle(sonarReadings, currentDirection, true, temp, false); //Takes the sonar readings and marks cells as appropriate.
         temp->printGrid(); //Prints the occupancy grid.
@@ -344,7 +287,6 @@ bool Pioneer::localise() {
             if (temp->getNeighboursUnexplored() != 0) {
                 cout << "Picking a neighbour to explore..." << endl;
                 targetDirection = temp->chooseNextCell(currentDirection); //Chooses the next unexplored neighbour cell to travel to.
-                temp->mapPath(targetDirection); //Adds direction the robot is leaving in to the top of the path stack.
             } else if (oG->getNeighboursUnexplored() == 0) {
                 cout << "All neighbours of current cell explored." << endl;
 
@@ -359,38 +301,29 @@ bool Pioneer::localise() {
 
             if (!temp->getPathStack().empty()) {
                 targetYaw = targetDirection;
+                turnToNewDirection(targetYaw, pp, robot); //Turns robot to face direction of next cell to travel to.    
 
-                if (targetDirection != currentDirection) {
-                    turnToNewDirection(targetYaw, &pp, &robot); //Turns robot to face direction of next cell to travel to.    
-                }
-
-                configureCycle(&robot, &pp, &currentYaw, &currentDirection);
-                for (int counter = 0; counter <= 15; counter++) sonarReadings[counter] = sp[counter];
+                configureCycle(robot, pp, &currentYaw, &currentDirection);
+                for (int counter = 0; counter <= 15; counter++) sonarReadings[counter] = (*sp)[counter];
                 surveyCycle(sonarReadings, currentDirection, true, temp, false); //Takes the sonar readings and marks cells as appropriate.
                 temp->printGrid(); //Prints the occupancy grid.
 
                 temp->moveRobotOnGrid(currentDirection);
-                calculateMoveDistance(&robot, &pp, currentDirection, 0.350);
+                calculateMoveDistance(robot, pp, currentDirection, 0.350);
 
-                robot.Read();
-                for (int counter = 0; counter <= 15; counter++) sonarReadings[counter] = sp[counter];
+                robot->Read();
+                for (int counter = 0; counter <= 15; counter++) sonarReadings[counter] = (*sp)[counter];
                 surveyCycle(sonarReadings, currentDirection, false, temp, false); //Takes the sonar readings and marks cells as appropriate.
-                calculateMoveDistance(&robot, &pp, currentDirection, 0.350);
+                calculateMoveDistance(robot, pp, currentDirection, 0.350);
             }
         } else return false;
 
     } while (attemptsLeft > 0);
 
-    pp.SetMotorEnable(false);
+    pp->SetMotorEnable(false);
 }
 
-void Pioneer::seek() {
-    PlayerClient robot("localhost");
-    //PlayerClient robot("bart.islnet");
-    RangerProxy sp(&robot, 0);
-    //SonarProxy sp(&robot, 0);
-    Position2dProxy pp(&robot, 0);
-
+void Pioneer::seek(PlayerClient *robot, RangerProxy *sp, Position2dProxy *pp) {
     double currentYaw = 0.000;
     double targetYaw = 0.000;
     double sonarReadings[16];
@@ -399,22 +332,21 @@ void Pioneer::seek() {
 
     oG->seekConfigure();
     oG->printGrid(); /* Print out initial grid. */
-    pp.SetMotorEnable(true); /* Enable motors. */
+    pp->SetMotorEnable(true); /* Enable motors. */
 
     do {
-        configureCycle(&robot, &pp, &currentYaw, &currentDirection);
-        for (int counter = 0; counter <= 15; counter++) sonarReadings[counter] = sp[counter];
+        configureCycle(robot, pp, &currentYaw, &currentDirection);
+        for (int counter = 0; counter <= 15; counter++) sonarReadings[counter] = (*sp)[counter];
         oG->setIsExploredTrue();
         surveyCycle(sonarReadings, currentDirection, true, oG, true); //Takes the sonar readings and marks cells as appropriate.
 
         if (!oG->getAnomalyFound()) {
             oG->printGrid(); //Prints the occupancy grid.
             cout << "Neighbours unexplored: " << oG->getNeighboursUnexplored() << endl;
-            
+
             if (oG->getNeighboursUnexplored() != 0) {
                 cout << "Picking a neighbour to explore..." << endl;
                 targetDirection = oG->chooseNextCell(currentDirection); //Chooses the next unexplored neighbour cell to travel to.
-                oG->mapPath(targetDirection); //Adds direction the robot is leaving in to the top of the path stack.
             } else if (oG->getNeighboursUnexplored() == 0) {
                 cout << "All neighbours of current cell explored." << endl;
 
@@ -429,70 +361,57 @@ void Pioneer::seek() {
 
             if (!oG->getPathStack().empty()) {
                 targetYaw = targetDirection;
+                turnToNewDirection(targetYaw, pp, robot); //Turns robot to face direction of next cell to travel to.    
 
-                if (targetDirection != currentDirection) {
-                    turnToNewDirection(targetYaw, &pp, &robot); //Turns robot to face direction of next cell to travel to.    
-                }
-
-                configureCycle(&robot, &pp, &currentYaw, &currentDirection);
-                for (int counter = 0; counter <= 15; counter++) sonarReadings[counter] = sp[counter];
+                configureCycle(robot, pp, &currentYaw, &currentDirection);
+                for (int counter = 0; counter <= 15; counter++) sonarReadings[counter] = (*sp)[counter];
                 surveyCycle(sonarReadings, currentDirection, true, oG, true); //Takes the sonar readings and marks cells as appropriate.
                 oG->printGrid(); //Prints the occupancy grid.
 
                 oG->moveRobotOnGrid(currentDirection);
-                calculateMoveDistance(&robot, &pp, currentDirection, 0.350);
+                calculateMoveDistance(robot, pp, currentDirection, 0.350);
 
-                robot.Read();
-                for (int counter = 0; counter <= 15; counter++) sonarReadings[counter] = sp[counter];
+                robot->Read();
+                for (int counter = 0; counter <= 15; counter++) sonarReadings[counter] = (*sp)[counter];
                 surveyCycle(sonarReadings, currentDirection, false, oG, true); //Takes the sonar readings and marks cells as appropriate.
-                calculateMoveDistance(&robot, &pp, currentDirection, 0.350);
+                calculateMoveDistance(robot, pp, currentDirection, 0.350);
             } else {
                 cout << "Path stack empty, mapping finished." << endl << endl;
             }
         }
     } while (!oG->getPathStack().empty() && oG->getAnomalyFound() == false); //Keeps the loop going while the path stack is not empty.
 
-    pp.SetMotorEnable(false);
+    pp->SetMotorEnable(false);
     if (oG->getAnomalyFound() == false) cout << "Failed to find any anomalies." << endl;
 }
 
-void Pioneer::hide() {
-    PlayerClient robot("localhost");
-    //PlayerClient robot("bart.islnet");
-    RangerProxy sp(&robot, 0);
-    //SonarProxy sp(&robot, 0);
-    Position2dProxy pp(&robot, 0);
-
+void Pioneer::hide(PlayerClient *robot, RangerProxy *sp, Position2dProxy *pp) {
     double currentYaw = 0.000;
     double targetYaw = 0.000;
-    double sonarReadings[16];
     int currentDirection;
     int targetDirection;
 
     oG->printGrid(); /* Print out initial grid. */
-    pp.SetMotorEnable(true); /* Enable motors. */
-    oG->getHideLocation();    
+    pp->SetMotorEnable(true); /* Enable motors. */
+    oG->getHideLocation();
 
     do {
-        configureCycle(&robot, &pp, &currentYaw, &currentDirection);
+        configureCycle(robot, pp, &currentYaw, &currentDirection);
         targetDirection = oG->getNextCellDriection();
         targetYaw = targetDirection;
-       
-        if (!oG->getHideStack().empty()) {
-            targetYaw = targetDirection;
 
-            if (targetDirection != currentDirection) {
-                turnToNewDirection(targetYaw, &pp, &robot); //Turns robot to face direction of next cell to travel to.    
-            }
+        if (!oG->getPathStack().empty()) {
+            targetYaw = targetDirection;
+            turnToNewDirection(targetYaw, pp, robot); //Turns robot to face direction of next cell to travel to.    
 
             oG->moveRobotOnGrid(currentDirection);
-            calculateMoveDistance(&robot, &pp, currentDirection, 0.700);
+            calculateMoveDistance(robot, pp, currentDirection, 0.700);
         } else {
             cout << "No more cells to move, robot should be in hiding location." << endl << endl;
         }
-    } while (!oG->getHideStack().empty()); //Keeps the loop going while the hide path stack is not empty.
+    } while (!oG->getPathStack().empty()); //Keeps the loop going while the hide path stack is not empty.
 
-    pp.SetMotorEnable(false);
+    pp->SetMotorEnable(false);
 }
 
 Pioneer::Pioneer() {
@@ -504,13 +423,19 @@ Pioneer::~Pioneer() {
 }
 
 int main(int argc, char *argv[]) {
-    Pioneer *pioneer = new Pioneer(); //Creates new pioneer on heap.    
-    pioneer->runProgram();
+    Pioneer *pioneer = new Pioneer(); //Creates new pioneer on heap.  
+    PlayerClient robot("localhost");
+    //PlayerClient robot("bart.islnet");
+    RangerProxy sp(&robot, 0);
+    //SonarProxy sp(&robot, 0);
+    Position2dProxy pp(&robot, 0);
+
+    pioneer->runProgram(&robot, &sp, &pp);
     delete(pioneer); //Ensures the deletion of pioneer.
     return 0;
 }
 
-void Pioneer::runProgram() {
+void Pioneer::runProgram(PlayerClient *robot, RangerProxy *sp, Position2dProxy *pp) {
     int option; //Field to store the user's option input.
     bool mapped = false;
 
@@ -531,22 +456,22 @@ void Pioneer::runProgram() {
 
         switch (option) {
             case 1:
-                map();
+                map(robot, sp, pp);
                 mapped = true;
                 break;
             case 2:
                 if (mapped == true) {
-                    if (localise()) {
+                    if (localise(robot, sp, pp)) {
                         cout << "Localisation successful, starting to seek..." << endl;
-                        seek();
+                        seek(robot, sp, pp);
                     } else cout << "Pioneer failed to localise itself, cannot seek." << endl;
                 } else cout << "Pioneer has not mapped the area yet, cannot localise for seeking." << endl;
                 break;
             case 3:
                 if (mapped == true) {
-                    if (localise()) {
+                    if (localise(robot, sp, pp)) {
                         cout << "Localisation successful, starting to hide..." << endl;
-                        hide();
+                        hide(robot, sp, pp);
                     } else cout << "Pioneer failed to localise itself, cannot hide." << endl;
                 } else cout << "Pioneer has not mapped the area yet, cannot localise for hiding." << endl;
                 break;

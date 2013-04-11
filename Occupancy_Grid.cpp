@@ -154,17 +154,17 @@ void Occupancy_Grid::checkResizeNeeded(int currentDirection) {
  * @param directionToExpand The direction to expand the occupancy grid.
  */
 void Occupancy_Grid::resizeGrid(int directionToExpand) {
-    if (directionToExpand == ZERO) resizeZero();
-    else if (directionToExpand == ONE_EIGHTY) resizeOneEighty();
-    else if (directionToExpand == MINUS_NIGHTY) resizeMinusNighty();
-    else if (directionToExpand == NIGHTY) resizeNighty();
+    if (directionToExpand == TOP) resizeZero();
+    else if (directionToExpand == BOTTOM) resizeOneEighty();
+    else if (directionToExpand == RIGHT) resizeMinusNighty();
+    else if (directionToExpand == LEFT) resizeNighty();
 }
 
 void Occupancy_Grid::moveRobotOnGrid(int direction) {
-    if (direction == ZERO) robotY++;
-    else if (direction == ONE_EIGHTY) robotY--;
-    else if (direction == NIGHTY) robotX--;
-    else if (direction == MINUS_NIGHTY) robotX++;
+    if (direction == TOP) robotY++;
+    else if (direction == BOTTOM) robotY--;
+    else if (direction == LEFT) robotX--;
+    else if (direction == RIGHT) robotX++;
 }
 
 /** Member function to print out the whole occupancy grid with the cells' obstacle values.
@@ -231,6 +231,7 @@ void Occupancy_Grid::setIsExploredTrue() {
 /** Member function to check the neighbours of the cell the robot currently occupies for their exploration state.*/
 void Occupancy_Grid::checkNeighbours(int xPos, int yPos) {
     int neighboursUnexplored = 0;
+    
     if (grid[xPos + 1][yPos].isExplored == false) neighboursUnexplored++;
     if (grid[xPos - 1][yPos].isExplored == false) neighboursUnexplored++;
     if (grid[xPos][yPos + 1].isExplored == false) neighboursUnexplored++;
@@ -260,38 +261,34 @@ int Occupancy_Grid::getNeighboursUnexplored() {
 void Occupancy_Grid::calculateCellToChange(int sonarFacing, bool obstaclePresent, bool seekMode) {
     if (obstaclePresent == true) {
         if (seekMode == false) {
-            if (sonarFacing == ZERO) incrementCell(robotX, robotY + 1);
-            if (sonarFacing == ONE_EIGHTY) incrementCell(robotX, robotY - 1);
-            if (sonarFacing == NIGHTY) incrementCell(robotX - 1, robotY);
-            if (sonarFacing == MINUS_NIGHTY) incrementCell(robotX + 1, robotY);
-            if (sonarFacing == FOURTY_FIVE) incrementCell(robotX - 1, robotY + 1);
-            if (sonarFacing == ONE_THIRTY_FIVE) incrementCell(robotX - 1, robotY - 1);
-            if (sonarFacing == MINUS_FOURTY_FIVE) incrementCell(robotX + 1, robotY + 1);
-            if (sonarFacing == MINUS_ONE_THIRTY_FIVE) incrementCell(robotX + 1, robotY - 1);
+            if (sonarFacing == TOP) incrementCell(robotX, robotY + 1);
+            if (sonarFacing == BOTTOM) incrementCell(robotX, robotY - 1);
+            if (sonarFacing == LEFT) incrementCell(robotX - 1, robotY);
+            if (sonarFacing == RIGHT) incrementCell(robotX + 1, robotY);
+            if (sonarFacing == TOP_LEFT) incrementCell(robotX - 1, robotY + 1);
+            if (sonarFacing == BOTTOM_LEFT) incrementCell(robotX - 1, robotY - 1);
+            if (sonarFacing == TOP_RIGHT) incrementCell(robotX + 1, robotY + 1);
+            if (sonarFacing == BOTTOM_RIGHT) incrementCell(robotX + 1, robotY - 1);
         } else {
-            if (sonarFacing == ZERO) detectAnomaly(robotX, robotY + 1);
-            if (sonarFacing == ONE_EIGHTY) detectAnomaly(robotX, robotY - 1);
-            if (sonarFacing == NIGHTY) detectAnomaly(robotX - 1, robotY);
-            if (sonarFacing == MINUS_NIGHTY) detectAnomaly(robotX + 1, robotY);
-            if (sonarFacing == FOURTY_FIVE) detectAnomaly(robotX - 1, robotY + 1);
-            if (sonarFacing == ONE_THIRTY_FIVE) detectAnomaly(robotX - 1, robotY - 1);
-            if (sonarFacing == MINUS_FOURTY_FIVE) detectAnomaly(robotX + 1, robotY + 1);
-            if (sonarFacing == MINUS_ONE_THIRTY_FIVE) detectAnomaly(robotX + 1, robotY - 1);
+            if (sonarFacing == TOP) detectAnomaly(robotX, robotY + 1);
+            if (sonarFacing == BOTTOM) detectAnomaly(robotX, robotY - 1);
+            if (sonarFacing == LEFT) detectAnomaly(robotX - 1, robotY);
+            if (sonarFacing == RIGHT) detectAnomaly(robotX + 1, robotY);
+            if (sonarFacing == TOP_LEFT) detectAnomaly(robotX - 1, robotY + 1);
+            if (sonarFacing == BOTTOM_LEFT) detectAnomaly(robotX - 1, robotY - 1);
+            if (sonarFacing == TOP_RIGHT) detectAnomaly(robotX + 1, robotY + 1);
+            if (sonarFacing == BOTTOM_RIGHT) detectAnomaly(robotX + 1, robotY - 1);
         }
     } else {
-        if (sonarFacing == ZERO) decrementCell(robotX, robotY + 1);
-        if (sonarFacing == ONE_EIGHTY) decrementCell(robotX, robotY - 1);
-        if (sonarFacing == NIGHTY) decrementCell(robotX - 1, robotY);
-        if (sonarFacing == MINUS_NIGHTY) decrementCell(robotX + 1, robotY);
-        if (sonarFacing == FOURTY_FIVE) decrementCell(robotX - 1, robotY + 1);
-        if (sonarFacing == ONE_THIRTY_FIVE) decrementCell(robotX - 1, robotY - 1);
-        if (sonarFacing == MINUS_FOURTY_FIVE) decrementCell(robotX + 1, robotY + 1);
-        if (sonarFacing == MINUS_ONE_THIRTY_FIVE) decrementCell(robotX + 1, robotY - 1);
+        if (sonarFacing == TOP) decrementCell(robotX, robotY + 1);
+        if (sonarFacing == BOTTOM) decrementCell(robotX, robotY - 1);
+        if (sonarFacing == LEFT) decrementCell(robotX - 1, robotY);
+        if (sonarFacing == RIGHT) decrementCell(robotX + 1, robotY);
+        if (sonarFacing == TOP_LEFT) decrementCell(robotX - 1, robotY + 1);
+        if (sonarFacing == BOTTOM_LEFT) decrementCell(robotX - 1, robotY - 1);
+        if (sonarFacing == TOP_RIGHT) decrementCell(robotX + 1, robotY + 1);
+        if (sonarFacing == BOTTOM_RIGHT) decrementCell(robotX + 1, robotY - 1);
     }
-}
-
-void Occupancy_Grid::mapPath(int direction) {
-    addCellToPath(direction, robotX, robotY);
 }
 
 /** Member function to add the cell the robot currently occupies to the pathStack. */
@@ -299,18 +296,12 @@ void Occupancy_Grid::addCellToPath(int direction, int xPos, int yPos) {
     pathStack.resize(++pathLength); //Add pointer of current cell to path stack.
     pathStack.back().xPos = xPos;
     pathStack.back().yPos = yPos;
-    pathStack.back().directionLeftFrom = direction;
+    pathStack.back().directionCameFrom = direction;
 }
 
-/** Member function to set the direction that*/
+/** Member function to get the direction of the next cell in the path. */
 int Occupancy_Grid::getDirectionOfLastCell() {
-    int direction;
-
-    if (pathStack.back().directionLeftFrom == ZERO) direction = ONE_EIGHTY;
-    else if (pathStack.back().directionLeftFrom == ONE_EIGHTY) direction = ZERO;
-    else if (pathStack.back().directionLeftFrom == NIGHTY) direction = MINUS_NIGHTY;
-    else if (pathStack.back().directionLeftFrom == MINUS_NIGHTY) direction = NIGHTY;
-
+    int direction = pathStack.back().directionCameFrom;
     pathStack.pop_back();
     pathLength--;
     return direction;
@@ -321,37 +312,56 @@ int Occupancy_Grid::getDirectionOfLastCell() {
  */
 int Occupancy_Grid::chooseNextCell(int currentDirection) {
     int randomDirection;
+    int cameDirection;
     int gridX;
     int gridY;
 
-    if (currentDirection == ZERO && grid[robotX][robotY + 1].isExplored == false) return ZERO;
-    else if (currentDirection == ONE_EIGHTY && grid[robotX][robotY - 1].isExplored == false) return ONE_EIGHTY;
-    else if (currentDirection == NIGHTY && grid[robotX - 1][robotY].isExplored == false) return NIGHTY;
-    else if (currentDirection == MINUS_NIGHTY && grid[robotX + 1][robotY].isExplored == false) return MINUS_NIGHTY;
+    if (currentDirection == TOP && grid[robotX][robotY + 1].isExplored == false) {
+        randomDirection = TOP;
+        gridX = robotX;
+        gridY = robotY + 1;
+    } else if (currentDirection == BOTTOM && grid[robotX][robotY - 1].isExplored == false) {
+        randomDirection = BOTTOM;
+        gridX = robotX;
+        gridY = robotY - 1;
+    } else if (currentDirection == LEFT && grid[robotX - 1][robotY].isExplored == false) {
+        randomDirection = LEFT;
+        gridX = robotX - 1;
+        gridY = robotY;
+    } else if (currentDirection == RIGHT && grid[robotX + 1][robotY].isExplored == false) {
+        randomDirection = RIGHT;
+        gridX = robotX + 1;
+        gridY = robotY;
+    } else {
+        do {
+            srand(time(NULL));
+            randomDirection = (rand() % 4);
 
-    do {
-        srand(time(NULL));
-        randomDirection = (rand() % 4);
+            if (randomDirection == 0) {
+                randomDirection = TOP;
+                gridX = robotX;
+                gridY = robotY + 1;
+            } else if (randomDirection == 1) {
+                randomDirection = RIGHT;
+                gridX = robotX + 1;
+                gridY = robotY;
+            } else if (randomDirection == 2) {
+                randomDirection = BOTTOM;
+                gridX = robotX;
+                gridY = robotY - 1;
+            } else if (randomDirection == 3) {
+                randomDirection = LEFT;
+                gridX = robotX - 1;
+                gridY = robotY;
+            }
+        } while (grid[gridX][gridY].isExplored == true);
+    }
 
-        if (randomDirection == 0) {
-            randomDirection = ZERO;
-            gridX = robotX;
-            gridY = robotY + 1;
-        } else if (randomDirection == 1) {
-            randomDirection = MINUS_NIGHTY;
-            gridX = robotX + 1;
-            gridY = robotY;
-        } else if (randomDirection == 2) {
-            randomDirection = ONE_EIGHTY;
-            gridX = robotX;
-            gridY = robotY - 1;
-        } else if (randomDirection == 3) {
-            randomDirection = NIGHTY;
-            gridX = robotX - 1;
-            gridY = robotY;
-        }
-    } while (grid[gridX][gridY].isExplored == true);
-
+    if (randomDirection == TOP) cameDirection = BOTTOM;
+    else if (randomDirection == RIGHT) cameDirection = LEFT;
+    else if (randomDirection == BOTTOM) cameDirection = TOP;
+    else cameDirection = RIGHT;
+    addCellToPath(cameDirection, gridX, gridY); //Adds direction the robot is leaving in to the top of the path stack.
     return randomDirection;
 }
 
@@ -370,7 +380,7 @@ bool Occupancy_Grid::checkFinished() {
     return true;
 }
 
-int Occupancy_Grid::attemptLocalisation(Occupancy_Grid *temp) {
+int Occupancy_Grid::attemptLocalisation(Occupancy_Grid * temp) {
     int possibleAreas = 0;
 
     for (int xCounter = 0; xCounter < (xLength - temp->getXLength()); xCounter++) {
@@ -489,7 +499,7 @@ int Occupancy_Grid::getNumberOfWalls(int xPos, int yPos) {
 
 bool Occupancy_Grid::plotPath(int currentX, int currentY, int targetX, int targetY, int cost) {
     int distanceRemaining = (targetX - currentX) + (targetY - currentY);
-    addCellToHidePath(frontier.back().directionCameFrom, frontier.back().xPos, frontier.back().yPos);
+    addCellToPath(frontier.back().directionCameFrom, frontier.back().xPos, frontier.back().yPos);
 
     if (currentX == targetX && currentY == targetY) {
         neighbours.erase(neighbours.begin(), neighbours.end());
@@ -504,13 +514,13 @@ bool Occupancy_Grid::plotPath(int currentX, int currentY, int targetX, int targe
             if (plotPath(frontier.back().xPos, frontier.back().yPos, targetX, targetY, cost + 1) == true) {
                 return true;
             } else {
-                hideStack.pop_back();
+                pathStack.pop_back();
                 pathLength--;
             }
         }
     }
 
-    hideStack.pop_back();
+    pathStack.pop_back();
     pathLength--;
     neighbours.erase(neighbours.begin(), neighbours.end());
     neighboursLength = 0;
@@ -520,10 +530,10 @@ bool Occupancy_Grid::plotPath(int currentX, int currentY, int targetX, int targe
 }
 
 void Occupancy_Grid::getExplorableNeighbours(int xPos, int yPos, int cost, int distanceRemaining) {
-    if (grid[xPos + 1][yPos].obstacleValue == 0) addExplorableNeighbour(xPos + 1, yPos, cost, distanceRemaining, NIGHTY);
-    if (grid[xPos - 1][yPos].obstacleValue == 0) addExplorableNeighbour(xPos - 1, yPos, cost, distanceRemaining, MINUS_NIGHTY);
-    if (grid[xPos][yPos + 1].obstacleValue == 0) addExplorableNeighbour(xPos, yPos + 1, cost, distanceRemaining, ONE_EIGHTY);
-    if (grid[xPos][yPos - 1].obstacleValue == 0) addExplorableNeighbour(xPos, yPos - 1, cost, distanceRemaining, ZERO);
+    if (grid[xPos + 1][yPos].obstacleValue == 0) addExplorableNeighbour(xPos + 1, yPos, cost, distanceRemaining, LEFT);
+    if (grid[xPos - 1][yPos].obstacleValue == 0) addExplorableNeighbour(xPos - 1, yPos, cost, distanceRemaining, RIGHT);
+    if (grid[xPos][yPos + 1].obstacleValue == 0) addExplorableNeighbour(xPos, yPos + 1, cost, distanceRemaining, BOTTOM);
+    if (grid[xPos][yPos - 1].obstacleValue == 0) addExplorableNeighbour(xPos, yPos - 1, cost, distanceRemaining, TOP);
 }
 
 void Occupancy_Grid::addExplorableNeighbour(int xPos, int yPos, int cost, int distanceRemaining, int direction) {
@@ -561,19 +571,8 @@ void Occupancy_Grid::addNodesToFrontier() {
     }
 }
 
-void Occupancy_Grid::addCellToHidePath(int direction, int xPos, int yPos) {
-    hideStack.resize(++pathLength);
-    hideStack.back().xPos = xPos;
-    hideStack.back().yPos = yPos;
-    hideStack.back().directionCameFrom = direction;
-}
-
 int Occupancy_Grid::getNextCellDriection() {
-    int direction = hideStack.front().directionCameFrom;
-    hideStack.erase(hideStack.begin());
+    int direction = pathStack.front().directionCameFrom;
+    pathStack.erase(pathStack.begin());
     return direction;
-}
-
-vector<Node> Occupancy_Grid::getHideStack() {
-    return hideStack;
 }
