@@ -370,76 +370,6 @@ bool Occupancy_Grid::checkFinished() {
     return true;
 }
 
-bool Occupancy_Grid::plotPath(int currentX, int currentY, int targetX, int targetY, int cost) {
-    int distanceRemaining = (targetX - currentX) + (targetY - currentY);
-    addCellToPath(frontier.back().directionLeftFrom, frontier.back().xPos, frontier.back().yPos);
-
-    if (currentX == targetX && currentY == targetY) {
-        neighbours.erase(neighbours.begin(), neighbours.end());
-        frontier.erase(frontier.begin(), frontier.end());
-        return true;
-    } else {
-        frontier.pop_back();
-        getExplorableNeighbours(currentX, currentY, cost, distanceRemaining);
-
-        for (int counter = neighboursLength - 1; counter >= 0; counter--) {
-            addNodesToFrontier();
-            if (plotPath(frontier.back().xPos, frontier.back().yPos, targetX, targetY, cost + 1) == true) {
-                return true;
-            } else {
-                pathStack.pop_back();
-                pathLength--;
-            }
-        }
-    }
-
-    pathStack.pop_back();
-    pathLength--;
-    return false;
-}
-
-void Occupancy_Grid::getExplorableNeighbours(int xPos, int yPos, int cost, int distanceRemaining) {
-    if (grid[xPos + 1][yPos].obstacleValue == 0) addExplorableNeighbour(xPos + 1, yPos, cost, distanceRemaining, MINUS_NIGHTY);
-    if (grid[xPos - 1][yPos].obstacleValue == 0) addExplorableNeighbour(xPos - 1, yPos, cost, distanceRemaining, NIGHTY);
-    if (grid[xPos][yPos + 1].obstacleValue == 0) addExplorableNeighbour(xPos, yPos + 1, cost, distanceRemaining, ZERO);
-    if (grid[xPos][yPos - 1].obstacleValue == 0) addExplorableNeighbour(xPos, yPos - 1, cost, distanceRemaining, ONE_EIGHTY);
-}
-
-void Occupancy_Grid::addExplorableNeighbour(int xPos, int yPos, int cost, int distanceRemaining, int direction) {
-
-    int pathValue = (++cost) + distanceRemaining;
-
-    if (neighboursLength > 1) {
-        for (int counter = neighboursLength - 1; counter >= 0; counter--) {
-            if (pathValue < neighbours.at(counter).pathValue) {
-                neighbours.resize(++neighboursLength);
-                neighbours.back().xPos = xPos;
-                neighbours.back().yPos = yPos;
-                neighbours.back().pathValue = pathValue;
-                neighbours.back().directionLeftFrom = direction;
-            } else {
-                neighbours.insert(neighbours.begin() + counter, Node());
-                neighbours.at(counter).xPos = xPos;
-                neighbours.at(counter).yPos = yPos;
-                neighbours.at(counter).pathValue = pathValue;
-                neighbours.at(counter).directionLeftFrom = direction;
-            }
-        }
-    }
-}
-
-void Occupancy_Grid::addNodesToFrontier() {
-    for (int counter = neighboursLength - 1; counter >= 0; counter--) {
-        frontier.resize(++frontierLength);
-        frontier.back().xPos = neighbours.back().xPos;
-        frontier.back().yPos = neighbours.back().yPos;
-        frontier.back().pathValue = neighbours.back().pathValue;
-        frontier.back().directionLeftFrom = neighbours.back().directionLeftFrom;
-        neighbours.pop_back();
-        neighboursLength--;
-    }
-}
-
 int Occupancy_Grid::attemptLocalisation(Occupancy_Grid *temp) {
     int possibleAreas = 0;
 
@@ -512,4 +442,138 @@ bool Occupancy_Grid::detectAnomaly(int xPos, int yPos) {
         anomalyFound = true;
         return true;
     } else return false;
+}
+
+void Occupancy_Grid::getHideLocation() {
+    if (!findLocation(3)) {
+        cout << "Could not find a location with 3 walls surrounding. Trying 2 wall locations..." << endl;
+
+        if (!findLocation(2)) {
+            cout << "Could not find a location with 2 walls surrounding. Trying 1 wall locations..." << endl;
+            findLocation(1);
+        }
+    }
+}
+
+bool Occupancy_Grid::findLocation(int numberOfWalls) {
+    for (int xCounter = 0; xCounter < xLength; xCounter++) {
+        for (int yCounter = 0; yCounter < yLength; yCounter++) {
+            if (grid[xCounter][yCounter].obstacleValue == 0 && grid[xCounter][yCounter].isExplored == true) {
+                if (getNumberOfWalls(xCounter, yCounter) == numberOfWalls) {
+                    frontier.resize(++frontierLength);
+                    frontier.back().xPos = robotX;
+                    frontier.back().yPos = robotY;
+                    frontier.back().pathValue = 0;
+                    if (plotPath(robotX, robotY, xCounter, yCounter, 0)) {
+                        cout << "Found a location surrounded by " << numberOfWalls << " walls and plotted path." << endl;
+                        return true;
+                    }
+                }
+            }
+        }
+    }
+
+    return false;
+}
+
+int Occupancy_Grid::getNumberOfWalls(int xPos, int yPos) {
+    int numberOfWalls = 0;
+
+    if (grid[xPos + 1][yPos].obstacleValue > 0) numberOfWalls++;
+    if (grid[xPos - 1][yPos].obstacleValue > 0) numberOfWalls++;
+    if (grid[xPos][yPos + 1].obstacleValue > 0) numberOfWalls++;
+    if (grid[xPos][yPos - 1].obstacleValue > 0) numberOfWalls++;
+
+    return numberOfWalls;
+}
+
+bool Occupancy_Grid::plotPath(int currentX, int currentY, int targetX, int targetY, int cost) {
+    int distanceRemaining = (targetX - currentX) + (targetY - currentY);
+    addCellToHidePath(frontier.back().directionCameFrom, frontier.back().xPos, frontier.back().yPos);
+
+    if (currentX == targetX && currentY == targetY) {
+        neighbours.erase(neighbours.begin(), neighbours.end());
+        frontier.erase(frontier.begin(), frontier.end());
+        return true;
+    } else {
+        frontier.pop_back();
+        getExplorableNeighbours(currentX, currentY, cost, distanceRemaining);
+
+        for (int counter = neighboursLength - 1; counter >= 0; counter--) {
+            addNodesToFrontier();
+            if (plotPath(frontier.back().xPos, frontier.back().yPos, targetX, targetY, cost + 1) == true) {
+                return true;
+            } else {
+                hideStack.pop_back();
+                pathLength--;
+            }
+        }
+    }
+
+    hideStack.pop_back();
+    pathLength--;
+    neighbours.erase(neighbours.begin(), neighbours.end());
+    neighboursLength = 0;
+    frontier.erase(frontier.begin(), frontier.end());
+    frontierLength = 0;
+    return false;
+}
+
+void Occupancy_Grid::getExplorableNeighbours(int xPos, int yPos, int cost, int distanceRemaining) {
+    if (grid[xPos + 1][yPos].obstacleValue == 0) addExplorableNeighbour(xPos + 1, yPos, cost, distanceRemaining, NIGHTY);
+    if (grid[xPos - 1][yPos].obstacleValue == 0) addExplorableNeighbour(xPos - 1, yPos, cost, distanceRemaining, MINUS_NIGHTY);
+    if (grid[xPos][yPos + 1].obstacleValue == 0) addExplorableNeighbour(xPos, yPos + 1, cost, distanceRemaining, ONE_EIGHTY);
+    if (grid[xPos][yPos - 1].obstacleValue == 0) addExplorableNeighbour(xPos, yPos - 1, cost, distanceRemaining, ZERO);
+}
+
+void Occupancy_Grid::addExplorableNeighbour(int xPos, int yPos, int cost, int distanceRemaining, int direction) {
+
+    int pathValue = (++cost) + distanceRemaining;
+
+    if (neighboursLength > 1) {
+        for (int counter = neighboursLength - 1; counter >= 0; counter--) {
+            if (pathValue < neighbours.at(counter).pathValue) {
+                neighbours.resize(++neighboursLength);
+                neighbours.back().xPos = xPos;
+                neighbours.back().yPos = yPos;
+                neighbours.back().pathValue = pathValue;
+                neighbours.back().directionCameFrom = direction;
+            } else {
+                neighbours.insert(neighbours.begin() + counter, Node());
+                neighbours.at(counter).xPos = xPos;
+                neighbours.at(counter).yPos = yPos;
+                neighbours.at(counter).pathValue = pathValue;
+                neighbours.at(counter).directionCameFrom = direction;
+            }
+        }
+    }
+}
+
+void Occupancy_Grid::addNodesToFrontier() {
+    for (int counter = neighboursLength - 1; counter >= 0; counter--) {
+        frontier.resize(++frontierLength);
+        frontier.back().xPos = neighbours.back().xPos;
+        frontier.back().yPos = neighbours.back().yPos;
+        frontier.back().pathValue = neighbours.back().pathValue;
+        frontier.back().directionCameFrom = neighbours.back().directionCameFrom;
+        neighbours.pop_back();
+        neighboursLength--;
+    }
+}
+
+void Occupancy_Grid::addCellToHidePath(int direction, int xPos, int yPos) {
+    hideStack.resize(++pathLength);
+    hideStack.back().xPos = xPos;
+    hideStack.back().yPos = yPos;
+    hideStack.back().directionCameFrom = direction;
+}
+
+int Occupancy_Grid::getNextCellDriection() {
+    int direction = hideStack.front().directionCameFrom;
+    hideStack.erase(hideStack.begin());
+    return direction;
+}
+
+vector<Node> Occupancy_Grid::getHideStack() {
+    return hideStack;
 }

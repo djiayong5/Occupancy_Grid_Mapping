@@ -47,7 +47,7 @@ struct Node {
     int xPos;
     int yPos;
     int pathValue;
-    int directionLeftFrom;
+    int directionCameFrom;
 };
 
 /* Occupancy_Grid class definition */
@@ -57,6 +57,7 @@ private:
     vector<vector<Cell> > grid;
     vector<Node> frontier;
     vector<Node> neighbours;
+    vector<Node> hideStack;
     int yLength;
     int xLength;
     int robotY;
@@ -82,12 +83,15 @@ private:
     void checkNeighbours(int xPos, int yPos);
     void addCellToPath(int direction, int xPos, int yPos);
     void checkPathExploration();
-    int calculateCost(int currentX, int currentY, int newX, int newY, int cost);
-    void getExplorableNeighbours(int xPos, int yPos, int cost, int distanceRemaining);
-    void addExplorableNeighbour(int xPos, int yPos, int cost, int distanceRemaining, int direction);
     void addNodesToFrontier();
     bool compareCells(Cell cell1, Cell cell2);
     bool compareArea(Occupancy_Grid *temp, int xCounter, int yCounter);
+    bool findLocation(int numberOfWalls);
+    int getNumberOfWalls(int xPos, int yPos);
+    int calculateCost(int currentX, int currentY, int newX, int newY, int cost);
+    void getExplorableNeighbours(int xPos, int yPos, int cost, int distanceRemaining);
+    void addExplorableNeighbour(int xPos, int yPos, int cost, int distanceRemaining, int direction);
+    void addCellToHidePath(int direction, int xPos, int yPos);
 
 public:
     /* Member Function Prototypes: */
@@ -111,10 +115,13 @@ public:
     void checkCellNeighbours();
     int chooseNextCell(int currentDirection);
     bool checkFinished();
-    bool plotPath(int currentX, int currentY, int targetX, int targetY, int cost);
     int attemptLocalisation(Occupancy_Grid *temp);
     void switchGrid();
     void seekConfigure();
     bool detectAnomaly(int xPos, int yPos);
+    void getHideLocation();
+    bool plotPath(int currentX, int currentY, int targetX, int targetY, int cost);
+    int getNextCellDriection();
+    vector<Node> getHideStack();   
 };
 #endif

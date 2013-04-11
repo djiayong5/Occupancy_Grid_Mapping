@@ -471,63 +471,26 @@ void Pioneer::hide() {
 
     oG->printGrid(); /* Print out initial grid. */
     pp.SetMotorEnable(true); /* Enable motors. */
-    robot.Read(); /* Read from proxies. */
-    currentYaw = rtod(pp.GetYaw()); /* Retrieve current yaw. */
-    cout << "Start Yaw: " << currentYaw << endl;
-
-    turnToNewDirection(0.000, &pp, &robot); //Gets robot to turn to 0 degrees (with error bounds).
-
-    cout << "Start Yaw Corrected to: " << currentYaw << endl;
-    currentDirection = evaluateDirection(currentYaw);
-    configureCycle(&robot, &pp, &currentYaw, &currentDirection);
+    oG->getHideLocation();    
 
     do {
         configureCycle(&robot, &pp, &currentYaw, &currentDirection);
-        for (int counter = 0; counter <= 15; counter++) sonarReadings[counter] = sp[counter];
-        oG->setIsExploredTrue();
-        surveyCycle(sonarReadings, currentDirection, true, oG, false); //Takes the sonar readings and marks cells as appropriate.
-        oG->printGrid(); //Prints the occupancy grid.
-        cout << "Neighbours unexplored: " << oG->getNeighboursUnexplored() << endl;
-
-        if (oG->getNeighboursUnexplored() != 0) {
-            cout << "Picking a neighbour to explore..." << endl;
-            targetDirection = oG->chooseNextCell(currentDirection); //Chooses the next unexplored neighbour cell to travel to.
-            oG->mapPath(targetDirection); //Adds direction the robot is leaving in to the top of the path stack.
-        } else if (oG->getNeighboursUnexplored() == 0) {
-            cout << "All neighbours of current cell explored." << endl;
-
-            if (oG->checkFinished()) {
-                cout << "Finished Mapping.";
-            } else if (!oG->getPathStack().empty()) {
-                cout << "Path not empty." << endl;
-                targetDirection = oG->getDirectionOfLastCell(); //Gets direction of cell on top of the path stack.
-                cout << "New Direction: " << targetDirection << endl;
-            }
-        }
-
-        if (!oG->getPathStack().empty()) {
+        targetDirection = oG->getNextCellDriection();
+        targetYaw = targetDirection;
+       
+        if (!oG->getHideStack().empty()) {
             targetYaw = targetDirection;
 
             if (targetDirection != currentDirection) {
                 turnToNewDirection(targetYaw, &pp, &robot); //Turns robot to face direction of next cell to travel to.    
             }
 
-            configureCycle(&robot, &pp, &currentYaw, &currentDirection);
-            for (int counter = 0; counter <= 15; counter++) sonarReadings[counter] = sp[counter];
-            surveyCycle(sonarReadings, currentDirection, true, oG, false); //Takes the sonar readings and marks cells as appropriate.
-            oG->printGrid(); //Prints the occupancy grid.
-
             oG->moveRobotOnGrid(currentDirection);
-            calculateMoveDistance(&robot, &pp, currentDirection, 0.350);
-
-            robot.Read();
-            for (int counter = 0; counter <= 15; counter++) sonarReadings[counter] = sp[counter];
-            surveyCycle(sonarReadings, currentDirection, false, oG, false); //Takes the sonar readings and marks cells as appropriate.
-            calculateMoveDistance(&robot, &pp, currentDirection, 0.350);
+            calculateMoveDistance(&robot, &pp, currentDirection, 0.700);
         } else {
-            cout << "Path stack empty, mapping finished." << endl << endl;
+            cout << "No more cells to move, robot should be in hiding location." << endl << endl;
         }
-    } while (!oG->getPathStack().empty()); //Keeps the loop going while the path stack is not empty.
+    } while (!oG->getHideStack().empty()); //Keeps the loop going while the hide path stack is not empty.
 
     pp.SetMotorEnable(false);
 }
