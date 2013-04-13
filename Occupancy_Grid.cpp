@@ -3,7 +3,7 @@
  * File Name: Occupancy_Grid.cpp
  * Description: Stores member function declarations for Occupancy_Grid class.
  * First Created: 25/02/2013
- * Last Modified: 07/04/2013
+ * Last Modified: 12/04/2013
  */
 
 #include <cstdio>
@@ -231,7 +231,7 @@ void Occupancy_Grid::setIsExploredTrue() {
 /** Member function to check the neighbours of the cell the robot currently occupies for their exploration state.*/
 void Occupancy_Grid::checkNeighbours(int xPos, int yPos) {
     int neighboursUnexplored = 0;
-    
+
     if (grid[xPos + 1][yPos].isExplored == false) neighboursUnexplored++;
     if (grid[xPos - 1][yPos].isExplored == false) neighboursUnexplored++;
     if (grid[xPos][yPos + 1].isExplored == false) neighboursUnexplored++;
@@ -280,14 +280,16 @@ void Occupancy_Grid::calculateCellToChange(int sonarFacing, bool obstaclePresent
             if (sonarFacing == BOTTOM_RIGHT) detectAnomaly(robotX + 1, robotY - 1);
         }
     } else {
-        if (sonarFacing == TOP) decrementCell(robotX, robotY + 1);
-        if (sonarFacing == BOTTOM) decrementCell(robotX, robotY - 1);
-        if (sonarFacing == LEFT) decrementCell(robotX - 1, robotY);
-        if (sonarFacing == RIGHT) decrementCell(robotX + 1, robotY);
-        if (sonarFacing == TOP_LEFT) decrementCell(robotX - 1, robotY + 1);
-        if (sonarFacing == BOTTOM_LEFT) decrementCell(robotX - 1, robotY - 1);
-        if (sonarFacing == TOP_RIGHT) decrementCell(robotX + 1, robotY + 1);
-        if (sonarFacing == BOTTOM_RIGHT) decrementCell(robotX + 1, robotY - 1);
+        if (seekMode == false) {
+            if (sonarFacing == TOP) decrementCell(robotX, robotY + 1);
+            if (sonarFacing == BOTTOM) decrementCell(robotX, robotY - 1);
+            if (sonarFacing == LEFT) decrementCell(robotX - 1, robotY);
+            if (sonarFacing == RIGHT) decrementCell(robotX + 1, robotY);
+            if (sonarFacing == TOP_LEFT) decrementCell(robotX - 1, robotY + 1);
+            if (sonarFacing == BOTTOM_LEFT) decrementCell(robotX - 1, robotY - 1);
+            if (sonarFacing == TOP_RIGHT) decrementCell(robotX + 1, robotY + 1);
+            if (sonarFacing == BOTTOM_RIGHT) decrementCell(robotX + 1, robotY - 1);
+        }
     }
 }
 
@@ -501,16 +503,16 @@ bool Occupancy_Grid::plotPath(int currentX, int currentY, int targetX, int targe
     int distanceRemaining = (targetX - currentX) + (targetY - currentY);
     addCellToPath(frontier.back().directionCameFrom, frontier.back().xPos, frontier.back().yPos);
 
-    if (currentX == targetX && currentY == targetY) {
+    if (currentX == targetX && currentY == targetY) { //Checks if at target cell.
         neighbours.erase(neighbours.begin(), neighbours.end());
         frontier.erase(frontier.begin(), frontier.end());
         return true;
     } else {
         frontier.pop_back();
-        getExplorableNeighbours(currentX, currentY, cost, distanceRemaining);
+        getExplorableNeighbours(currentX, currentY, cost, distanceRemaining); //Gets list of neighbours that the robot can actually move into.
 
         for (int counter = neighboursLength - 1; counter >= 0; counter--) {
-            addNodesToFrontier();
+            addNodesToFrontier(); 
             if (plotPath(frontier.back().xPos, frontier.back().yPos, targetX, targetY, cost + 1) == true) {
                 return true;
             } else {
@@ -519,7 +521,6 @@ bool Occupancy_Grid::plotPath(int currentX, int currentY, int targetX, int targe
             }
         }
     }
-
     pathStack.pop_back();
     pathLength--;
     neighbours.erase(neighbours.begin(), neighbours.end());
@@ -537,7 +538,6 @@ void Occupancy_Grid::getExplorableNeighbours(int xPos, int yPos, int cost, int d
 }
 
 void Occupancy_Grid::addExplorableNeighbour(int xPos, int yPos, int cost, int distanceRemaining, int direction) {
-
     int pathValue = (++cost) + distanceRemaining;
 
     if (neighboursLength > 1) {

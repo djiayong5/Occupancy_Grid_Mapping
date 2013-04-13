@@ -3,7 +3,7 @@
  * File Name: Pioneer.cpp
  * Description: Stores function declarations for Pioneer to use.
  * First Created: 25/02/2013
- * Last Modified: 06/04/2013
+ * Last Modified: 13/04/2013
  */
 
 #include <iostream>
@@ -256,7 +256,6 @@ bool Pioneer::localise(PlayerClient *robot, RangerProxy *sp, Position2dProxy *pp
     double sonarReadings[16];
     int currentDirection;
     int targetDirection;
-    int attemptsLeft = 3;
 
     temp->printGrid(); /* Print out initial grid. */
     pp->SetMotorEnable(true); /* Enable motors. */
@@ -277,11 +276,11 @@ bool Pioneer::localise(PlayerClient *robot, RangerProxy *sp, Position2dProxy *pp
         surveyCycle(sonarReadings, currentDirection, true, temp, false); //Takes the sonar readings and marks cells as appropriate.
         temp->printGrid(); //Prints the occupancy grid.
 
-        if (oG->attemptLocalisation(temp) == 3) {
+        if (oG->attemptLocalisation(temp) == 3) { //Localised successfully.
             oG->switchGrid();
+            pp->SetMotorEnable(false);
             return true;
-        } else if (oG->attemptLocalisation(temp) == 2 && attemptsLeft > 0) {
-            attemptsLeft--;
+        } else if (oG->attemptLocalisation(temp) == 2) { //Multiple possible locations.
             cout << "Neighbours unexplored: " << temp->getNeighboursUnexplored() << endl;
 
             if (temp->getNeighboursUnexplored() != 0) {
@@ -291,6 +290,7 @@ bool Pioneer::localise(PlayerClient *robot, RangerProxy *sp, Position2dProxy *pp
                 cout << "All neighbours of current cell explored." << endl;
 
                 if (temp->checkFinished()) {
+                    pp->SetMotorEnable(false);
                     return false;
                 } else if (!temp->getPathStack().empty()) {
                     cout << "Path not empty." << endl;
@@ -316,11 +316,12 @@ bool Pioneer::localise(PlayerClient *robot, RangerProxy *sp, Position2dProxy *pp
                 surveyCycle(sonarReadings, currentDirection, false, temp, false); //Takes the sonar readings and marks cells as appropriate.
                 calculateMoveDistance(robot, pp, currentDirection, 0.350);
             }
-        } else return false;
+        } else {
+            pp->SetMotorEnable(false);
+            return false; //Failed to localise.
+        }
 
-    } while (attemptsLeft > 0);
-
-    pp->SetMotorEnable(false);
+    } while (true);
 }
 
 void Pioneer::seek(PlayerClient *robot, RangerProxy *sp, Position2dProxy *pp) {
