@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.4-1.40.13 (TeX Live 2012/Debian) (format=pdflatex 2013.2.18)  13 APR 2013 15:53
+This is pdfTeX, Version 3.1415926-2.4-1.40.13 (TeX Live 2012/Debian) (format=pdflatex 2013.2.18)  15 APR 2013 13:18
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -164,25 +164,146 @@ LaTeX Font Info:    External font `cmex10' loaded for size
 \tf@toc=\write3
 \openout3 = `chs17_Hide_and_Seek_Report.toc'.
 
- [2] [3] [4]
-(./chs17_Hide_and_Seek_Report.aux) ) 
+ [2]
+<DFS_SS.png, id=13, 427.5975pt x 200.24812pt>
+File: DFS_SS.png Graphic file (type png)
+ <use DFS_SS.png>
+Package pdftex.def Info: DFS_SS.png used on input line 18.
+(pdftex.def)             Requested size: 342.07846pt x 160.19872pt.
+
+<Check_Finished_SS.png, id=14, 818.30719pt x 181.42781pt>
+File: Check_Finished_SS.png Graphic file (type png)
+
+<use Check_Finished_SS.png>
+Package pdftex.def Info: Check_Finished_SS.png used on input line 26.
+(pdftex.def)             Requested size: 450.07034pt x 99.7856pt.
+ [3 <./DFS_SS.png> <./Check_Finished_SS.png>]
+<Compare_Area_SS.png, id=18, 679.03688pt x 396.7322pt>
+File: Compare_Area_SS.png Graphic file (type png)
+
+<use Compare_Area_SS.png>
+Package pdftex.def Info: Compare_Area_SS.png used on input line 37.
+(pdftex.def)             Requested size: 441.36874pt x 257.87286pt.
+
+<Attempt_Localisation_SS.png, id=19, 589.4522pt x 175.40532pt>
+File: Attempt_Localisation_SS.png Graphic file (type png)
+
+<use Attempt_Localisation_SS.png>
+Package pdftex.def Info: Attempt_Localisation_SS.png used on input line 45.
+(pdftex.def)             Requested size: 442.08806pt x 131.55365pt.
+ [4 <./Compare_Area_SS.png>]
+<Get_Hide_Location_SS.png, id=23, 742.27313pt x 137.7647pt>
+File: Get_Hide_Location_SS.png Graphic file (type png)
+
+<use Get_Hide_Location_SS.png>
+Package pdftex.def Info: Get_Hide_Location_SS.png used on input line 53.
+(pdftex.def)             Requested size: 445.36732pt x 82.65944pt.
+
+<Find_Location_SS.png, id=24, 824.32968pt x 273.27094pt>
+File: Find_Location_SS.png Graphic file (type png)
+
+<use Find_Location_SS.png>
+Package pdftex.def Info: Find_Location_SS.png used on input line 58.
+(pdftex.def)             Requested size: 453.38272pt x 150.29947pt.
+ [5 <./Attempt_Localisation_SS.png> <./Get_Hide_Location_SS.png> <./Find_Locati
+on_SS.png>]
+<Plot_Path_SS.png, id=28, 737.00343pt x 408.77719pt>
+File: Plot_Path_SS.png Graphic file (type png)
+ <use Plot_Path_SS.png>
+Package pdftex.def Info: Plot_Path_SS.png used on input line 66.
+(pdftex.def)             Requested size: 442.20547pt x 245.2682pt.
+
+<Detect_Anomaly_SS.png, id=29, 642.90187pt x 97.11281pt>
+File: Detect_Anomaly_SS.png Graphic file (type png)
+
+<use Detect_Anomaly_SS.png>
+Package pdftex.def Info: Detect_Anomaly_SS.png used on input line 74.
+(pdftex.def)             Requested size: 417.88126pt x 63.12257pt.
+ [6 <./Plot_Path_SS.png> <./Detect_Anomaly_SS.png>]
+LaTeX Font Info:    Try loading font information for OMS+cmr on input line 86.
+
+(/usr/share/texlive/texmf-dist/tex/latex/base/omscmr.fd
+File: omscmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
+)
+LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <12> not available
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 86.
+
+<RunT1.png, id=33, 279.29344pt x 231.86626pt>
+File: RunT1.png Graphic file (type png)
+ <use RunT1.png>
+Package pdftex.def Info: RunT1.png used on input line 93.
+(pdftex.def)             Requested size: 279.29276pt x 231.86568pt.
+
+<RunS1.png, id=34, 465.23813pt x 102.3825pt>
+File: RunS1.png Graphic file (type png)
+ <use RunS1.png>
+Package pdftex.def Info: RunS1.png used on input line 98.
+(pdftex.def)             Requested size: 418.71043pt x 92.14339pt.
+ [7 <./RunT1.png>]
+<RunT2.png, id=40, 230.36063pt x 191.21437pt>
+File: RunT2.png Graphic file (type png)
+ <use RunT2.png>
+Package pdftex.def Info: RunT2.png used on input line 103.
+(pdftex.def)             Requested size: 230.36005pt x 191.2139pt.
+
+<RunS2.png, id=41, 467.49657pt x 199.49532pt>
+File: RunS2.png Graphic file (type png)
+ <use RunS2.png>
+Package pdftex.def Info: RunS2.png used on input line 108.
+(pdftex.def)             Requested size: 420.74303pt x 179.54411pt.
+
+<RunT3.png, id=42, 232.61906pt x 448.67625pt>
+File: RunT3.png Graphic file (type png)
+ <use RunT3.png>
+Package pdftex.def Info: RunT3.png used on input line 113.
+(pdftex.def)             Requested size: 232.61848pt x 448.67516pt.
+ [8 <./RunS1.png> <./RunT2.png> <./RunS2.png>] <RunS3.png, id=46, 280.04625pt x
+ 481.04718pt>
+File: RunS3.png Graphic file (type png)
+
+<use RunS3.png>
+Package pdftex.def Info: RunS3.png used on input line 118.
+(pdftex.def)             Requested size: 252.03928pt x 432.93846pt.
+ [9 <./RunT3.png>]
+<RunT4.png, id=50, 241.65282pt x 449.42906pt>
+File: RunT4.png Graphic file (type png)
+ <use RunT4.png>
+Package pdftex.def Info: RunT4.png used on input line 123.
+(pdftex.def)             Requested size: 241.65222pt x 449.42795pt.
+ [10 <./RunS3.png>] <RunS4.png, id=54, 429.85594pt x 255.95625pt>
+File: RunS4.png Graphic file (type png)
+ <use RunS4.png>
+Package pdftex.def Info: RunS4.png used on input line 128.
+(pdftex.def)             Requested size: 386.86678pt x 230.35847pt.
+ [11 <./RunT4.png>] <RunT5.png, id=58, 359.09157pt x 465.99094pt>
+File: RunT5.png Graphic file (type png)
+ <use RunT5.png>
+Package pdftex.def Info: RunT5.png used on input line 133.
+(pdftex.def)             Requested size: 359.09068pt x 465.98979pt.
+ [12 <./RunS4.png>] <RunS5.png, id=62, 260.47313pt x 261.97874pt>
+File: RunS5.png Graphic file (type png)
+ <use RunS5.png>
+Package pdftex.def Info: RunS5.png used on input line 138.
+(pdftex.def)             Requested size: 234.42365pt x 235.77869pt.
+ [13 <./RunT5.png>] [14 <./RunS5.png>] (./chs17_Hide_and_Seek_Report.aux) ) 
 Here is how much of TeX's memory you used:
- 1572 strings out of 495059
- 22587 string characters out of 3182030
- 76738 words of memory out of 3000000
- 4755 multiletter control sequences out of 15000+200000
+ 1684 strings out of 495059
+ 24514 string characters out of 3182030
+ 75738 words of memory out of 3000000
+ 4845 multiletter control sequences out of 15000+200000
  8977 words of font info for 32 fonts, out of 3000000 for 9000
  14 hyphenation exceptions out of 8191
- 37i,6n,23p,800b,236s stack positions out of 5000i,500n,10000p,200000b,50000s
-</usr/share/texlive/texmf-dist/fonts/type1/
-public/amsfonts/cm/cmbx12.pfb></usr/share/texlive/texmf-dist/fonts/type1/public
-/amsfonts/cm/cmr12.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfon
-ts/cm/cmr17.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/c
-mtt12.pfb>
-Output written on chs17_Hide_and_Seek_Report.pdf (4 pages, 53949 bytes).
+ 37i,6n,23p,778b,236s stack positions out of 5000i,500n,10000p,200000b,50000s
+</us
+r/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/shar
+e/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/share/texli
+ve/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/share/texlive/texm
+f-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist
+/fonts/type1/public/amsfonts/cm/cmtt12.pfb>
+Output written on chs17_Hide_and_Seek_Report.pdf (14 pages, 271067 bytes).
 PDF statistics:
- 33 PDF objects out of 1000 (max. 8388607)
- 22 compressed objects within 1 object stream
+ 88 PDF objects out of 1000 (max. 8388607)
+ 48 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
- 1 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 91 words of extra memory for PDF output out of 10000 (max. 10000000)
 
