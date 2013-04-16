@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.4-1.40.13 (TeX Live 2012/Debian) (format=pdflatex 2013.2.18)  15 APR 2013 13:18
+This is pdfTeX, Version 3.1415926-2.4-1.40.13 (TeX Live 2012/Debian) (format=pdflatex 2013.2.18)  16 APR 2013 16:44
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -220,90 +220,81 @@ File: Detect_Anomaly_SS.png Graphic file (type png)
 Package pdftex.def Info: Detect_Anomaly_SS.png used on input line 74.
 (pdftex.def)             Requested size: 417.88126pt x 63.12257pt.
  [6 <./Plot_Path_SS.png> <./Detect_Anomaly_SS.png>]
-LaTeX Font Info:    Try loading font information for OMS+cmr on input line 86.
-
-(/usr/share/texlive/texmf-dist/tex/latex/base/omscmr.fd
-File: omscmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
-)
-LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <12> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 86.
-
 <RunT1.png, id=33, 279.29344pt x 231.86626pt>
 File: RunT1.png Graphic file (type png)
  <use RunT1.png>
-Package pdftex.def Info: RunT1.png used on input line 93.
+Package pdftex.def Info: RunT1.png used on input line 102.
 (pdftex.def)             Requested size: 279.29276pt x 231.86568pt.
 
 <RunS1.png, id=34, 465.23813pt x 102.3825pt>
 File: RunS1.png Graphic file (type png)
  <use RunS1.png>
-Package pdftex.def Info: RunS1.png used on input line 98.
+Package pdftex.def Info: RunS1.png used on input line 107.
 (pdftex.def)             Requested size: 418.71043pt x 92.14339pt.
  [7 <./RunT1.png>]
-<RunT2.png, id=40, 230.36063pt x 191.21437pt>
+<RunT2.png, id=39, 230.36063pt x 191.21437pt>
 File: RunT2.png Graphic file (type png)
  <use RunT2.png>
-Package pdftex.def Info: RunT2.png used on input line 103.
+Package pdftex.def Info: RunT2.png used on input line 112.
 (pdftex.def)             Requested size: 230.36005pt x 191.2139pt.
 
-<RunS2.png, id=41, 467.49657pt x 199.49532pt>
+<RunS2.png, id=40, 467.49657pt x 199.49532pt>
 File: RunS2.png Graphic file (type png)
  <use RunS2.png>
-Package pdftex.def Info: RunS2.png used on input line 108.
+Package pdftex.def Info: RunS2.png used on input line 117.
 (pdftex.def)             Requested size: 420.74303pt x 179.54411pt.
 
-<RunT3.png, id=42, 232.61906pt x 448.67625pt>
+<RunT3.png, id=41, 232.61906pt x 448.67625pt>
 File: RunT3.png Graphic file (type png)
  <use RunT3.png>
-Package pdftex.def Info: RunT3.png used on input line 113.
+Package pdftex.def Info: RunT3.png used on input line 122.
 (pdftex.def)             Requested size: 232.61848pt x 448.67516pt.
- [8 <./RunS1.png> <./RunT2.png> <./RunS2.png>] <RunS3.png, id=46, 280.04625pt x
+ [8 <./RunS1.png> <./RunT2.png> <./RunS2.png>] <RunS3.png, id=45, 280.04625pt x
  481.04718pt>
 File: RunS3.png Graphic file (type png)
 
 <use RunS3.png>
-Package pdftex.def Info: RunS3.png used on input line 118.
+Package pdftex.def Info: RunS3.png used on input line 127.
 (pdftex.def)             Requested size: 252.03928pt x 432.93846pt.
  [9 <./RunT3.png>]
-<RunT4.png, id=50, 241.65282pt x 449.42906pt>
+<RunT4.png, id=49, 241.65282pt x 449.42906pt>
 File: RunT4.png Graphic file (type png)
  <use RunT4.png>
-Package pdftex.def Info: RunT4.png used on input line 123.
+Package pdftex.def Info: RunT4.png used on input line 132.
 (pdftex.def)             Requested size: 241.65222pt x 449.42795pt.
- [10 <./RunS3.png>] <RunS4.png, id=54, 429.85594pt x 255.95625pt>
+ [10 <./RunS3.png>] <RunS4.png, id=53, 429.85594pt x 255.95625pt>
 File: RunS4.png Graphic file (type png)
  <use RunS4.png>
-Package pdftex.def Info: RunS4.png used on input line 128.
+Package pdftex.def Info: RunS4.png used on input line 137.
 (pdftex.def)             Requested size: 386.86678pt x 230.35847pt.
- [11 <./RunT4.png>] <RunT5.png, id=58, 359.09157pt x 465.99094pt>
+ [11 <./RunT4.png>] <RunT5.png, id=57, 359.09157pt x 465.99094pt>
 File: RunT5.png Graphic file (type png)
  <use RunT5.png>
-Package pdftex.def Info: RunT5.png used on input line 133.
+Package pdftex.def Info: RunT5.png used on input line 142.
 (pdftex.def)             Requested size: 359.09068pt x 465.98979pt.
- [12 <./RunS4.png>] <RunS5.png, id=62, 260.47313pt x 261.97874pt>
+ [12 <./RunS4.png>] <RunS5.png, id=61, 260.47313pt x 261.97874pt>
 File: RunS5.png Graphic file (type png)
  <use RunS5.png>
-Package pdftex.def Info: RunS5.png used on input line 138.
+Package pdftex.def Info: RunS5.png used on input line 147.
 (pdftex.def)             Requested size: 234.42365pt x 235.77869pt.
- [13 <./RunT5.png>] [14 <./RunS5.png>] (./chs17_Hide_and_Seek_Report.aux) ) 
+ [13 <./RunT5.png>] [14 <./RunS5.png>] [15] [16] (./chs17_Hide_and_Seek_Report.
+aux) ) 
 Here is how much of TeX's memory you used:
- 1684 strings out of 495059
- 24514 string characters out of 3182030
- 75738 words of memory out of 3000000
- 4845 multiletter control sequences out of 15000+200000
+ 1668 strings out of 495059
+ 24231 string characters out of 3182030
+ 76738 words of memory out of 3000000
+ 4832 multiletter control sequences out of 15000+200000
  8977 words of font info for 32 fonts, out of 3000000 for 9000
  14 hyphenation exceptions out of 8191
- 37i,6n,23p,778b,236s stack positions out of 5000i,500n,10000p,200000b,50000s
-</us
-r/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/shar
-e/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/share/texli
-ve/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/share/texlive/texm
-f-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist
-/fonts/type1/public/amsfonts/cm/cmtt12.pfb>
-Output written on chs17_Hide_and_Seek_Report.pdf (14 pages, 271067 bytes).
+ 37i,9n,23p,836b,236s stack positions out of 5000i,500n,10000p,200000b,50000s
+</usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb>
+</usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/s
+hare/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/share/te
+xlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt12.pfb>
+Output written on chs17_Hide_and_Seek_Report.pdf (16 pages, 269875 bytes).
 PDF statistics:
- 88 PDF objects out of 1000 (max. 8388607)
- 48 compressed objects within 1 object stream
+ 90 PDF objects out of 1000 (max. 8388607)
+ 49 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
  91 words of extra memory for PDF output out of 10000 (max. 10000000)
 

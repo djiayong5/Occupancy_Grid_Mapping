@@ -82,12 +82,21 @@ Hide and Seek}
 
 \vspace{5mm}
 \noindent Key:
-\begin{itemize}
-\item \# = Obstacle present
-\item \textasciitilde = Unexplored cell
-\item R = Robot's current location
-\item An empty cell represents an explored cell with no obstacle present.
-\end{itemize}
+\begin{table}[H]
+\begin{tabular}{| l | l |}
+	\hline
+	\textbf{Icon} & \textbf{What it represents}
+	\\\hline
+	\# & Obstacle present
+	\\\hline
+	\textasciitilde & Unexplored cell
+	\\\hline
+	R & Robot's current location
+	\\\hline
+	 & An empty cell represents an explored cell with no obstacle present.
+	\\\hline
+\end{tabular}
+\end{table}
 
 \begin{figure}[H]
 \includegraphics[scale=1.0]{RunT1.png}
@@ -141,14 +150,34 @@ Hide and Seek}
 \subsection{Real world trial runs}
 
 \section{Discussion of trial run results}
+\noindent At the start it was expected that a lot of the simulated trial runs would finish prematurely due to a robot crash. This was in fact the case. Most of the time the robot would crash when turning and usually it was at the bottom of the simulated world where the robot tries to explore the upper section. Once it occurred that a 60cm by 60cm cell space was not sufficient to give the robot space to turn (explained in the evaluation section below) and this was amended to 70cm by 70cm cells, the robot managed to avoid getting too close to the walls so did not have problems when turning and was then able to complete a full successful map of the simulated area. This same result was replicated again when the function implemented to check that the robot had finished mapping needed testing.
+
+\vspace{5mm}
+\noindent In terms of real world results, 
 
 \section{Evaluation of work done}
 
 \subsection{Positive parts}
+\noindent The mapping algorithm implemented ensures that all explorable cells are explored due to the nature of a depth-first-search. The accuracy of the mapping is also very good as shown in the simulated trial run. As the mapping is very accurate due to only scanning a maximum of 8 cells around the robot at any given time (to reduce errors with sonar spread at longer ranges), there is no need to apply a threshold to the values. This helps improves efficiency as there is one less task to run.
+
+\vspace{5mm}
+\noindent The robot program implemented the way it is would work very well in a square world where all shapes are square-like. This is because the robot turns to the angles 0, 90, 180 and 270 degrees and no others. The path plotting algorithm is quite simple and as it uses an A* search, the path required to get the robot to its hiding location should be found quite fast without too many extra nodes being expanded. Also because the robot can keep track of a path along which it has travelled and return along, the path found by the A* algorithm is simply loaded into the robot for it to follow to get to its destination.
+
+\vspace{5mm}
+\noindent The robots localisation algorithm is also simple but enables the robot to localise as soon as possible and also notify the user that localisation is unsuccessful as soon as possible. This is great as a robot that has limited battery power wants to avoid draining power where possible moving around.
 
 \subsection{Negative parts}
+\noindent The main negative part about the robot program implemented is that the robot is very deliberative and is constrained to working in a square environment. As the robot only turns to the 0, 90, 180, 270, the robot is very limited in moving around environments. The robot is also constrained in moving forwards not backwards and at set distances, this again limits the robots capabilities with adapting to different environments. All of these problems exist mainly because of the deliberative nature of of the program implemented.
 
 \subsection{Hardest parts}
+\noindent The hardest part to implement was the mapping algorithm as it is a complex task to accomplish. Deciding how many and which sensors to use was a problem as well as figuring/estimating the angles and error bounds for each sensor. Also, regarding the sensors, the range at which the values returned would be considered accurate was an aspect of the project that took some thought. It was decided to just use ranges that would enable one cell in each direction to be scanned reliably including the diagonal/corner cells (8 cells around the robot in total). Detecting corners was a big problem that needed a lot of trial and error to get reasonably working.
+
+\vspace{5mm}
+\noindent With regards to problems encountered with using a real robot, the main problem was the robots believing they had turned to the specified angle wanted when in reality they had not. This needed a lot of trial of error with changing the PGAIN value using when calculating the turn rate for the robot. Even at that point each turn would not produce the same result so the robot would easily be able to produce different results with each run, sometimes resulting in a crash.
 
 \subsection{What would be done differently}
+\noindent An attempt to implement a reactive robot would be made to enable the robot to adaptive to a changing environment more effectively and avoid crashing better. If a reactive system was implemented, it may be a lot more complex (reason for not using this approach) but would allow the robot to have more freedom and deal with obstacles appearing right next to it (such as an object moving into its path etc). It would also be easier for the robot to avoid being too close to walls (or at least correct to get a minimum distance from the walls) and thus VOID crashing when it turns. However, giving the robot more freedom with movement would make it more difficult to map as it would be harder to determine where the robot would be located on the grid so this may still not be a real viable option.
+
+\vspace{5mm}
+\noindent Another place where things would be done differently would be in the testing area. Testing the robot in different simulated environments would help to produce a robot that could function better in various kinds of environments (be more versatile). Also the same goes for real world testing/trials.
 \end{document}

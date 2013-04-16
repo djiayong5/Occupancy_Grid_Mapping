@@ -15,14 +15,6 @@
 #include <cstdlib>
 #include "Occupancy_Grid.h"
 
-#ifndef DIRECTIONS
-#define DIRECTIONS
-#define TOP 0
-#define BOTTOM 180
-#define LEFT 90
-#define RIGHT -90
-#endif
-
 #define ANGLE_ERROR 10
 #define MOVE_PGAIN 0.8
 #define TURN_PGAIN 0.8

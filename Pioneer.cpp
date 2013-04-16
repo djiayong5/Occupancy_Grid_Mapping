@@ -94,9 +94,9 @@ int Pioneer::evaluateDirection(double currentYaw) {
     if (currentYaw <= (RIGHT + ANGLE_ERROR) && currentYaw >= (RIGHT - ANGLE_ERROR)) return RIGHT;
     else if (currentYaw <= (LEFT + ANGLE_ERROR) && currentYaw >= (LEFT - ANGLE_ERROR)) return LEFT;
     else if ((currentYaw <= -170 && currentYaw >= -179.99) || (currentYaw >= 170.00 && currentYaw <= 180.00)) return BOTTOM;
-    //else if (currentYaw <= (DOWN + ANGLE_ERROR) && currentYaw >= (DOWN + ANGLE_ERROR)) return DOWN;
+    //else if (currentYaw <= (BOTTOM + ANGLE_ERROR) && currentYaw >= (BOTTOM - ANGLE_ERROR)) return BOTTOM;
     if ((currentYaw <= 10.00 && currentYaw >= 0.00) || (currentYaw >= -10.00 && currentYaw <= 0.00)) return TOP;
-    //else if (currentYaw <= (TOP + ANGLE_ERROR) && currentYaw >= (TOP + ANGLE_ERROR)) return TOP;
+    //else if (currentYaw >= (360 - ANGLE_ERROR) || currentYaw <= (TOP + ANGLE_ERROR)) return TOP;
 }
 
 int Pioneer::setSensorDirection(int currentDirection, int angleOffset) {
@@ -199,8 +199,6 @@ void Pioneer::map(PlayerClient *robot, RangerProxy *sp, Position2dProxy *pp) {
 
     turnToNewDirection(0.000, pp, robot); //Gets robot to turn to 0 degrees (with error bounds).
     cout << "Start Yaw Corrected to: " << currentYaw << endl;
-    currentDirection = evaluateDirection(currentYaw);
-    configureCycle(robot, pp, &currentYaw, &currentDirection);
 
     do {
         configureCycle(robot, pp, &currentYaw, &currentDirection);
@@ -266,8 +264,6 @@ bool Pioneer::localise(PlayerClient *robot, RangerProxy *sp, Position2dProxy *pp
     turnToNewDirection(0.000, pp, robot); //Gets robot to turn to 0 degrees (with error bounds).
 
     cout << "Start Yaw Corrected to: " << currentYaw << endl;
-    currentDirection = evaluateDirection(currentYaw);
-    configureCycle(robot, pp, &currentYaw, &currentDirection);
 
     do {
         configureCycle(robot, pp, &currentYaw, &currentDirection);
