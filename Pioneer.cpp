@@ -33,10 +33,17 @@ void Pioneer::turnToNewDirection(double targetYaw, Position2dProxy *pp, PlayerCl
         robot->Read();
         currentYaw = rtod(pp->GetYaw());
 
-        if (currentYaw >= (targetYaw - TURN_ERROR_BOUND) && currentYaw <= (targetYaw + TURN_ERROR_BOUND)) {
+	if (targetYaw == TOP) {
+	    if (currentYaw >= (360 - ANGLE_ERROR) || currentYaw <= (targetYaw + ANGLE_ERROR)) {
+		turnRate = 0.000;
+		yawAchieved = true;
+	    }
+        } else if (currentYaw >= (targetYaw - ANGLE_ERROR) && currentYaw <= (targetYaw + ANGLE_ERROR)) {
             turnRate = 0.000;
             yawAchieved = true;
-        } else turnRate = calculateTurnRate(currentYaw, targetYaw);
+        } 
+        
+        if (yawAchieved != true) turnRate = calculateTurnRate(currentYaw, targetYaw);
 
         pp->SetSpeed(0.000, turnRate);
     }
@@ -97,6 +104,8 @@ int Pioneer::evaluateDirection(double currentYaw) {
     else if (currentYaw <= (BOTTOM + ANGLE_ERROR) && currentYaw >= (BOTTOM - ANGLE_ERROR)) return BOTTOM;
    //if ((currentYaw <= 10.00 && currentYaw >= 0.00) || (currentYaw >= -10.00 && currentYaw <= 0.00)) return TOP;
     else if (currentYaw >= (360 - ANGLE_ERROR) || currentYaw <= (TOP + ANGLE_ERROR)) return TOP;
+    else cout << "Not able to evalutate direction, current yaw = " << currentYaw << endl;
+    return -1;
 }
 
 int Pioneer::setSensorDirection(int currentDirection, int angleOffset) {
@@ -107,9 +116,8 @@ int Pioneer::setSensorDirection(int currentDirection, int angleOffset) {
     else if (currentDirection == BOTTOM) facing = (BOTTOM + angleOffset);
     else if (currentDirection == LEFT) facing = (LEFT + angleOffset);
 
-    if (facing > 180) facing -= 360;
-    if (facing == -180) facing = BOTTOM;
-
+    if (facing == 360) facing = TOP;
+    else if (facing > 360) facing = facing - 360;
     return facing;
 }
 
@@ -172,7 +180,7 @@ void Pioneer::evaluateMovingReadings(double reading1, double reading2, double ra
 }
 
 void Pioneer::evaluateBlindSpots(double reading1, double reading2, double range, int sensorFacing, Occupancy_Grid *grid, bool seekMode) {
-    if (reading1 <= range || reading2 <= range) grid->calculateCellToChange(sensor Facing, true, seekMode);
+    if (reading1 <= range || reading2 <= range) grid->calculateCellToChange(sensorFacing, true, seekMode);
 }
 
 void Pioneer::configureCycle(PlayerClient *robot, Position2dProxy *pp, double *currentYaw, int *currentDirection) {
@@ -197,10 +205,11 @@ void Pioneer::map(PlayerClient *robot, SonarProxy *sp, Position2dProxy *pp) {
     currentYaw = rtod(pp->GetYaw()); /* Retrieve current yaw. */
     cout << "Start Yaw: " << currentYaw << endl;
 
-    turnToNewDirection(0.000, pp, robot); //Gets robot to turn to 0 degrees (with error bounds).
+    turnToNewDirection(targetYaw, pp, robot); //Gets robot to turn to 0 degrees (with error bounds).
     cout << "Start Yaw Corrected to: " << currentYaw << endl;
 
     do {
+	turnToNewDirection(targetYaw, pp, robot); //Turns robot to face direction of next cell to travel to.    
         configureCycle(robot, pp, &currentYaw, &currentDirection);
         for (int counter = 0; counter <= 15; counter++) sonarReadings[counter] = (*sp)[counter];
         oG->setIsExploredTrue();
@@ -250,7 +259,7 @@ void Pioneer::map(PlayerClient *robot, SonarProxy *sp, Position2dProxy *pp) {
 bool Pioneer::localise(PlayerClient *robot, SonarProxy *sp, Position2dProxy *pp) {
     Occupancy_Grid *temp = new Occupancy_Grid();
     double currentYaw = 0.000;
-    double targetYaw = 0.000;
+    double targetYaw;
     double sonarReadings[16];
     int currentDirection;
     int targetDirection;
@@ -259,13 +268,10 @@ bool Pioneer::localise(PlayerClient *robot, SonarProxy *sp, Position2dProxy *pp)
     pp->SetMotorEnable(true); /* Enable motors. */
     robot->Read(); /* Read from proxies. */
     currentYaw = rtod(pp->GetYaw()); /* Retrieve current yaw. */
-    cout << "Start Yaw: " << currentYaw << endl;
-
-    turnToNewDirection(0.000, pp, robot); //Gets robot to turn to 0 degrees (with error bounds).
-
-    cout << "Start Yaw Corrected to: " << currentYaw << endl;
+    targetYaw = currentYaw;
 
     do {
+	turnToNewDirection(targetYaw, pp, robot); //Turns robot to face direction of next cell to travel to. 
         configureCycle(robot, pp, &currentYaw, &currentDirection);
         for (int counter = 0; counter <= 15; counter++) sonarReadings[counter] = (*sp)[counter];
         temp->setIsExploredTrue();
@@ -322,7 +328,7 @@ bool Pioneer::localise(PlayerClient *robot, SonarProxy *sp, Position2dProxy *pp)
 
 void Pioneer::seek(PlayerClient *robot, SonarProxy *sp, Position2dProxy *pp) {
     double currentYaw = 0.000;
-    double targetYaw = 0.000;
+    double targetYaw;
     double sonarReadings[16];
     int currentDirection;
     int targetDirection;
@@ -330,8 +336,12 @@ void Pioneer::seek(PlayerClient *robot, SonarProxy *sp, Position2dProxy *pp) {
     oG->seekConfigure();
     oG->printGrid(); /* Print out initial grid. */
     pp->SetMotorEnable(true); /* Enable motors. */
+    robot->Read(); /* Read from proxies. */
+    currentYaw = rtod(pp->GetYaw()); /* Retrieve current yaw. */
+    targetYaw = currentYaw;
 
     do {
+	turnToNewDirection(targetYaw, pp, robot); //Rechecks angle within limits and turn 
         configureCycle(robot, pp, &currentYaw, &currentDirection);
         for (int counter = 0; counter <= 15; counter++) sonarReadings[counter] = (*sp)[counter];
         oG->setIsExploredTrue();

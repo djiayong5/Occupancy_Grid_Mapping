@@ -16,13 +16,13 @@
 #ifndef DIRECTIONS
 #define DIRECTIONS
 #define TOP 0
-#define TOP_LEFT 315
-#define LEFT 270
-#define BOTTOM_LEFT 225
+#define TOP_LEFT 45
+#define LEFT 90
+#define BOTTOM_LEFT 135
 #define BOTTOM 180
-#define BOTTOM_RIGHT 135
-#define RIGHT 90
-#define TOP_RIGHT 45
+#define BOTTOM_RIGHT 225
+#define RIGHT 270
+#define TOP_RIGHT 315
 #endif
 
 #define CELL_WIDTH 0.7

@@ -1,0 +1,64 @@
+/*
+ * Author: Chris Savill, chs17@aber.ac.uk
+ * File Name: Pioneer.h
+ * Description: Stores function prototypes for Pioneer to use.
+ * First Created: 25/02/2013
+ * Last Modified: 17/04/2013
+ */
+
+#ifndef PIONEER_H
+#define PIONEER_H
+
+#include <iostream>
+#include <libplayerc++/playerc++.h>
+#include <cstdio>
+#include <cstdlib>
+#include "Occupancy_Grid.h"
+
+#define ANGLE_ERROR 15
+#define MOVE_PGAIN 0.9
+#define TURN_PGAIN 1.20
+#define MOVE_ERROR_BOUND 0.050
+#define FRONT_REAR_RANGE 0.70
+#define LEFT_RIGHT_RANGE 0.800
+#define CORNER_RANGE 1.10
+#define CLOSE_RANGE 0.300
+
+using namespace PlayerCc;
+
+class Pioneer {
+private:
+    Occupancy_Grid *oG;
+    int frontSensorFacing; /* Field that describes the direction the front sensor currently faces. */
+    int rearSensorFacing; /* Field that describes the direction the rear sensor currently faces. */
+    int leftSensorFacing; /* Field that describes the direction the right sensor currently faces. */
+    int rightSensorFacing; /* Field that describes the direction the left sensor currently faces. */
+    int frontLeftSensorFacing; /* Field that describes the direction the front left sensor currently faces. */
+    int frontRightSensorFacing; /* Field that describes the direction the front right sensor currently faces. */
+    int rearLeftSensorFacing; /* Field that describes the direction the rear left sensor currently faces. */
+    int rearRightSensorFacing; /* Field that describes the direction the rear right sensor currently faces. */
+    void map(PlayerClient *robot, SonarProxy *sp, Position2dProxy *pp);
+    bool localise(PlayerClient *robot, SonarProxy *sp, Position2dProxy *pp);
+    void seek(PlayerClient *robot, SonarProxy *sp, Position2dProxy *pp);
+    void hide(PlayerClient *robot, SonarProxy *sp, Position2dProxy *pp);
+    double calculateTurnRate(double currentYaw, double targetYaw);
+    void turnToNewDirection(double targetYaw, Position2dProxy *pp, PlayerClient *robot);
+    void calculateMoveDistance(PlayerClient *robot, Position2dProxy *pp, int direction, double distanceToMove);
+    void moveForward(PlayerClient *robot, Position2dProxy *pp, int direction, double posDifference);
+    int evaluateDirection(double currentYaw);
+    int setSensorDirection(int currentDirection, int angleOffset);
+    void reconfigureSensors(int currentDirection);
+    void surveyCycle(double readings[], int currentDirection, bool inNextCell, Occupancy_Grid *grid, bool seekMode);
+    void evaluateReadings(double reading1, double reading2, double range, int sensorFacing, Occupancy_Grid *grid, bool seekMode);
+    void evaluateCornerReadings(double reading, double lowerBound, double upperBound, int sensorFacing, Occupancy_Grid *grid, bool seekMode);
+    void evaluateMovingReadings(double reading1, double reading2, double range1, double range2, int sensorFacing, Occupancy_Grid *grid, bool seekMode);
+    void evaluateBlindSpots(double reading1, double reading2, double range, int sensorFacing, Occupancy_Grid *grid, bool seekMode);
+    void configureCycle(PlayerClient *robot, Position2dProxy *pp, double *currentYaw, int *currentDirection);
+
+
+public:
+    ~Pioneer();
+    Pioneer();
+    void runProgram(PlayerClient *robot, SonarProxy *sp, Position2dProxy *pp);
+};
+#endif

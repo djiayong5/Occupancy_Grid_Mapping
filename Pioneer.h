@@ -17,13 +17,12 @@
 
 #define ANGLE_ERROR 15
 #define MOVE_PGAIN 0.9
-#define TURN_PGAIN 1.4
-#define MOVE_ERROR_BOUND 0.025
-#define TURN_ERROR_BOUND 0.050
-#define FRONT_REAR_RANGE 0.850
-#define LEFT_RIGHT_RANGE 0.950
-#define CORNER_RANGE 1.20
-#define CLOSE_RANGE 0.300
+#define TURN_PGAIN 1.20
+#define MOVE_ERROR_BOUND 0.050
+#define FRONT_REAR_RANGE 0.70
+#define LEFT_RIGHT_RANGE 0.800
+#define CORNER_RANGE 1.10
+#define CLOSE_RANGE 0.200
 
 using namespace PlayerCc;
 
