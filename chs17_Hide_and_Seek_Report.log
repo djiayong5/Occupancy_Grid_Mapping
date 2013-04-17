@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.4-1.40.13 (TeX Live 2012/Debian) (format=pdflatex 2013.2.18)  16 APR 2013 16:44
+This is pdfTeX, Version 3.1415926-2.4-1.40.13 (TeX Live 2012/Debian) (format=pdflatex 2013.2.18)  16 APR 2013 16:51
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -286,12 +286,12 @@ Here is how much of TeX's memory you used:
  4832 multiletter control sequences out of 15000+200000
  8977 words of font info for 32 fonts, out of 3000000 for 9000
  14 hyphenation exceptions out of 8191
- 37i,9n,23p,836b,236s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 37i,9n,23p,837b,236s stack positions out of 5000i,500n,10000p,200000b,50000s
 </usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb>
 </usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/s
 hare/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/share/te
 xlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt12.pfb>
-Output written on chs17_Hide_and_Seek_Report.pdf (16 pages, 269875 bytes).
+Output written on chs17_Hide_and_Seek_Report.pdf (16 pages, 269663 bytes).
 PDF statistics:
  90 PDF objects out of 1000 (max. 8388607)
  49 compressed objects within 1 object stream

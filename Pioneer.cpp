@@ -3,7 +3,7 @@
  * File Name: Pioneer.cpp
  * Description: Stores function declarations for Pioneer to use.
  * First Created: 25/02/2013
- * Last Modified: 13/04/2013
+ * Last Modified: 17/04/2013
  */
 
 #include <iostream>
@@ -59,21 +59,21 @@ void Pioneer::moveForward(PlayerClient *robot, Position2dProxy *pp, int directio
     double distanceLeft;
     robot->Read();
 
-    if (direction == TOP || direction == BOTTOM) {
-        target = pp->GetXPos() + posDifference; //Simulated world rotated 90 degrees do axis are switched.
-        current = pp->GetXPos(); //Simulated world rotated 90 degrees do axis are switched.
+    if (direction == TOP || direction == BOTTOM) {      
+        current = pp->GetXPos();
+        target = current + posDifference;
     } else if (direction == LEFT || direction == RIGHT) {
-        target = pp->GetYPos() + posDifference; //Simulated world rotated 90 degrees do axis are switched.
-        current = pp->GetYPos(); //Simulated world rotated 90 degrees do axis are switched.
+        current = pp->GetYPos();
+        target = current + posDifference;       
     }
 
     while (travelledDistance == false) {
         robot->Read();
 
         if (direction == TOP || direction == BOTTOM) {
-            current = pp->GetXPos(); //Simulated world rotated 90 degrees do axis are switched.
+            current = pp->GetXPos();
         } else if (direction == LEFT || direction == RIGHT) {
-            current = pp->GetYPos(); //Simulated world rotated 90 degrees do axis are switched.
+            current = pp->GetYPos();
         }
 
         distanceLeft = target - current;
@@ -93,10 +93,10 @@ void Pioneer::moveForward(PlayerClient *robot, Position2dProxy *pp, int directio
 int Pioneer::evaluateDirection(double currentYaw) {
     if (currentYaw <= (RIGHT + ANGLE_ERROR) && currentYaw >= (RIGHT - ANGLE_ERROR)) return RIGHT;
     else if (currentYaw <= (LEFT + ANGLE_ERROR) && currentYaw >= (LEFT - ANGLE_ERROR)) return LEFT;
-    else if ((currentYaw <= -170 && currentYaw >= -179.99) || (currentYaw >= 170.00 && currentYaw <= 180.00)) return BOTTOM;
-    //else if (currentYaw <= (BOTTOM + ANGLE_ERROR) && currentYaw >= (BOTTOM - ANGLE_ERROR)) return BOTTOM;
-    if ((currentYaw <= 10.00 && currentYaw >= 0.00) || (currentYaw >= -10.00 && currentYaw <= 0.00)) return TOP;
-    //else if (currentYaw >= (360 - ANGLE_ERROR) || currentYaw <= (TOP + ANGLE_ERROR)) return TOP;
+   // else if ((currentYaw <= -170 && currentYaw >= -179.99) || (currentYaw >= 170.00 && currentYaw <= 180.00)) return BOTTOM;
+    else if (currentYaw <= (BOTTOM + ANGLE_ERROR) && currentYaw >= (BOTTOM - ANGLE_ERROR)) return BOTTOM;
+   //if ((currentYaw <= 10.00 && currentYaw >= 0.00) || (currentYaw >= -10.00 && currentYaw <= 0.00)) return TOP;
+    else if (currentYaw >= (360 - ANGLE_ERROR) || currentYaw <= (TOP + ANGLE_ERROR)) return TOP;
 }
 
 int Pioneer::setSensorDirection(int currentDirection, int angleOffset) {
@@ -172,7 +172,7 @@ void Pioneer::evaluateMovingReadings(double reading1, double reading2, double ra
 }
 
 void Pioneer::evaluateBlindSpots(double reading1, double reading2, double range, int sensorFacing, Occupancy_Grid *grid, bool seekMode) {
-    if (reading1 <= range || reading2 <= range) grid->calculateCellToChange(sensorFacing, true, seekMode);
+    if (reading1 <= range || reading2 <= range) grid->calculateCellToChange(sensor Facing, true, seekMode);
 }
 
 void Pioneer::configureCycle(PlayerClient *robot, Position2dProxy *pp, double *currentYaw, int *currentDirection) {
@@ -183,7 +183,7 @@ void Pioneer::configureCycle(PlayerClient *robot, Position2dProxy *pp, double *c
     reconfigureSensors(*currentDirection);
 }
 
-void Pioneer::map(PlayerClient *robot, RangerProxy *sp, Position2dProxy *pp) {
+void Pioneer::map(PlayerClient *robot, SonarProxy *sp, Position2dProxy *pp) {
     oG->mapConfigure();
     double currentYaw = 0.000;
     double targetYaw = 0.000;
@@ -247,7 +247,7 @@ void Pioneer::map(PlayerClient *robot, RangerProxy *sp, Position2dProxy *pp) {
     pp->SetMotorEnable(false);
 }
 
-bool Pioneer::localise(PlayerClient *robot, RangerProxy *sp, Position2dProxy *pp) {
+bool Pioneer::localise(PlayerClient *robot, SonarProxy *sp, Position2dProxy *pp) {
     Occupancy_Grid *temp = new Occupancy_Grid();
     double currentYaw = 0.000;
     double targetYaw = 0.000;
@@ -320,7 +320,7 @@ bool Pioneer::localise(PlayerClient *robot, RangerProxy *sp, Position2dProxy *pp
     } while (true);
 }
 
-void Pioneer::seek(PlayerClient *robot, RangerProxy *sp, Position2dProxy *pp) {
+void Pioneer::seek(PlayerClient *robot, SonarProxy *sp, Position2dProxy *pp) {
     double currentYaw = 0.000;
     double targetYaw = 0.000;
     double sonarReadings[16];
@@ -382,7 +382,7 @@ void Pioneer::seek(PlayerClient *robot, RangerProxy *sp, Position2dProxy *pp) {
     if (oG->getAnomalyFound() == false) cout << "Failed to find any anomalies." << endl;
 }
 
-void Pioneer::hide(PlayerClient *robot, RangerProxy *sp, Position2dProxy *pp) {
+void Pioneer::hide(PlayerClient *robot, SonarProxy *sp, Position2dProxy *pp) {
     double currentYaw = 0.000;
     double targetYaw = 0.000;
     int currentDirection;
@@ -421,10 +421,10 @@ Pioneer::~Pioneer() {
 
 int main(int argc, char *argv[]) {
     Pioneer *pioneer = new Pioneer(); //Creates new pioneer on heap.  
-    PlayerClient robot("localhost");
-    //PlayerClient robot("bart.islnet");
-    RangerProxy sp(&robot, 0);
-    //SonarProxy sp(&robot, 0);
+    //PlayerClient robot("localhost");
+    PlayerClient robot("lisa.islnet");
+    //RangerProxy sp(&robot, 0);
+    SonarProxy sp(&robot, 0);
     Position2dProxy pp(&robot, 0);
 
     pioneer->runProgram(&robot, &sp, &pp);
@@ -432,7 +432,7 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 
-void Pioneer::runProgram(PlayerClient *robot, RangerProxy *sp, Position2dProxy *pp) {
+void Pioneer::runProgram(PlayerClient *robot, SonarProxy *sp, Position2dProxy *pp) {
     int option; //Field to store the user's option input.
     bool mapped = false;
 

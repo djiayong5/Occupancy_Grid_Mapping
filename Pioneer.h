@@ -3,7 +3,7 @@
  * File Name: Pioneer.h
  * Description: Stores function prototypes for Pioneer to use.
  * First Created: 25/02/2013
- * Last Modified: 12/04/2013
+ * Last Modified: 17/04/2013
  */
 
 #ifndef PIONEER_H
@@ -15,9 +15,9 @@
 #include <cstdlib>
 #include "Occupancy_Grid.h"
 
-#define ANGLE_ERROR 10
-#define MOVE_PGAIN 0.8
-#define TURN_PGAIN 0.8
+#define ANGLE_ERROR 15
+#define MOVE_PGAIN 0.9
+#define TURN_PGAIN 1.4
 #define MOVE_ERROR_BOUND 0.025
 #define TURN_ERROR_BOUND 0.050
 #define FRONT_REAR_RANGE 0.850
@@ -38,10 +38,10 @@ private:
     int frontRightSensorFacing; /* Field that describes the direction the front right sensor currently faces. */
     int rearLeftSensorFacing; /* Field that describes the direction the rear left sensor currently faces. */
     int rearRightSensorFacing; /* Field that describes the direction the rear right sensor currently faces. */
-    void map(PlayerClient *robot, RangerProxy *sp, Position2dProxy *pp);
-    bool localise(PlayerClient *robot, RangerProxy *sp, Position2dProxy *pp);
-    void seek(PlayerClient *robot, RangerProxy *sp, Position2dProxy *pp);
-    void hide(PlayerClient *robot, RangerProxy *sp, Position2dProxy *pp);
+    void map(PlayerClient *robot, SonarProxy *sp, Position2dProxy *pp);
+    bool localise(PlayerClient *robot, SonarProxy *sp, Position2dProxy *pp);
+    void seek(PlayerClient *robot, SonarProxy *sp, Position2dProxy *pp);
+    void hide(PlayerClient *robot, SonarProxy *sp, Position2dProxy *pp);
     double calculateTurnRate(double currentYaw, double targetYaw);
     void turnToNewDirection(double targetYaw, Position2dProxy *pp, PlayerClient *robot);
     void calculateMoveDistance(PlayerClient *robot, Position2dProxy *pp, int direction, double distanceToMove);
@@ -60,6 +60,6 @@ private:
 public:
     ~Pioneer();
     Pioneer();
-    void runProgram(PlayerClient *robot, RangerProxy *sp, Position2dProxy *pp);
+    void runProgram(PlayerClient *robot, SonarProxy *sp, Position2dProxy *pp);
 };
 #endif

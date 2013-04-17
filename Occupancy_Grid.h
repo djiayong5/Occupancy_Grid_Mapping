@@ -3,7 +3,7 @@
  * File Name: Occupancy_Grid.h
  * Description: Stores member function prototypes and class definition for Occupancy_Grid class.
  * First Created: 25/02/2013
- * Last Modified: 12/04/2013
+ * Last Modified: 17/04/2013
  */
 
 #ifndef OCCUPANCY_GRID_H
@@ -16,13 +16,13 @@
 #ifndef DIRECTIONS
 #define DIRECTIONS
 #define TOP 0
-#define TOP_LEFT 45
-#define LEFT 90
-#define BOTTOM_LEFT 135
+#define TOP_LEFT 315
+#define LEFT 270
+#define BOTTOM_LEFT 225
 #define BOTTOM 180
-#define BOTTOM_RIGHT -135
-#define RIGHT -90
-#define TOP_RIGHT -45
+#define BOTTOM_RIGHT 135
+#define RIGHT 90
+#define TOP_RIGHT 45
 #endif
 
 #define CELL_WIDTH 0.7
