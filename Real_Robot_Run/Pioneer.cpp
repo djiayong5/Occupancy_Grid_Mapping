@@ -209,7 +209,7 @@ void Pioneer::map(PlayerClient *robot, SonarProxy *sp, Position2dProxy *pp) {
     cout << "Start Yaw Corrected to: " << currentYaw << endl;
 
     do {
-	turnToNewDirection(targetYaw, pp, robot); //Turns robot to face direction of next cell to travel to.    
+		turnToNewDirection(targetYaw, pp, robot); //Rechecks angle within limits and turn.   
         configureCycle(robot, pp, &currentYaw, &currentDirection);
         for (int counter = 0; counter <= 15; counter++) sonarReadings[counter] = (*sp)[counter];
         oG->setIsExploredTrue();
@@ -271,7 +271,7 @@ bool Pioneer::localise(PlayerClient *robot, SonarProxy *sp, Position2dProxy *pp)
     targetYaw = currentYaw;
 
     do {
-	turnToNewDirection(targetYaw, pp, robot); //Turns robot to face direction of next cell to travel to. 
+		turnToNewDirection(targetYaw, pp, robot); //Rechecks angle within limits and turn.
         configureCycle(robot, pp, &currentYaw, &currentDirection);
         for (int counter = 0; counter <= 15; counter++) sonarReadings[counter] = (*sp)[counter];
         temp->setIsExploredTrue();
@@ -341,7 +341,7 @@ void Pioneer::seek(PlayerClient *robot, SonarProxy *sp, Position2dProxy *pp) {
     targetYaw = currentYaw;
 
     do {
-	turnToNewDirection(targetYaw, pp, robot); //Rechecks angle within limits and turn 
+		turnToNewDirection(targetYaw, pp, robot); //Rechecks angle within limits and turn.
         configureCycle(robot, pp, &currentYaw, &currentDirection);
         for (int counter = 0; counter <= 15; counter++) sonarReadings[counter] = (*sp)[counter];
         oG->setIsExploredTrue();
@@ -403,6 +403,7 @@ void Pioneer::hide(PlayerClient *robot, SonarProxy *sp, Position2dProxy *pp) {
     oG->getHideLocation();
 
     do {
+		turnToNewDirection(targetYaw, pp, robot); //Rechecks angle within limits and turn.
         configureCycle(robot, pp, &currentYaw, &currentDirection);
         targetDirection = oG->getNextCellDriection();
         targetYaw = targetDirection;

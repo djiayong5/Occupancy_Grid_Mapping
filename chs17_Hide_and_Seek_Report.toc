@@ -6,9 +6,9 @@
 \contentsline {section}{\numberline {2}Trial runs}{7}
 \contentsline {subsection}{\numberline {2.1}Simulated trial runs}{7}
 \contentsline {subsection}{\numberline {2.2}Real world trial runs}{14}
-\contentsline {section}{\numberline {3}Discussion of trial run results}{14}
-\contentsline {section}{\numberline {4}Evaluation of work done}{14}
-\contentsline {subsection}{\numberline {4.1}Positive parts}{14}
-\contentsline {subsection}{\numberline {4.2}Negative parts}{15}
-\contentsline {subsection}{\numberline {4.3}Hardest parts}{15}
-\contentsline {subsection}{\numberline {4.4}What would be done differently}{15}
+\contentsline {section}{\numberline {3}Discussion of trial run results}{21}
+\contentsline {section}{\numberline {4}Evaluation of work done}{22}
+\contentsline {subsection}{\numberline {4.1}Positive parts}{22}
+\contentsline {subsection}{\numberline {4.2}Negative parts}{22}
+\contentsline {subsection}{\numberline {4.3}Hardest parts}{22}
+\contentsline {subsection}{\numberline {4.4}What would be done differently}{23}

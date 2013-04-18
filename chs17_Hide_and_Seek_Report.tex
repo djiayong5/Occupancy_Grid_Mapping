@@ -147,7 +147,82 @@ Hide and Seek}
 \includegraphics[scale=0.9]{RunS5.png}
 \caption{Screen shot of the Stage window corresponding to the screen shot above.}
 \end{figure}
+
 \subsection{Real world trial runs}
+\noindent As it was hard to get hold of a working robot to perform any real robot trial runs, only one successful recorded trial run of a pioneer mapping out a very small area could be obtained. Below is a key, 6 terminal screen shots and 5 photos of the pioneer mapping linking to the terminal screen shots).
+
+\vspace{5mm}
+\noindent Key:
+\begin{table}[H]
+\begin{tabular}{| l | l |}
+	\hline
+	\textbf{Icon} & \textbf{What it represents}
+	\\\hline
+	\# & Obstacle present
+	\\\hline
+	\textasciitilde & Unexplored cell
+	\\\hline
+	R & Robot's current location
+	\\\hline
+	 & An empty cell represents an explored cell with no obstacle present.
+	\\\hline
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+\includegraphics[scale=0.9]{RealRunStart.png}
+\caption{Screen shot of the terminal window showing the start up of the program and the robot's position on the occupancy grid when created.}
+\end{figure}
+
+\begin{figure}[H]
+\includegraphics[scale=1.0]{RealRunT1.png}
+\caption{Screen shot of the terminal window corresponding to the screen shot below. The robot first sensor sweep shows that it can only travel forward in the direction it started facing.}
+\end{figure}
+
+\begin{figure}[H]
+\includegraphics[scale=0.13]{RealS1.jpg}
+\caption{Photo showing the robot in its starting position facing forward with obstacles on all sides except directly in front of it. Corresponds to the terminal screen shot above.}
+\end{figure}
+
+\begin{figure}[H]
+\includegraphics[scale=1.0]{RealRunT2.png}
+\caption{Screen shot of the terminal window corresponding to the screen shot below. Once the robot has moved to the cell in front of it, the next sensor sweep still only provides the robot with one direction to move in, directly in front of it.}
+\end{figure}
+
+\begin{figure}[H]
+\includegraphics[scale=0.13]{RealS2.jpg}
+\caption{Photo showing the robot in the second cell corresponding to the terminal screen shot above.}
+\end{figure}
+
+\begin{figure}[H]
+\includegraphics[scale=1.0]{RealRunT3.png}
+\caption{Screen shot of the terminal window corresponding to the screen shot below. Once the robot has entered its third cell the sensor sweep shows that the robot has no obstacle on its left side.}
+\end{figure}
+
+\begin{figure}[H]
+\includegraphics[scale=0.13]{RealS3.jpg}
+\caption{Photo showing the robot in the third cell corresponding to the terminal screen shot above.}
+\end{figure}
+
+\begin{figure}[H]
+\includegraphics[scale=1.0]{RealRunT4.png}
+\caption{Screen shot of the terminal window corresponding to the screen shot below. One the robot has turned and entered its fourth cell the sensor sweep determines that there is no obstacle on its left side.}
+\end{figure}
+
+\begin{figure}[H]
+\includegraphics[scale=0.13]{RealS4.jpg}
+\caption{Photo showing the robot in the fourth cell corresponding to the terminal screen shot above.}
+\end{figure}
+
+\begin{figure}[H]
+\includegraphics[scale=1.0]{RealRunT5.png}
+\caption{Screen shot of the terminal window corresponding to the screen shot below. Once the robot enters its fifth cell the robot determines that it has finished exploring the area and returns the program to menu.}
+\end{figure}
+
+\begin{figure}[H]
+\includegraphics[scale=0.13]{RealS5.jpg}
+\caption{Photo showing the robot in the fifth and final cell corresponding to the terminal screen shot above.}
+\end{figure}
 
 \section{Discussion of trial run results}
 \noindent At the start it was expected that a lot of the simulated trial runs would finish prematurely due to a robot crash. This was in fact the case. Most of the time the robot would crash when turning and usually it was at the bottom of the simulated world where the robot tries to explore the upper section. Once it occurred that a 60cm by 60cm cell space was not sufficient to give the robot space to turn (explained in the evaluation section below) and this was amended to 70cm by 70cm cells, the robot managed to avoid getting too close to the walls so did not have problems when turning and was then able to complete a full successful map of the simulated area. This same result was replicated again when the function implemented to check that the robot had finished mapping needed testing.
