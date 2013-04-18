@@ -100,7 +100,7 @@ Hide and Seek}
 
 \begin{figure}[H]
 \includegraphics[scale=1.0]{RunT1.png}
-\caption{Screen shot of the terminal window corresponding to the screen shot below. Having mapped the the bottom area and hitting a dead end, the robot return along its path to the next available unexplored cell.}
+\caption{Having mapped the the bottom area and hitting a dead end, the robot return along its path to the next available unexplored cell.}
 \end{figure}
 
 \begin{figure}[H]
@@ -110,7 +110,7 @@ Hide and Seek}
 
 \begin{figure}[H]
 \includegraphics[scale=1.0]{RunT2.png}
-\caption{Screen shot of the terminal window corresponding to the screen shot below. Having found the next unexplored cell the robot starts to travel and map upwards.}
+\caption{Having found the next unexplored cell the robot starts to travel and map upwards.}
 \end{figure}
 
 \begin{figure}[H]
@@ -120,7 +120,7 @@ Hide and Seek}
 
 \begin{figure}[H]
 \includegraphics[scale=1.0]{RunT3.png}
-\caption{Screen shot of the terminal window corresponding to the screen shot below. Having reached the top the robot turns left as it is the only neighbour cell unexplored.}
+\caption{Having reached the top the robot turns left as it is the only neighbour cell unexplored.}
 \end{figure}
 
 \begin{figure}[H]
@@ -130,7 +130,7 @@ Hide and Seek}
 
 \begin{figure}[H]
 \includegraphics[scale=1.0]{RunT4.png}
-\caption{Screen shot of the terminal window corresponding to the screen shot below. Having scanned the left side all the way back to the pre-explored area, the robot turns to travel back along its path to the next unexplored cell.}
+\caption{Having scanned the left side all the way back to the pre-explored area, the robot turns to travel back along its path to the next unexplored cell.}
 \end{figure}
 
 \begin{figure}[H]
@@ -140,7 +140,7 @@ Hide and Seek}
 
 \begin{figure}[H]
 \includegraphics[scale=1.0]{RunT5.png}
-\caption{Screen shot of the terminal window corresponding to the screen shot below. Having reached a dead end, the robot evaluates if it has any cells left to explore. As it evaluates there are none, the mapping is declared finished.}
+\caption{Having reached a dead end, the robot evaluates if it has any cells left to explore. As it evaluates there are none, the mapping is declared finished.}
 \end{figure}
 
 \begin{figure}[H]
@@ -176,7 +176,7 @@ Hide and Seek}
 
 \begin{figure}[H]
 \includegraphics[scale=1.0]{RealRunT1.png}
-\caption{Screen shot of the terminal window corresponding to the screen shot below. The robot first sensor sweep shows that it can only travel forward in the direction it started facing.}
+\caption{The robot first sensor sweep shows that it can only travel forward in the direction it started facing.}
 \end{figure}
 
 \begin{figure}[H]
@@ -186,7 +186,7 @@ Hide and Seek}
 
 \begin{figure}[H]
 \includegraphics[scale=1.0]{RealRunT2.png}
-\caption{Screen shot of the terminal window corresponding to the screen shot below. Once the robot has moved to the cell in front of it, the next sensor sweep still only provides the robot with one direction to move in, directly in front of it.}
+\caption{Once the robot has moved to the cell in front of it, the next sensor sweep still only provides the robot with one direction to move in, directly in front of it.}
 \end{figure}
 
 \begin{figure}[H]
@@ -196,7 +196,7 @@ Hide and Seek}
 
 \begin{figure}[H]
 \includegraphics[scale=1.0]{RealRunT3.png}
-\caption{Screen shot of the terminal window corresponding to the screen shot below. Once the robot has entered its third cell the sensor sweep shows that the robot has no obstacle on its left side.}
+\caption{Once the robot has entered its third cell the sensor sweep shows that the robot has no obstacle on its left side.}
 \end{figure}
 
 \begin{figure}[H]
@@ -206,7 +206,7 @@ Hide and Seek}
 
 \begin{figure}[H]
 \includegraphics[scale=1.0]{RealRunT4.png}
-\caption{Screen shot of the terminal window corresponding to the screen shot below. One the robot has turned and entered its fourth cell the sensor sweep determines that there is no obstacle on its left side.}
+\caption{Once the robot has turned and entered its fourth cell the sensor sweep determines that there is no obstacle on its left side.}
 \end{figure}
 
 \begin{figure}[H]
@@ -216,7 +216,7 @@ Hide and Seek}
 
 \begin{figure}[H]
 \includegraphics[scale=1.0]{RealRunT5.png}
-\caption{Screen shot of the terminal window corresponding to the screen shot below. Once the robot enters its fifth cell the robot determines that it has finished exploring the area and returns the program to menu.}
+\caption{Once the robot enters its fifth cell the robot determines that it has finished exploring the area and returns the program to menu.}
 \end{figure}
 
 \begin{figure}[H]
@@ -228,7 +228,7 @@ Hide and Seek}
 \noindent At the start it was expected that a lot of the simulated trial runs would finish prematurely due to a robot crash. This was in fact the case. Most of the time the robot would crash when turning and usually it was at the bottom of the simulated world where the robot tries to explore the upper section. Once it occurred that a 60cm by 60cm cell space was not sufficient to give the robot space to turn (explained in the evaluation section below) and this was amended to 70cm by 70cm cells, the robot managed to avoid getting too close to the walls so did not have problems when turning and was then able to complete a full successful map of the simulated area. This same result was replicated again when the function implemented to check that the robot had finished mapping needed testing.
 
 \vspace{5mm}
-\noindent In terms of real world results, 
+\noindent In terms of real world results, it was hard to get enough time to test all of the functions implemented on the real pioneers. Only  real trials of the mapping algorithm could be ran. Also as the localisation, hiding and seeking can only be tested if a successful map was generated, no trials of these algorithms could be tested. The one successful real pioneer mapping trial (shown above) showed a perfect end map result. If more time were available, more tests would of been performed as one successful run can only show that the algorithms can work, but it would need testing in other environments multiple times.
 
 \section{Evaluation of work done}
 
